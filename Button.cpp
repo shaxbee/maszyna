@@ -1,23 +1,13 @@
-//---------------------------------------------------------------------------
-
-#include "system.hpp"
-#include "classes.hpp"
-#pragma hdrstop
-
 #include "Button.h"
 #include "Console.h"
 
-//---------------------------------------------------------------------------
-
-#pragma package(smart_init)
-
-__fastcall TButton::TButton()
+TButton::TButton()
 {
     iFeedbackBit = 0;
     Clear();
 };
 
-__fastcall TButton::~TButton(){};
+TButton::~TButton(){};
 
 void TButton::Clear(int i)
 {
@@ -26,15 +16,15 @@ void TButton::Clear(int i)
     bOn = false;
     if (i >= 0)
         FeedbackBitSet(i);
-    Update(); // kasowanie bitu Feedback, o ile jakiœ ustawiony
+    Update(); // kasowanie bitu Feedback, o ile jakiÅ› ustawiony
 };
 
-void TButton::Init(AnsiString asName, TModel3d *pModel, bool bNewOn)
+void TButton::Init(const std::string name, TModel3d *pModel, bool bNewOn)
 {
     if (!pModel)
-        return; // nie ma w czym szukaæ
-    pModelOn = pModel->GetFromName(AnsiString(asName + "_on").c_str());
-    pModelOff = pModel->GetFromName(AnsiString(asName + "_off").c_str());
+        return; // nie ma w czym szukaÄ‡
+    pModelOn = pModel->GetFromName(name + "_on");
+    pModelOff = pModel->GetFromName(name + "_off");
     bOn = bNewOn;
     Update();
 };
@@ -48,7 +38,7 @@ void TButton::Load(TQueryParserComp *Parser, TModel3d *pModel1, TModel3d *pModel
         if (pModel2)
             if (!pModelOn && !pModelOff)
                 Init(str, pModel2,
-                     false); // mo¿e w drugim bêdzie (jak nie w kabinie, to w zewnêtrznym)
+                     false); // moÅ¼e w drugim bÄ™dzie (jak nie w kabinie, to w zewnÄ™trznym)
     }
     else
     {
@@ -63,7 +53,7 @@ void TButton::Update()
         pModelOn->iVisible = bOn;
     if (pModelOff)
         pModelOff->iVisible = !bOn;
-    if (iFeedbackBit) // je¿eli generuje informacjê zwrotn¹
+    if (iFeedbackBit) // jeÅ¼eli generuje informacjÄ™ zwrotnÄ…
     {
         if (bOn) // zapalenie
             Console::BitsSet(iFeedbackBit);

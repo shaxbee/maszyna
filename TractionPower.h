@@ -29,9 +29,9 @@ class TTractionPowerSource
 
   protected:
   public: // zmienne publiczne
-    TTractionPowerSource *psNode[2]; // zasilanie na koñcach dla sekcji
-    bool bSection; // czy jest sekcj¹
-    TGroundNode *gMyNode; // Ra 2015-03: znowu prowizorka, aby mieæ nazwê do logowania
+    TTractionPowerSource *psNode[2]; // zasilanie na koÅ„cach dla sekcji
+    bool bSection; // czy jest sekcjÄ…
+    TGroundNode *gMyNode; // Ra 2015-03: znowu prowizorka, aby mieÄ‡ nazwÄ™ do logowania
   public:
     // AnsiString asName;
     TTractionPowerSource();

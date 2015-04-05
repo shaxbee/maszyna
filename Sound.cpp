@@ -1,204 +1,15 @@
-//---------------------------------------------------------------------------
-
-#include "system.hpp"
-#include "classes.hpp"
-#pragma hdrstop
-
-#define STRICT
 #include "Sound.h"
 #include "Usefull.h"
 #include "Globals.h"
-//#define SAFE_DELETE(p)  { if(p) { delete (p);     (p)=NULL; } }
-#define SAFE_RELEASE(p)     \
-    {                       \
-        if (p)              \
-        {                   \
-            (p)->Release(); \
-            (p) = NULL;     \
-        }                   \
-    }
 
-char Directory[] = "sounds\\";
+const std::string directory = "sounds\\";
 
-LPDIRECTSOUND TSoundsManager::pDS;
-LPDIRECTSOUNDNOTIFY TSoundsManager::pDSNotify;
-
-int TSoundsManager::Count = 0;
-TSoundContainer *TSoundsManager::First = NULL;
-
-__fastcall TSoundContainer::TSoundContainer(LPDIRECTSOUND pDS, char *Directory, char *strFileName,
-                                            int NConcurrent)
-{ // wczytanie pliku dŸwiêkowego
-    int hr = 111;
-    DSBuffer = NULL; // na pocz¹tek, gdyby uruchomiæ dŸwiêków siê nie uda³o
-
-    Concurrent = NConcurrent;
-
-    Oldest = 0;
-    //    strcpy(Name, strFileName);
-
-    strcpy(Name, Directory);
-    strcat(Name, strFileName);
-
-    CWaveSoundRead *pWaveSoundRead;
-
-    // Create a new wave file class
-    pWaveSoundRead = new CWaveSoundRead();
-
-    // Load the wave file
-    if (FAILED(pWaveSoundRead->Open(Name)))
-        if (FAILED(pWaveSoundRead->Open(strFileName)))
-        {
-            //        SetFileUI( hDlg, TEXT("Bad wave file.") );
-            return;
-            ErrorLog("Missed sound: " + AnsiString(strFileName));
-        }
-
-    strcpy(Name, AnsiString(strFileName).LowerCase().c_str());
-
-    // Set up the direct sound buffer, and only request the flags needed
-    // since each requires some overhead and limits if the buffer can
-    // be hardware accelerated
-    DSBUFFERDESC dsbd;
-    ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
-    dsbd.dwSize = sizeof(DSBUFFERDESC);
-    dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY;
-    if (!Global::bInactivePause) // jeœli prze³¹czony w t³o ma nadal dzia³aæ
-        dsbd.dwFlags |= DSBCAPS_GLOBALFOCUS; // to dŸwiêki maj¹ byæ równie¿ s³yszalne
-    dsbd.dwBufferBytes = pWaveSoundRead->m_ckIn.cksize;
-    dsbd.lpwfxFormat = pWaveSoundRead->m_pwfx;
-    fSamplingRate = pWaveSoundRead->m_pwfx->nSamplesPerSec;
-    iBitsPerSample = pWaveSoundRead->m_pwfx->wBitsPerSample;
-
-    //    pDSBuffer= (LPDIRECTSOUNDBUFFER*) malloc(Concurrent*sizeof(LPDIRECTSOUNDBUFFER));
-    //    for (int i=0; i<Concurrent; i++)
-    //      pDSBuffer[i]= NULL;
-
-    // Create the static DirectSound buffer
-    if (FAILED(hr = pDS->CreateSoundBuffer(&dsbd, &(DSBuffer), NULL)))
-        // if (FAILED(pDS->CreateSoundBuffer(&dsbd,&(DSBuffer),NULL)))
-        return;
-
-    // Remember how big the buffer is
-    DWORD dwBufferBytes;
-
-    dwBufferBytes = dsbd.dwBufferBytes;
-
-    //----------------------------------------------------------
-
-    BYTE *pbWavData; // Pointer to actual wav data
-    UINT cbWavSize;  // Size of data
-    VOID *pbData = NULL;
-    VOID *pbData2 = NULL;
-    DWORD dwLength;
-    DWORD dwLength2;
-
-    // The size of wave data is in pWaveFileSound->m_ckIn
-    INT nWaveFileSize = pWaveSoundRead->m_ckIn.cksize;
-
-    // Allocate that buffer.
-    pbWavData = new BYTE[nWaveFileSize];
-    if (NULL == pbWavData)
-        return; // E_OUTOFMEMORY;
-
-    // if (FAILED(hr=pWaveSoundRead->Read( nWaveFileSize,pbWavData,&cbWavSize)))
-    if (FAILED(hr = pWaveSoundRead->Read(nWaveFileSize, pbWavData, &cbWavSize)))
-        return;
-
-    // Reset the file to the beginning
-    pWaveSoundRead->Reset();
-
-    // Lock the buffer down
-    // if (FAILED(hr=DSBuffer->Lock(0,dwBufferBytes,&pbData,&dwLength,&pbData2,&dwLength2,0)))
-    if (FAILED(hr = DSBuffer->Lock(0, dwBufferBytes, &pbData, &dwLength, &pbData2, &dwLength2, 0L)))
-        return;
-
-    // Copy the memory to it.
-    memcpy(pbData, pbWavData, dwBufferBytes);
-
-    // Unlock the buffer, we don't need it anymore.
-    DSBuffer->Unlock(pbData, dwBufferBytes, NULL, 0);
-    pbData = NULL;
-
-    // We dont need the wav file data buffer anymore, so delete it
-    delete[] pbWavData;
-
-    delete pWaveSoundRead;
-
-    DSBuffers.push(DSBuffer);
-
-    /*
-        for (int i=1; i<Concurrent; i++)
-        {
-            if( FAILED( hr= pDS->DuplicateSoundBuffer(pDSBuffer[0],&(pDSBuffer[i]))))
-            {
-                Concurrent= i;
-                break;
-            };
-
-
-        };*/
-};
-__fastcall TSoundContainer::~TSoundContainer()
-{
-    //    for (int i=Concurrent-1; i>=0; i--)
-    //        SAFE_RELEASE( pDSBuffer[i] );
-    //    free(pDSBuffer);
-    while (!DSBuffers.empty())
-    {
-        SAFE_RELEASE(DSBuffers.top());
-        DSBuffers.pop();
-    }
-    SafeDelete(Next);
-};
-
-LPDIRECTSOUNDBUFFER TSoundContainer::GetUnique(LPDIRECTSOUND pDS)
-{
-    if (!DSBuffer)
-        return NULL;
-    // jeœli siê dobrze zainicjowa³o
-    LPDIRECTSOUNDBUFFER buff;
-    pDS->DuplicateSoundBuffer(DSBuffer, &buff);
-    if (buff)
-        DSBuffers.push(buff);
-    return DSBuffers.top();
-};
-
-__fastcall TSoundsManager::~TSoundsManager() { Free(); };
-
-void TSoundsManager::Free()
-{
-    SafeDelete(First);
-    SAFE_RELEASE(pDS);
-};
-
-TSoundContainer *__fastcall TSoundsManager::LoadFromFile(char *Dir, char *Name, int Concurrent)
-{
-    TSoundContainer *Tmp = First;
-    First = new TSoundContainer(pDS, Dir, Name, Concurrent);
-    First->Next = Tmp;
-    Count++;
-    return First; // albo NULL, jak nie wyjdzie (na razie zawsze wychodzi)
-};
-
-void TSoundsManager::LoadSounds(char *Directory)
-{ // wczytanie wszystkich plików z katalogu - ma³o elastyczne
-    WIN32_FIND_DATA FindFileData;
-    HANDLE handle = FindFirstFile("sounds\\*.wav", &FindFileData);
-    if (handle != INVALID_HANDLE_VALUE)
-        do
-        {
-            LoadFromFile(Directory, FindFileData.cFileName, 1);
-        } while (FindNextFile(handle, &FindFileData));
-    FindClose(handle);
-};
-
-LPDIRECTSOUNDBUFFER TSoundsManager::GetFromName(char *Name, bool Dynamic,
+ALuint TSoundsManager::GetFromName(char *Name, bool Dynamic,
                                                            float *fSamplingRate)
-{ // wyszukanie dŸwiêku w pamiêci albo wczytanie z pliku
+{ // wyszukanie dÅºwiÄ™ku w pamiÄ™ci albo wczytanie z pliku
     AnsiString file;
     if (Dynamic)
-    { // próba wczytania z katalogu pojazdu
+    { // prÃ³ba wczytania z katalogu pojazdu
         file = Global::asCurrentDynamicPath + AnsiString(Name);
         if (FileExists(file))
             Name = file.c_str(); // nowa nazwa
@@ -212,7 +23,7 @@ LPDIRECTSOUNDBUFFER TSoundsManager::GetFromName(char *Name, bool Dynamic,
         if (strcmp(Name, Next->Name) == 0)
         {
             if (fSamplingRate)
-                *fSamplingRate = Next->fSamplingRate; // czêstotliwoœæ
+                *fSamplingRate = Next->fSamplingRate; // czÄ™stotliwoÅ›Ä‡
             return (Next->GetUnique(pDS));
             //      DSBuffers.
             /*
@@ -247,7 +58,7 @@ LPDIRECTSOUNDBUFFER TSoundsManager::GetFromName(char *Name, bool Dynamic,
     if (Next)
     { //
         if (fSamplingRate)
-            *fSamplingRate = Next->fSamplingRate; // czêstotliwoœæ
+            *fSamplingRate = Next->fSamplingRate; // czÄ™stotliwoÅ›Ä‡
         return Next->GetUnique(pDS);
     }
     ErrorLog("Missed sound: " + AnsiString(Name));
@@ -340,8 +151,8 @@ void TSoundsManager::Init(HWND hWnd)
     ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
     dsbd.dwSize = sizeof(DSBUFFERDESC);
     dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER;
-    if (!Global::bInactivePause) // jeœli prze³¹czony w t³o ma nadal dzia³aæ
-        dsbd.dwFlags |= DSBCAPS_GLOBALFOCUS; // to dŸwiêki maj¹ byæ równie¿ s³yszalne
+    if (!Global::bInactivePause) // jeÅ›li przeÅ‚Ä…czony w tÅ‚o ma nadal dziaÅ‚aÄ‡
+        dsbd.dwFlags |= DSBCAPS_GLOBALFOCUS; // to dÅºwiÄ™ki majÄ… byÄ‡ rÃ³wnieÅ¼ sÅ‚yszalne
     dsbd.dwBufferBytes = 0;
     dsbd.lpwfxFormat = NULL;
 

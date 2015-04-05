@@ -14,7 +14,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // cParser -- generic class for parsing text data, either from file or provided string
 
-class cParser : public std::stringstream
+class cParser
 {
   public:
     // parameters:
@@ -28,12 +28,12 @@ class cParser : public std::stringstream
             bool tr = true);
     // destructor:
     virtual ~cParser();
+
     // methods:
-    template <typename OutputT> inline void getToken(OutputT &output)
-    {
-        getTokens();
-        *this >> output;
-    };
+    std::string readString() { return readToken(); }
+    int readInt() { return std::stoi(readToken()); }
+    double readDouble() { return std::stof(readToken()); }
+
     inline void ignoreToken() { readToken(); };
     inline void ignoreTokens(int count)
     {

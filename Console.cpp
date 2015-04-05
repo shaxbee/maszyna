@@ -11,45 +11,45 @@
 
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
-// Ra: klasa statyczna gromadz¹ca sygna³y steruj¹ce oraz informacje zwrotne
-// Ra: stan wejœcia zmieniany klawiatur¹ albo dedykowanym urz¹dzeniem
-// Ra: stan wyjœcia zmieniany przez symulacjê (mierniki, kontrolki)
+// Ra: klasa statyczna gromadzÄ…ca sygnaÅ‚y sterujÄ…ce oraz informacje zwrotne
+// Ra: stan wejÅ›cia zmieniany klawiaturÄ… albo dedykowanym urzÄ…dzeniem
+// Ra: stan wyjÅ›cia zmieniany przez symulacjÄ™ (mierniki, kontrolki)
 
 /*******************************
-Do klawisza klawiatury przypisana jest maska bitowa oraz numer wejœcia.
-Naciœniêcie klawisza powoduje wywo³anie procedury ustawienia bitu o podanej
-masce na podanym wejœciu. Zwonienie klawisza analogicznie wywo³uje zerowanie
+Do klawisza klawiatury przypisana jest maska bitowa oraz numer wejÅ›cia.
+NaciÅ›niÄ™cie klawisza powoduje wywoÅ‚anie procedury ustawienia bitu o podanej
+masce na podanym wejÅ›ciu. Zwonienie klawisza analogicznie wywoÅ‚uje zerowanie
 bitu wg maski. Zasadniczo w masce ustawiony jest jeden bit, ale w razie
-potrzeby mo¿e byæ ich wiêcej.
+potrzeby moÅ¼e byÄ‡ ich wiÄ™cej.
 
-Oddzielne wejœcia s¹ wprowadzone po to, by mo¿na by³o u¿ywaæ wiêcej ni¿ 32
-bity do sterowania. Podzia³ na wejœcia jest równie¿ ze wzglêdów organizacyjnych,
-np. sterowanie œwiat³ami mo¿e mieæ oddzielny numer wejœcia ni¿ prze³¹czanie
-radia, poniewa¿ nie ma potrzeby ich uzale¿niaæ (tzn. badaæ wspóln¹ maskê bitow¹).
+Oddzielne wejÅ›cia sÄ… wprowadzone po to, by moÅ¼na byÅ‚o uÅ¼ywaÄ‡ wiÄ™cej niÅ¼ 32
+bity do sterowania. PodziaÅ‚ na wejÅ›cia jest rÃ³wnieÅ¼ ze wzglÄ™dÃ³w organizacyjnych,
+np. sterowanie Å›wiatÅ‚ami moÅ¼e mieÄ‡ oddzielny numer wejÅ›cia niÅ¼ przeÅ‚Ä…czanie
+radia, poniewaÅ¼ nie ma potrzeby ich uzaleÅ¼niaÄ‡ (tzn. badaÄ‡ wspÃ³lnÄ… maskÄ™ bitowÄ…).
 
-Do ka¿dego wejœcia podpiêty jest skrypt binarny, charakterystyczny dla danej
-konstrukcji pojazdu. Sprawdza on zale¿noœci (w tym uszkodzenia) za pomoc¹
-operacji logicznych na maskach bitowych. Do ka¿dego wejœcia jest przypisana
-jedna, oddzielna maska 32 bit, ale w razie potrzeby istnieje te¿ mo¿liwoœæ
-korzystania z masek innych wejœæ. Skrypt mo¿e te¿ wysy³aæ maski na inne wejœcia,
-ale nale¿y unikaæ rekurencji.
+Do kaÅ¼dego wejÅ›cia podpiÄ™ty jest skrypt binarny, charakterystyczny dla danej
+konstrukcji pojazdu. Sprawdza on zaleÅ¼noÅ›ci (w tym uszkodzenia) za pomocÄ…
+operacji logicznych na maskach bitowych. Do kaÅ¼dego wejÅ›cia jest przypisana
+jedna, oddzielna maska 32 bit, ale w razie potrzeby istnieje teÅ¼ moÅ¼liwoÅ›Ä‡
+korzystania z masek innych wejÅ›Ä‡. Skrypt moÅ¼e teÅ¼ wysyÅ‚aÄ‡ maski na inne wejÅ›cia,
+ale naleÅ¼y unikaÄ‡ rekurencji.
 
-Definiowanie wejœæ oraz przeznaczenia ich masek jest w gestii konstruktora
-skryptu. Ka¿dy pojazd mo¿e mieæ inny schemat wejœæ i masek, ale w miarê mo¿liwoœci
-nale¿y d¹¿yæ do unifikacji. Skrypty mog¹ równie¿ u¿ywaæ dodatkowych masek bitowych.
-Maski bitowe odpowiadaj¹ stanom prze³¹czników, czujników, styczników itd.
+Definiowanie wejÅ›Ä‡ oraz przeznaczenia ich masek jest w gestii konstruktora
+skryptu. KaÅ¼dy pojazd moÅ¼e mieÄ‡ inny schemat wejÅ›Ä‡ i masek, ale w miarÄ™ moÅ¼liwoÅ›ci
+naleÅ¼y dÄ…Å¼yÄ‡ do unifikacji. Skrypty mogÄ… rÃ³wnieÅ¼ uÅ¼ywaÄ‡ dodatkowych masek bitowych.
+Maski bitowe odpowiadajÄ… stanom przeÅ‚Ä…cznikÃ³w, czujnikÃ³w, stycznikÃ³w itd.
 
-Dzia³anie jest nastêpuj¹ce:
+DziaÅ‚anie jest nastÄ™pujÄ…ce:
 - na klawiaturze konsoli naciskany jest przycisk
-- naciœniêcie przycisku zamieniane jest na maskê bitow¹ oraz numer wejœcia
-- wywo³ywany jest skrypt danego wejœcia z ow¹ mask¹
-- skrypt sprawdza zale¿noœci i np. modyfikuje w³asnoœci fizyki albo inne maski
-- ewentualnie do wyzwalacza czasowego dodana jest maska i numer wejœcia
+- naciÅ›niÄ™cie przycisku zamieniane jest na maskÄ™ bitowÄ… oraz numer wejÅ›cia
+- wywoÅ‚ywany jest skrypt danego wejÅ›cia z owÄ… maskÄ…
+- skrypt sprawdza zaleÅ¼noÅ›ci i np. modyfikuje wÅ‚asnoÅ›ci fizyki albo inne maski
+- ewentualnie do wyzwalacza czasowego dodana jest maska i numer wejÅ›cia
 
 /*******************************/
 
 /* //kod do przetrawienia:
-//aby siê nie w³¹czacz wygaszacz ekranu, co jakiœ czas naciska siê wirtualnie ScrollLock
+//aby siÄ™ nie wÅ‚Ä…czacz wygaszacz ekranu, co jakiÅ› czas naciska siÄ™ wirtualnie ScrollLock
 
 [DllImport("user32.dll")]
 static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
@@ -96,19 +96,19 @@ void SetLedState(char Code, bool bOn)
 
 //---------------------------------------------------------------------------
 
-int Console::iBits = 0; // zmienna statyczna - obiekt Console jest jednen wspólny
+int Console::iBits = 0; // zmienna statyczna - obiekt Console jest jednen wspÃ³lny
 int Console::iMode = 0;
 int Console::iConfig = 0;
 TPoKeys55 *Console::PoKeys55[2] = {NULL, NULL};
 TLPT *Console::LPT = NULL;
-int Console::iSwitch[8]; // bistabilne w kabinie, za³¹czane z [Shift], wy³¹czane bez
-int Console::iButton[8]; // monostabilne w kabinie, za³¹czane podczas trzymania klawisza
+int Console::iSwitch[8]; // bistabilne w kabinie, zaÅ‚Ä…czane z [Shift], wyÅ‚Ä…czane bez
+int Console::iButton[8]; // monostabilne w kabinie, zaÅ‚Ä…czane podczas trzymania klawisza
 
 __fastcall Console::Console()
 {
     PoKeys55[0] = PoKeys55[1] = NULL;
     for (int i = 0; i < 8; ++i)
-    { // zerowanie prze³¹czników
+    { // zerowanie przeÅ‚Ä…cznikÃ³w
         iSwitch[i] = 0; // bity 0..127 - bez [Ctrl], 128..255 - z [Ctrl]
         iButton[i] = 0; // bity 0..127 - bez [Shift], 128..255 - z [Shift]
     }
@@ -127,24 +127,24 @@ void Console::ModeSet(int m, int h)
 };
 
 int Console::On()
-{ // za³¹czenie konsoli (np. nawi¹zanie komunikacji)
+{ // zaÅ‚Ä…czenie konsoli (np. nawiÄ…zanie komunikacji)
     iSwitch[0] = iSwitch[1] = iSwitch[2] = iSwitch[3] = 0; // bity 0..127 - bez [Ctrl]
     iSwitch[4] = iSwitch[5] = iSwitch[6] = iSwitch[7] = 0; // bity 128..255 - z [Ctrl]
     switch (iMode)
     {
     case 1: // kontrolki klawiatury
     case 2: // kontrolki klawiatury
-        iConfig = 0; // licznik u¿ycia Scroll Lock
+        iConfig = 0; // licznik uÅ¼ycia Scroll Lock
         break;
     case 3: // LPT
         LPT = new TLPT(); // otwarcie inpout32.dll
         if (LPT ? LPT->Connect(iConfig) : false)
-        { // wys³aæ 0?
-            BitsUpdate(-1); // aktualizacjia stanów, bo przy wczytywaniu mog³o byæ nieaktywne
+        { // wysÅ‚aÄ‡ 0?
+            BitsUpdate(-1); // aktualizacjia stanÃ³w, bo przy wczytywaniu mogÅ‚o byÄ‡ nieaktywne
             WriteLog("Feedback Mode 3: InpOut32.dll OK");
         }
         else
-        { // po³¹czenie nie wysz³o, ma byæ NULL
+        { // poÅ‚Ä…czenie nie wyszÅ‚o, ma byÄ‡ NULL
             delete LPT;
             LPT = NULL;
         }
@@ -154,10 +154,10 @@ int Console::On()
         if (PoKeys55[0] ? PoKeys55[0]->Connect() : false)
         {
             WriteLog("Found " + PoKeys55[0]->Version());
-            BitsUpdate(-1); // aktualizacjia stanów, bo przy wczytywaniu mog³o byæ nieaktywne
+            BitsUpdate(-1); // aktualizacjia stanÃ³w, bo przy wczytywaniu mogÅ‚o byÄ‡ nieaktywne
         }
         else
-        { // po³¹czenie nie wysz³o, ma byæ NULL
+        { // poÅ‚Ä…czenie nie wyszÅ‚o, ma byÄ‡ NULL
             delete PoKeys55[0];
             PoKeys55[0] = NULL;
         }
@@ -167,12 +167,12 @@ int Console::On()
 };
 
 void Console::Off()
-{ // wy³¹czenie informacji zwrotnych (reset pulpitu)
+{ // wyÅ‚Ä…czenie informacji zwrotnych (reset pulpitu)
     BitsClear(-1);
     if ((iMode == 1) || (iMode == 2))
-        if (iConfig & 1) // licznik u¿ycia Scroll Lock
-        { // bez sensu to jest, ale mi siê samo w³¹cza
-            SetLedState(VK_SCROLL, true); // przyciœniêty
+        if (iConfig & 1) // licznik uÅ¼ycia Scroll Lock
+        { // bez sensu to jest, ale mi siÄ™ samo wÅ‚Ä…cza
+            SetLedState(VK_SCROLL, true); // przyciÅ›niÄ™ty
             SetLedState(VK_SCROLL, false); // zwolniony
         }
     delete PoKeys55[0];
@@ -184,93 +184,93 @@ void Console::Off()
 };
 
 void Console::BitsSet(int mask, int entry)
-{ // ustawienie bitów o podanej masce (mask) na wejœciu (entry)
-    if ((iBits & mask) != mask) // je¿eli zmiana
+{ // ustawienie bitÃ³w o podanej masce (mask) na wejÅ›ciu (entry)
+    if ((iBits & mask) != mask) // jeÅ¼eli zmiana
     {
         int old = iBits; // poprzednie stany
         iBits |= mask;
-        BitsUpdate(old ^ iBits); // 1 dla bitów zmienionych
+        BitsUpdate(old ^ iBits); // 1 dla bitÃ³w zmienionych
     }
 };
 
 void Console::BitsClear(int mask, int entry)
-{ // zerowanie bitów o podanej masce (mask) na wejœciu (entry)
-    if (iBits & mask) // je¿eli zmiana
+{ // zerowanie bitÃ³w o podanej masce (mask) na wejÅ›ciu (entry)
+    if (iBits & mask) // jeÅ¼eli zmiana
     {
         int old = iBits; // poprzednie stany
         iBits &= ~mask;
-        BitsUpdate(old ^ iBits); // 1 dla bitów zmienionych
+        BitsUpdate(old ^ iBits); // 1 dla bitÃ³w zmienionych
     }
 };
 
 void Console::BitsUpdate(int mask)
-{ // aktualizacja stanu interfejsu informacji zwrotnej; (mask) - zakres zmienianych bitów
+{ // aktualizacja stanu interfejsu informacji zwrotnej; (mask) - zakres zmienianych bitÃ³w
     switch (iMode)
     {
-    case 1: // sterowanie œwiate³kami klawiatury: CA/SHP+opory
+    case 1: // sterowanie Å›wiateÅ‚kami klawiatury: CA/SHP+opory
         if (mask & 3) // gdy SHP albo CA
             SetLedState(VK_CAPITAL, iBits & 3);
         if (mask & 4) // gdy jazda na oporach
-        { // Scroll Lock ma jakoœ dziwnie... zmiana stanu na przeciwny
-            SetLedState(VK_SCROLL, true); // przyciœniêty
+        { // Scroll Lock ma jakoÅ› dziwnie... zmiana stanu na przeciwny
+            SetLedState(VK_SCROLL, true); // przyciÅ›niÄ™ty
             SetLedState(VK_SCROLL, false); // zwolniony
-            ++iConfig; // licznik u¿ycia Scroll Lock
+            ++iConfig; // licznik uÅ¼ycia Scroll Lock
         }
         break;
-    case 2: // sterowanie œwiate³kami klawiatury: CA+SHP
+    case 2: // sterowanie Å›wiateÅ‚kami klawiatury: CA+SHP
         if (mask & 2) // gdy CA
             SetLedState(VK_CAPITAL, iBits & 2);
         if (mask & 1) // gdy SHP
-        { // Scroll Lock ma jakoœ dziwnie... zmiana stanu na przeciwny
-            SetLedState(VK_SCROLL, true); // przyciœniêty
+        { // Scroll Lock ma jakoÅ› dziwnie... zmiana stanu na przeciwny
+            SetLedState(VK_SCROLL, true); // przyciÅ›niÄ™ty
             SetLedState(VK_SCROLL, false); // zwolniony
-            ++iConfig; // licznik u¿ycia Scroll Lock
+            ++iConfig; // licznik uÅ¼ycia Scroll Lock
         }
         break;
-    case 3: // LPT Marcela z modyfikacj¹ (jazda na oporach zamiast brzêczyka)
+    case 3: // LPT Marcela z modyfikacjÄ… (jazda na oporach zamiast brzÄ™czyka)
         if (LPT)
             LPT->Out(iBits);
         break;
-    case 4: // PoKeys55 wg Marcela - wersja druga z koñca 2012
+    case 4: // PoKeys55 wg Marcela - wersja druga z koÅ„ca 2012
         if (PoKeys55[0])
-        { // pewnie trzeba bêdzie to dodatkowo buforowaæ i oczekiwaæ na potwierdzenie
+        { // pewnie trzeba bÄ™dzie to dodatkowo buforowaÄ‡ i oczekiwaÄ‡ na potwierdzenie
             if (mask & 0x0001) // b0 gdy SHP
                 PoKeys55[0]->Write(0x40, 23 - 1, iBits & 0x0001 ? 1 : 0);
             if (mask & 0x0002) // b1 gdy zmieniony CA
                 PoKeys55[0]->Write(0x40, 24 - 1, iBits & 0x0002 ? 1 : 0);
             if (mask & 0x0004) // b2 gdy jazda na oporach
                 PoKeys55[0]->Write(0x40, 32 - 1, iBits & 0x0004 ? 1 : 0);
-            if (mask & 0x0008) // b3 Lampka WS (wy³¹cznika szybkiego)
+            if (mask & 0x0008) // b3 Lampka WS (wyÅ‚Ä…cznika szybkiego)
                 PoKeys55[0]->Write(0x40, 25 - 1, iBits & 0x0008 ? 1 : 0);
-            if (mask & 0x0010) // b4 Lampka przekaŸnika nadmiarowego silników trakcyjnych
+            if (mask & 0x0010) // b4 Lampka przekaÅºnika nadmiarowego silnikÃ³w trakcyjnych
                 PoKeys55[0]->Write(0x40, 27 - 1, iBits & 0x0010 ? 1 : 0);
-            if (mask & 0x0020) // b5 Lampka styczników liniowych
+            if (mask & 0x0020) // b5 Lampka stycznikÃ³w liniowych
                 PoKeys55[0]->Write(0x40, 29 - 1, iBits & 0x0020 ? 1 : 0);
-            if (mask & 0x0040) // b6 Lampka poœlizgu
+            if (mask & 0x0040) // b6 Lampka poÅ›lizgu
                 PoKeys55[0]->Write(0x40, 30 - 1, iBits & 0x0040 ? 1 : 0);
             if (mask & 0x0080) // b7 Lampka "przetwornicy"
                 PoKeys55[0]->Write(0x40, 28 - 1, iBits & 0x0080 ? 1 : 0);
-            if (mask & 0x0100) // b8 Kontrolka przekaŸnika nadmiarowego sprê¿arki
+            if (mask & 0x0100) // b8 Kontrolka przekaÅºnika nadmiarowego sprÄ™Å¼arki
                 PoKeys55[0]->Write(0x40, 33 - 1, iBits & 0x0100 ? 1 : 0);
-            if (mask & 0x0200) // b9 Kontrolka sygnalizacji wentylatorów i oporów
+            if (mask & 0x0200) // b9 Kontrolka sygnalizacji wentylatorÃ³w i oporÃ³w
                 PoKeys55[0]->Write(0x40, 26 - 1, iBits & 0x0200 ? 1 : 0);
             if (mask & 0x0400) // b10 Kontrolka wysokiego rozruchu
                 PoKeys55[0]->Write(0x40, 31 - 1, iBits & 0x0400 ? 1 : 0);
-            if (mask & 0x0800) // b11 Kontrolka ogrzewania poci¹gu
+            if (mask & 0x0800) // b11 Kontrolka ogrzewania pociÄ…gu
                 PoKeys55[0]->Write(0x40, 34 - 1, iBits & 0x0800 ? 1 : 0);
-            if (mask & 0x1000) // b12 Ciœnienie w cylindrach do odbijania w haslerze
+            if (mask & 0x1000) // b12 CiÅ›nienie w cylindrach do odbijania w haslerze
                 PoKeys55[0]->Write(0x40, 52 - 1, iBits & 0x1000 ? 1 : 0);
-            if (mask & 0x2000) // b13 Pr¹d na silnikach do odbijania w haslerze
+            if (mask & 0x2000) // b13 PrÄ…d na silnikach do odbijania w haslerze
                 PoKeys55[0]->Write(0x40, 53 - 1, iBits & 0x2000 ? 1 : 0);
         }
         break;
     }
 };
 
-bool Console::Pressed(int x) { // na razie tak - czyta siê tylko klawiatura return Global::bActive && (GetKeyState(x) < 0); };
+bool Console::Pressed(int x) { // na razie tak - czyta siÄ™ tylko klawiatura return Global::bActive && (GetKeyState(x) < 0); };
 
 void Console::ValueSet(int x, double y)
-{ // ustawienie wartoœci (y) na kanale analogowym (x)
+{ // ustawienie wartoÅ›ci (y) na kanale analogowym (x)
     if (iMode == 4)
         if (PoKeys55[0])
         {
@@ -283,24 +283,24 @@ void Console::ValueSet(int x, double y)
 };
 
 void Console::Update()
-{ // funkcja powinna byæ wywo³ywana regularnie, np. raz w ka¿dej ramce ekranowej
+{ // funkcja powinna byÄ‡ wywoÅ‚ywana regularnie, np. raz w kaÅ¼dej ramce ekranowej
     if (iMode == 4)
         if (PoKeys55[0])
             if (PoKeys55[0]->Update((Global::iPause & 8) > 0))
-            { // wykrycie przestawionych prze³¹czników?
+            { // wykrycie przestawionych przeÅ‚Ä…cznikÃ³w?
                 Global::iPause &= ~8;
             }
             else
-            { // b³¹d komunikacji - zapauzowaæ symulacjê?
-                if (!(Global::iPause & 8)) // jeœli jeszcze nie oflagowana
+            { // bÅ‚Ä…d komunikacji - zapauzowaÄ‡ symulacjÄ™?
+                if (!(Global::iPause & 8)) // jeÅ›li jeszcze nie oflagowana
                     Global::iTextMode = VK_F1; // pokazanie czasu/pauzy
                 Global::iPause |= 8; // tak???
-                PoKeys55[0]->Connect(); // próba ponownego pod³¹czenia
+                PoKeys55[0]->Connect(); // prÃ³ba ponownego podÅ‚Ä…czenia
             }
 };
 
 float Console::AnalogGet(int x)
-{ // pobranie wartoœci analogowej
+{ // pobranie wartoÅ›ci analogowej
     if (iMode == 4)
         if (PoKeys55[0])
             return PoKeys55[0]->fAnalog[x];
@@ -308,7 +308,7 @@ float Console::AnalogGet(int x)
 };
 
 unsigned char Console::DigitalGet(int x)
-{ // pobranie wartoœci cyfrowej
+{ // pobranie wartoÅ›ci cyfrowej
     if (iMode == 4)
         if (PoKeys55[0])
             return PoKeys55[0]->iInputs[x];
@@ -316,35 +316,35 @@ unsigned char Console::DigitalGet(int x)
 };
 
 void Console::OnKeyDown(int k)
-{ // naciœniêcie klawisza z powoduje wy³¹czenie, a
-    if (k & 0x10000) // jeœli [Shift]
-    { // ustawienie bitu w tabeli prze³¹czników bistabilnych
-        if (k & 0x20000) // jeœli [Ctrl], to zestaw dodatkowy
-            iSwitch[4 + (char(k) >> 5)] |= 1 << (k & 31); // za³¹cz bistabliny dodatkowy
+{ // naciÅ›niÄ™cie klawisza z powoduje wyÅ‚Ä…czenie, a
+    if (k & 0x10000) // jeÅ›li [Shift]
+    { // ustawienie bitu w tabeli przeÅ‚Ä…cznikÃ³w bistabilnych
+        if (k & 0x20000) // jeÅ›li [Ctrl], to zestaw dodatkowy
+            iSwitch[4 + (char(k) >> 5)] |= 1 << (k & 31); // zaÅ‚Ä…cz bistabliny dodatkowy
         else
-        { // z [Shift] w³¹czenie bitu bistabilnego i dodatkowego monostabilnego
-            iSwitch[char(k) >> 5] |= 1 << (k & 31); // za³¹cz bistabliny podstawowy
-            iButton[4 + (char(k) >> 5)] |= (1 << (k & 31)); // za³¹cz monostabilny dodatkowy
+        { // z [Shift] wÅ‚Ä…czenie bitu bistabilnego i dodatkowego monostabilnego
+            iSwitch[char(k) >> 5] |= 1 << (k & 31); // zaÅ‚Ä…cz bistabliny podstawowy
+            iButton[4 + (char(k) >> 5)] |= (1 << (k & 31)); // zaÅ‚Ä…cz monostabilny dodatkowy
         }
     }
     else
-    { // zerowanie bitu w tabeli prze³¹czników bistabilnych
-        if (k & 0x20000) // jeœli [Ctrl], to zestaw dodatkowy
-            iSwitch[4 + (char(k) >> 5)] &= ~(1 << (k & 31)); // wy³¹cz bistabilny dodatkowy
+    { // zerowanie bitu w tabeli przeÅ‚Ä…cznikÃ³w bistabilnych
+        if (k & 0x20000) // jeÅ›li [Ctrl], to zestaw dodatkowy
+            iSwitch[4 + (char(k) >> 5)] &= ~(1 << (k & 31)); // wyÅ‚Ä…cz bistabilny dodatkowy
         else
         {
-            iSwitch[char(k) >> 5] &= ~(1 << (k & 31)); // wy³¹cz bistabilny podstawowy
-            iButton[char(k) >> 5] |= 1 << (k & 31); // za³¹cz monostabilny podstawowy
+            iSwitch[char(k) >> 5] &= ~(1 << (k & 31)); // wyÅ‚Ä…cz bistabilny podstawowy
+            iButton[char(k) >> 5] |= 1 << (k & 31); // zaÅ‚Ä…cz monostabilny podstawowy
         }
     }
 };
 void Console::OnKeyUp(int k)
 { // puszczenie klawisza w zasadzie nie ma znaczenia dla iSwitch, ale zeruje iButton
     if ((k & 0x20000) == 0) // monostabilne tylko bez [Ctrl]
-        if (k & 0x10000) // jeœli [Shift]
-            iButton[4 + (char(k) >> 5)] &= ~(1 << (k & 31)); // wy³¹cz monostabilny dodatkowy
+        if (k & 0x10000) // jeÅ›li [Shift]
+            iButton[4 + (char(k) >> 5)] &= ~(1 << (k & 31)); // wyÅ‚Ä…cz monostabilny dodatkowy
         else
-            iButton[char(k) >> 5] &= ~(1 << (k & 31)); // wy³¹cz monostabilny podstawowy
+            iButton[char(k) >> 5] &= ~(1 << (k & 31)); // wyÅ‚Ä…cz monostabilny podstawowy
 };
 int Console::KeyDownConvert(int k) { return int(ktTable[k & 0x3FF].iDown); };
 int Console::KeyUpConvert(int k) { return int(ktTable[k & 0x3FF].iUp); };

@@ -3,14 +3,14 @@
 #ifndef DataH
 #define DataH
 //---------------------------------------------------------------------------
-// Modu≥ z danymi
+// Modu≈Ç z danymi
 //---------------------------------------------------------------------------
 
 struct TDist
 {
     int x, y;
 };
-const TDist SectorOrder[] = { // tabela wspÛ≥rzÍdnych sektorÛw, posortowana wg odleg≥oúci
+const TDist SectorOrder[] = { // tabela wsp√≥≈Çrzƒôdnych sektor√≥w, posortowana wg odleg≈Ço≈õci
     {0, 0}, // 0.00
     {1, 0}, // 1.00
     {0, 1}, // 1.00

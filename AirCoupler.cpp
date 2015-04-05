@@ -1,18 +1,12 @@
-//---------------------------------------------------------------------------
-
-#include "system.hpp"
-#include "classes.hpp"
-#pragma hdrstop
-
 #include "AirCoupler.h"
 #include "Timer.h"
 
-__fastcall TAirCoupler::TAirCoupler() { Clear(); }
+TAirCoupler::TAirCoupler() { Clear(); }
 
-__fastcall TAirCoupler::~TAirCoupler() {}
+TAirCoupler::~TAirCoupler() {}
 
 int TAirCoupler::GetStatus()
-{ // zwraca 1, jeœli istnieje model prosty, 2 gdy skoœny
+{ // zwraca 1, jeÅ›li istnieje model prosty, 2 gdy skoÅ›ny
     int x = 0;
     if (pModelOn)
         x = 1;
@@ -22,7 +16,7 @@ int TAirCoupler::GetStatus()
 }
 
 void TAirCoupler::Clear()
-{ // zerowanie wskaŸników
+{ // zerowanie wskaÅºnikÃ³w
     pModelOn = NULL;
     pModelOff = NULL;
     pModelxOn = NULL;
@@ -30,20 +24,22 @@ void TAirCoupler::Clear()
     bxOn = false;
 }
 
-void TAirCoupler::Init(AnsiString asName, TModel3d *pModel)
+void TAirCoupler::Init(const std::string name, TModel3d *pModel)
 { // wyszukanie submodeli
     if (!pModel)
-        return; // nie ma w czym szukaæ
-    pModelOn = pModel->GetFromName(AnsiString(asName + "_on").c_str()); // po³¹czony na wprost
-    pModelOff = pModel->GetFromName(AnsiString(asName + "_off").c_str()); // odwieszony
-    pModelxOn = pModel->GetFromName(AnsiString(asName + "_xon").c_str()); // po³¹czony na skos
+        return;                                     // nie ma w czym szukaÄ‡
+    pModelOn = pModel->GetFromName(name + "_on");   // poÅ‚Ä…czony na wprost
+    pModelOff = pModel->GetFromName(name + "_off"); // odwieszony
+    pModelxOn = pModel->GetFromName(name + "_xon"); // poÅ‚Ä…czony na skos
 }
 
-void TAirCoupler::Load(TQueryParserComp *Parser, TModel3d *pModel)
+void TAirCoupler::Load(cParser &parser, TModel3d *pModel)
 {
-    AnsiString str = Parser->GetNextSymbol().LowerCase();
+    auto str = parser.readString();
     if (pModel)
+    {
         Init(str, pModel);
+    }
     else
     {
         pModelOn = NULL;
@@ -64,7 +60,3 @@ void TAirCoupler::Update()
             pModelxOn->iVisible = bxOn;
     }
 }
-
-//---------------------------------------------------------------------------
-
-#pragma package(smart_init)

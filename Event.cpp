@@ -21,54 +21,54 @@
 
 __fastcall TEvent::TEvent(AnsiString m)
 {
-    // asName=""; //czy nazwa eventu jest niezbêdna w tym przypadku? chyba nie
+    // asName=""; //czy nazwa eventu jest niezbÄ™dna w tym przypadku? chyba nie
     evNext = evNext2 = NULL;
-    bEnabled = false; // false dla eventów u¿ywanych do skanowania sygna³ów (nie dodawane do
+    bEnabled = false; // false dla eventÃ³w uÅ¼ywanych do skanowania sygnaÅ‚Ã³w (nie dodawane do
                       // kolejki)
-    asNodeName = m; // nazwa obiektu powi¹zanego
-    iQueued = 0; // nie zosta³ dodany do kolejki
+    asNodeName = m; // nazwa obiektu powiÄ…zanego
+    iQueued = 0; // nie zostaÅ‚ dodany do kolejki
     // bIsHistory=false;
     fDelay = 0;
     fStartTime = 0; // 0 nie ma sensu
     Type = m.IsEmpty() ? tp_Unknown :
-                         tp_GetValues; // utworzenie niejawnego odczytu komórki pamiêci w torze
+                         tp_GetValues; // utworzenie niejawnego odczytu komÃ³rki pamiÄ™ci w torze
     for (int i = 0; i < 13; i++)
         Params[i].asPointer = NULL;
-    evJoined = NULL; // nie ma kolejnego z t¹ sam¹ nazw¹, usuwane s¹ wg listy Next2
+    evJoined = NULL; // nie ma kolejnego z tÄ… samÄ… nazwÄ…, usuwane sÄ… wg listy Next2
     Activator = NULL;
     iFlags = 0;
-    // event niejawny jest tworzony przed faz¹ InitEvents, która podmienia nazwê komórki pamiêci na
-    // wskaŸnik
-    // Current->Params[8].asGroundNode=m; //to siê ustawi w InitEvents
+    // event niejawny jest tworzony przed fazÄ… InitEvents, ktÃ³ra podmienia nazwÄ™ komÃ³rki pamiÄ™ci na
+    // wskaÅºnik
+    // Current->Params[8].asGroundNode=m; //to siÄ™ ustawi w InitEvents
     // Current->Params[9].asMemCell=m->MemCell;
-    fRandomDelay = 0.0; // standardowo nie bêdzie dodatkowego losowego opóŸnienia
+    fRandomDelay = 0.0; // standardowo nie bÄ™dzie dodatkowego losowego opÃ³Åºnienia
 };
 
 __fastcall TEvent::~TEvent()
 {
     switch (Type)
-    { // sprz¹tanie
+    { // sprzÄ…tanie
     case tp_Multiple:
-        // SafeDeleteArray(Params[9].asText); //nie usuwaæ - nazwa obiektu powi¹zanego zamieniana na
-        // wskaŸnik
-        if (iFlags & conditional_memstring) // o ile jest ³añcuch do porównania w memcompare
+        // SafeDeleteArray(Params[9].asText); //nie usuwaÄ‡ - nazwa obiektu powiÄ…zanego zamieniana na
+        // wskaÅºnik
+        if (iFlags & conditional_memstring) // o ile jest Å‚aÅ„cuch do porÃ³wnania w memcompare
             SafeDeleteArray(Params[10].asText);
         break;
     case tp_UpdateValues:
     case tp_AddValues:
         SafeDeleteArray(Params[0].asText);
-        if (iFlags & conditional_memstring) // o ile jest ³añcuch do porównania w memcompare
+        if (iFlags & conditional_memstring) // o ile jest Å‚aÅ„cuch do porÃ³wnania w memcompare
             SafeDeleteArray(Params[10].asText);
         break;
     case tp_Animation: // nic
-        // SafeDeleteArray(Params[9].asText); //nie usuwaæ - nazwa jest zamieniana na wskaŸnik do
+        // SafeDeleteArray(Params[9].asText); //nie usuwaÄ‡ - nazwa jest zamieniana na wskaÅºnik do
         // submodelu
-        if (Params[0].asInt == 4) // jeœli z pliku VMD
-            delete[] Params[8].asPointer; // zwolniæ obszar
+        if (Params[0].asInt == 4) // jeÅ›li z pliku VMD
+            delete[] Params[8].asPointer; // zwolniÄ‡ obszar
     case tp_GetValues: // nic
         break;
     }
-    evJoined = NULL; // nie usuwaæ podczepionych tutaj
+    evJoined = NULL; // nie usuwaÄ‡ podczepionych tutaj
 };
 
 void TEvent::Init(){
@@ -76,15 +76,15 @@ void TEvent::Init(){
 };
 
 void TEvent::Conditions(cParser *parser, AnsiString s)
-{ // przetwarzanie warunków, wspólne dla Multiple i UpdateValues
+{ // przetwarzanie warunkÃ³w, wspÃ³lne dla Multiple i UpdateValues
     if (s == "condition")
     { // jesli nie "endevent"
         std::string token;
         AnsiString str;
         if (!asNodeName.IsEmpty())
-        { // podczepienie ³añcucha, jeœli nie jest pusty
+        { // podczepienie Å‚aÅ„cucha, jeÅ›li nie jest pusty
             Params[9].asText = new char[asNodeName.Length() + 1]; // usuwane i zamieniane na
-                                                                  // wskaŸnik
+                                                                  // wskaÅºnik
             strcpy(Params[9].asText, asNodeName.c_str());
         }
         parser->getTokens();
@@ -107,7 +107,7 @@ void TEvent::Conditions(cParser *parser, AnsiString s)
             *parser >> token;
             str = AnsiString(token.c_str());
             if (str != "*") //"*" - nie brac command pod uwage
-            { // zapamiêtanie ³añcucha do porównania
+            { // zapamiÄ™tanie Å‚aÅ„cucha do porÃ³wnania
                 Params[10].asText = new char[255];
                 strcpy(Params[10].asText, str.c_str());
                 iFlags |= conditional_memstring;
@@ -131,10 +131,10 @@ void TEvent::Conditions(cParser *parser, AnsiString s)
         }
         parser->getTokens();
         *parser >> token;
-        s = AnsiString(token.c_str()); // ewentualnie dalej losowe opóŸnienie
+        s = AnsiString(token.c_str()); // ewentualnie dalej losowe opÃ³Åºnienie
     }
     if (s == "randomdelay")
-    { // losowe opóŸnienie
+    { // losowe opÃ³Åºnienie
         std::string token;
         parser->getTokens();
         *parser >> fRandomDelay; // Ra 2014-03-11
@@ -152,11 +152,11 @@ void TEvent::Load(cParser *parser, vector3 *org)
     AnsiString str;
     char *ptr;
 
-    bEnabled = true; // zmieniane na false dla eventów u¿ywanych do skanowania sygna³ów
+    bEnabled = true; // zmieniane na false dla eventÃ³w uÅ¼ywanych do skanowania sygnaÅ‚Ã³w
 
     parser->getTokens();
     *parser >> token;
-    asName = AnsiString(token.c_str()).LowerCase(); // u¿ycie parametrów mo¿e dawaæ wielkie
+    asName = AnsiString(token.c_str()).LowerCase(); // uÅ¼ycie parametrÃ³w moÅ¼e dawaÄ‡ wielkie
 
     parser->getTokens();
     *parser >> token;
@@ -181,7 +181,7 @@ void TEvent::Load(cParser *parser, vector3 *org)
     else if (str == AnsiString("lights"))
         Type = tp_Lights;
     else if (str == AnsiString("visible"))
-        Type = tp_Visible; // zmiana wyœwietlania obiektu
+        Type = tp_Visible; // zmiana wyÅ›wietlania obiektu
     else if (str == AnsiString("switch"))
         Type = tp_Switch;
     else if (str == AnsiString("dynvel"))
@@ -199,9 +199,9 @@ void TEvent::Load(cParser *parser, vector3 *org)
     else if (str == AnsiString("logvalues"))
         Type = tp_LogValues;
     else if (str == AnsiString("voltage"))
-        Type = tp_Voltage; // zmiana napiêcia w zasilaczu (TractionPowerSource)
+        Type = tp_Voltage; // zmiana napiÄ™cia w zasilaczu (TractionPowerSource)
     else if (str == AnsiString("message"))
-        Type = tp_Message; // wyœwietlenie komunikatu
+        Type = tp_Message; // wyÅ›wietlenie komunikatu
     else if (str == AnsiString("friction"))
         Type = tp_Friction; // zmiana tarcia na scenerii
     else
@@ -215,28 +215,28 @@ void TEvent::Load(cParser *parser, vector3 *org)
     str = AnsiString(token.c_str());
 
     if (str != "none")
-        asNodeName = str; // nazwa obiektu powi¹zanego
+        asNodeName = str; // nazwa obiektu powiÄ…zanego
 
     if (asName.SubString(1, 5) == "none_")
-        Type = tp_Ignored; // Ra: takie s¹ ignorowane
+        Type = tp_Ignored; // Ra: takie sÄ… ignorowane
 
     switch (Type)
     {
     case tp_AddValues:
         iFlags = update_memadd; // dodawanko
     case tp_UpdateValues:
-        // if (Type==tp_UpdateValues) iFlags=0; //co modyfikowaæ
+        // if (Type==tp_UpdateValues) iFlags=0; //co modyfikowaÄ‡
         parser->getTokens(1, false); // case sensitive
         *parser >> token;
         str = AnsiString(token.c_str());
         Params[0].asText = new char[str.Length() + 1];
         strcpy(Params[0].asText, str.c_str());
-        if (str != "*") // czy ma zostaæ bez zmian?
+        if (str != "*") // czy ma zostaÄ‡ bez zmian?
             iFlags |= update_memstring;
         parser->getTokens();
         *parser >> token;
         str = AnsiString(token.c_str());
-        if (str != "*") // czy ma zostaæ bez zmian?
+        if (str != "*") // czy ma zostaÄ‡ bez zmian?
         {
             Params[1].asdouble = str.ToDouble();
             iFlags |= update_memval1;
@@ -246,7 +246,7 @@ void TEvent::Load(cParser *parser, vector3 *org)
         parser->getTokens();
         *parser >> token;
         str = AnsiString(token.c_str());
-        if (str != "*") // czy ma zostaæ bez zmian?
+        if (str != "*") // czy ma zostaÄ‡ bez zmian?
         {
             Params[2].asdouble = str.ToDouble();
             iFlags |= update_memval2;
@@ -255,23 +255,23 @@ void TEvent::Load(cParser *parser, vector3 *org)
             Params[2].asdouble = 0;
         parser->getTokens();
         *parser >> token;
-        Conditions(parser, token.c_str()); // sprawdzanie warunków
+        Conditions(parser, token.c_str()); // sprawdzanie warunkÃ³w
         break;
     case tp_CopyValues:
         Params[9].asText = NULL;
         iFlags = update_memstring | update_memval1 | update_memval2; // normalanie trzy
         i = 0;
         parser->getTokens();
-        *parser >> token; // nazwa drugiej komórki (Ÿród³owej)
+        *parser >> token; // nazwa drugiej komÃ³rki (ÅºrÃ³dÅ‚owej)
         while (token.compare("endevent") != 0)
         {
             switch (++i)
-            { // znaczenie kolejnych parametrów
-            case 1: // nazwa drugiej komórki (Ÿród³owej)
-                Params[9].asText = new char[token.length() + 1]; // usuwane i zamieniane na wskaŸnik
+            { // znaczenie kolejnych parametrÃ³w
+            case 1: // nazwa drugiej komÃ³rki (ÅºrÃ³dÅ‚owej)
+                Params[9].asText = new char[token.length() + 1]; // usuwane i zamieniane na wskaÅºnik
                 strcpy(Params[9].asText, token.c_str());
                 break;
-            case 2: // maska wartoœci
+            case 2: // maska wartoÅ›ci
                 iFlags = AnsiString(token.c_str())
                              .ToIntDef(update_memstring | update_memval1 | update_memval2);
                 break;
@@ -284,12 +284,12 @@ void TEvent::Load(cParser *parser, vector3 *org)
         iFlags = update_memstring | update_memval1 | update_memval2; // normalanie trzy
         i = 0;
         parser->getTokens();
-        *parser >> token; // nazwa drugiej komórki (Ÿród³owej)
+        *parser >> token; // nazwa drugiej komÃ³rki (ÅºrÃ³dÅ‚owej)
         while (token.compare("endevent") != 0)
         {
             switch (++i)
-            { // znaczenie kolejnych parametrów
-            case 1: // maska wartoœci
+            { // znaczenie kolejnych parametrÃ³w
+            case 1: // maska wartoÅ›ci
                 iFlags = AnsiString(token.c_str())
                              .ToIntDef(update_memstring | update_memval1 | update_memval2);
                 break;
@@ -305,12 +305,12 @@ void TEvent::Load(cParser *parser, vector3 *org)
         break;
     case tp_PutValues:
         parser->getTokens(3);
-        *parser >> Params[3].asdouble >> Params[4].asdouble >> Params[5].asdouble; // po³o¿enie
+        *parser >> Params[3].asdouble >> Params[4].asdouble >> Params[5].asdouble; // poÅ‚oÅ¼enie
                                                                                    // X,Y,Z
         if (org)
-        { // przesuniêcie
-            // tmp->pCenter.RotateY(aRotate.y/180.0*M_PI); //Ra 2014-11: uwzglêdnienie rotacji
-            Params[3].asdouble += org->x; // wspó³rzêdne w scenerii
+        { // przesuniÄ™cie
+            // tmp->pCenter.RotateY(aRotate.y/180.0*M_PI); //Ra 2014-11: uwzglÄ™dnienie rotacji
+            Params[3].asdouble += org->x; // wspÃ³Å‚rzÄ™dne w scenerii
             Params[4].asdouble += org->y;
             Params[5].asdouble += org->z;
         }
@@ -321,9 +321,9 @@ void TEvent::Load(cParser *parser, vector3 *org)
         if (str.SubString(1, 19) == "PassengerStopPoint:")
         {
             if (str.Pos("#"))
-                str = str.SubString(1, str.Pos("#") - 1); // obciêcie unikatowoœci
-            bEnabled = false; // nie do kolejki (dla SetVelocity te¿, ale jak jest do toru
-                              // dowi¹zany)
+                str = str.SubString(1, str.Pos("#") - 1); // obciÄ™cie unikatowoÅ›ci
+            bEnabled = false; // nie do kolejki (dla SetVelocity teÅ¼, ale jak jest do toru
+                              // dowiÄ…zany)
             Params[6].asCommand = cm_PassengerStopPoint;
         }
         else if (str == "SetVelocity")
@@ -343,7 +343,7 @@ void TEvent::Load(cParser *parser, vector3 *org)
         }
         else if (str == "OutsideStation")
         {
-            bEnabled = false; // ma byæ skanowny, aby AI nie przekracza³o W5
+            bEnabled = false; // ma byÄ‡ skanowny, aby AI nie przekraczaÅ‚o W5
             Params[6].asCommand = cm_OutsideStation;
         }
         else
@@ -393,12 +393,12 @@ void TEvent::Load(cParser *parser, vector3 *org)
             {
                 str = AnsiString(token.c_str());
                 if (i < 8)
-                    Params[i].asdouble = str.ToDouble(); // teraz mo¿e mieæ u³amek
+                    Params[i].asdouble = str.ToDouble(); // teraz moÅ¼e mieÄ‡ uÅ‚amek
                 i++;
             }
         } while (token.compare("endevent") != 0);
         break;
-    case tp_Visible: // zmiana wyœwietlania obiektu
+    case tp_Visible: // zmiana wyÅ›wietlania obiektu
         parser->getTokens();
         *parser >> token;
         str = AnsiString(token.c_str());
@@ -440,7 +440,7 @@ void TEvent::Load(cParser *parser, vector3 *org)
         *parser >> token;
         Params[0].asInt = 0; // na razie nieznany typ
         if (token.compare("rotate") == 0)
-        { // obrót wzglêdem osi
+        { // obrÃ³t wzglÄ™dem osi
             parser->getTokens();
             *parser >> token;
             Params[9].asText = new char[255]; // nazwa submodelu
@@ -468,11 +468,11 @@ void TEvent::Load(cParser *parser, vector3 *org)
             Params[9].asText = new char[255]; // nazwa submodelu
             strcpy(Params[9].asText, token.c_str());
             Params[0].asInt = 8;
-            parser->getTokens(4); // jaki ma byæ sens tych parametrów?
+            parser->getTokens(4); // jaki ma byÄ‡ sens tych parametrÃ³w?
             *parser >> Params[1].asdouble >> Params[2].asdouble >> Params[3].asdouble >>
                 Params[4].asdouble;
         }
-        else if (token.substr(token.length() - 4, 4) == ".vmd") // na razie tu, mo¿e bêdzie inaczej
+        else if (token.substr(token.length() - 4, 4) == ".vmd") // na razie tu, moÅ¼e bÄ™dzie inaczej
         { // animacja z pliku VMD
             TFileStream *fs = new TFileStream("models\\" + AnsiString(token.c_str()), fmOpenRead);
             Params[7].asInt = fs->Size;
@@ -499,22 +499,22 @@ void TEvent::Load(cParser *parser, vector3 *org)
         str = AnsiString(token.c_str());
         if (str != "endevent")
         {
-            Params[1].asdouble = str.ToDouble(); // prêdkoœæ liniowa ruchu iglic
+            Params[1].asdouble = str.ToDouble(); // prÄ™dkoÅ›Ä‡ liniowa ruchu iglic
             parser->getTokens();
             *parser >> token;
             str = AnsiString(token.c_str());
         }
         else
-            Params[1].asdouble = -1.0; // u¿yæ domyœlnej
+            Params[1].asdouble = -1.0; // uÅ¼yÄ‡ domyÅ›lnej
         if (str != "endevent")
         {
             Params[2].asdouble =
-                str.ToDouble(); // dodatkowy ruch drugiej iglicy (zamkniêcie nastawnicze)
+                str.ToDouble(); // dodatkowy ruch drugiej iglicy (zamkniÄ™cie nastawnicze)
             parser->getTokens();
             *parser >> token;
         }
         else
-            Params[2].asdouble = -1.0; // u¿yæ domyœlnej
+            Params[2].asdouble = -1.0; // uÅ¼yÄ‡ domyÅ›lnej
         break;
     case tp_DynVel:
         parser->getTokens();
@@ -538,17 +538,17 @@ void TEvent::Load(cParser *parser, vector3 *org)
                str != AnsiString("randomdelay"))
         {
             if ((str.SubString(1, 5) != "none_") ? (i < 8) : false)
-            { // eventy rozpoczynaj¹ce siê od "none_" s¹ ignorowane
+            { // eventy rozpoczynajÄ…ce siÄ™ od "none_" sÄ… ignorowane
                 if (str != "else")
                 {
                     Params[i].asText = new char[255];
                     strcpy(Params[i].asText, str.c_str());
                     if (ti)
-                        iFlags |= conditional_else << i; // oflagowanie dla eventów "else"
+                        iFlags |= conditional_else << i; // oflagowanie dla eventÃ³w "else"
                     i++;
                 }
                 else
-                    ti = !ti; // zmiana flagi dla s³owa "else"
+                    ti = !ti; // zmiana flagi dla sÅ‚owa "else"
             }
             else if (i >= 8)
                 ErrorLog("Bad event: \"" + str + "\" ignored in multiple \"" + asName + "\"!");
@@ -558,16 +558,16 @@ void TEvent::Load(cParser *parser, vector3 *org)
             *parser >> token;
             str = AnsiString(token.c_str());
         }
-        Conditions(parser, str); // sprawdzanie warunków
+        Conditions(parser, str); // sprawdzanie warunkÃ³w
         break;
-    case tp_Voltage: // zmiana napiêcia w zasilaczu (TractionPowerSource)
+    case tp_Voltage: // zmiana napiÄ™cia w zasilaczu (TractionPowerSource)
     case tp_Friction: // zmiana przyczepnosci na scenerii
         parser->getTokens();
         *parser >> Params[0].asdouble; // Ra 2014-01-27
         parser->getTokens();
         *parser >> token;
         break;
-    case tp_Message: // wyœwietlenie komunikatu
+    case tp_Message: // wyÅ›wietlenie komunikatu
         do
         {
             parser->getTokens();
@@ -605,72 +605,72 @@ void TEvent::AddToQuery(TEvent *e)
 AnsiString TEvent::CommandGet()
 { // odczytanie komendy z eventu
     switch (Type)
-    { // to siê wykonuje równie¿ sk³adu jad¹cego bez obs³ugi
+    { // to siÄ™ wykonuje rÃ³wnieÅ¼ skÅ‚adu jadÄ…cego bez obsÅ‚ugi
     case tp_GetValues:
         return String(Params[9].asMemCell->Text());
     case tp_PutValues:
         return String(Params[0].asText);
     }
-    return ""; // inne eventy siê nie licz¹
+    return ""; // inne eventy siÄ™ nie liczÄ…
 };
 
 TCommandType TEvent::Command()
 { // odczytanie komendy z eventu
     switch (Type)
-    { // to siê wykonuje równie¿ dla sk³adu jad¹cego bez obs³ugi
+    { // to siÄ™ wykonuje rÃ³wnieÅ¼ dla skÅ‚adu jadÄ…cego bez obsÅ‚ugi
     case tp_GetValues:
         return Params[9].asMemCell->Command();
     case tp_PutValues:
         return Params[6].asCommand; // komenda zakodowana binarnie
     }
-    return cm_Unknown; // inne eventy siê nie licz¹
+    return cm_Unknown; // inne eventy siÄ™ nie liczÄ…
 };
 
 double TEvent::ValueGet(int n)
 { // odczytanie komendy z eventu
-    n &= 1; // tylko 1 albo 2 jest prawid³owy
+    n &= 1; // tylko 1 albo 2 jest prawidÅ‚owy
     switch (Type)
-    { // to siê wykonuje równie¿ sk³adu jad¹cego bez obs³ugi
+    { // to siÄ™ wykonuje rÃ³wnieÅ¼ skÅ‚adu jadÄ…cego bez obsÅ‚ugi
     case tp_GetValues:
         return n ? Params[9].asMemCell->Value1() : Params[9].asMemCell->Value2();
     case tp_PutValues:
         return Params[2 - n].asdouble;
     }
-    return 0.0; // inne eventy siê nie licz¹
+    return 0.0; // inne eventy siÄ™ nie liczÄ…
 };
 
 vector3 TEvent::PositionGet()
-{ // pobranie wspó³rzêdnych eventu
+{ // pobranie wspÃ³Å‚rzÄ™dnych eventu
     switch (Type)
     { //
     case tp_GetValues:
-        return Params[9].asMemCell->Position(); // wspó³rzêdne pod³¹czonej komórki pamiêci
+        return Params[9].asMemCell->Position(); // wspÃ³Å‚rzÄ™dne podÅ‚Ä…czonej komÃ³rki pamiÄ™ci
     case tp_PutValues:
         return vector3(Params[3].asdouble, Params[4].asdouble, Params[5].asdouble);
     }
-    return vector3(0, 0, 0); // inne eventy siê nie licz¹
+    return vector3(0, 0, 0); // inne eventy siÄ™ nie liczÄ…
 };
 
 bool TEvent::StopCommand()
 { //
     if (Type == tp_GetValues)
-        return Params[9].asMemCell->StopCommand(); // info o komendzie z komórki
+        return Params[9].asMemCell->StopCommand(); // info o komendzie z komÃ³rki
     return false;
 };
 
 void TEvent::StopCommandSent()
 {
     if (Type == tp_GetValues)
-        Params[9].asMemCell->StopCommandSent(); // komenda z komórki zosta³a wys³ana
+        Params[9].asMemCell->StopCommandSent(); // komenda z komÃ³rki zostaÅ‚a wysÅ‚ana
 };
 
 void TEvent::Append(TEvent *e)
-{ // doczepienie kolejnych z t¹ sam¹ nazw¹
+{ // doczepienie kolejnych z tÄ… samÄ… nazwÄ…
     if (evJoined)
-        evJoined->Append(e); // rekurencja! - góra kilkanaœcie eventów bêdzie potrzebne
+        evJoined->Append(e); // rekurencja! - gÃ³ra kilkanaÅ›cie eventÃ³w bÄ™dzie potrzebne
     else
     {
         evJoined = e;
-        e->bEnabled = true; // ten doczepiony mo¿e byæ tylko kolejkowany
+        e->bEnabled = true; // ten doczepiony moÅ¼e byÄ‡ tylko kolejkowany
     }
 };

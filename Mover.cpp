@@ -3,114 +3,114 @@
 #include "Mover.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
-// Ra: tu nale¿y przenosiæ funcje z mover.pas, które nie s¹ z niego wywo³ywane.
-// Jeœli jakieœ zmienne nie s¹ u¿ywane w mover.pas, te¿ mo¿na je przenosiæ.
-// Przeniesienie wszystkiego na raz zrobi³o by zbyt wielki chaos do ogarniêcia.
+// Ra: tu naleÅ¼y przenosiÄ‡ funcje z mover.pas, ktÃ³re nie sÄ… z niego wywoÅ‚ywane.
+// JeÅ›li jakieÅ› zmienne nie sÄ… uÅ¼ywane w mover.pas, teÅ¼ moÅ¼na je przenosiÄ‡.
+// Przeniesienie wszystkiego na raz zrobiÅ‚o by zbyt wielki chaos do ogarniÄ™cia.
 
-const dEpsilon = 0.01; // 1cm (zale¿y od typu sprzêgu...)
+const dEpsilon = 0.01; // 1cm (zaleÅ¼y od typu sprzÄ™gu...)
 
 __fastcall TMoverParameters::TMoverParameters(double VelInitial, AnsiString TypeNameInit,
                                               AnsiString NameInit, int LoadInitial,
                                               AnsiString LoadTypeInitial, int Cab)
     : T_MoverParameters(VelInitial, TypeNameInit, NameInit, LoadInitial, LoadTypeInitial, Cab)
-{ // g³ówny konstruktor
-    DimHalf.x = 0.5 * Dim.W; // po³owa szerokoœci, OX jest w bok?
-    DimHalf.y = 0.5 * Dim.L; // po³owa d³ugoœci, OY jest do przodu?
-    DimHalf.z = 0.5 * Dim.H; // po³owa wysokoœci, OZ jest w górê?
-    // BrakeLevelSet(-2); //Pascal ustawia na 0, przestawimy na odciêcie (CHK jest jeszcze nie
+{ // gÅ‚Ã³wny konstruktor
+    DimHalf.x = 0.5 * Dim.W; // poÅ‚owa szerokoÅ›ci, OX jest w bok?
+    DimHalf.y = 0.5 * Dim.L; // poÅ‚owa dÅ‚ugoÅ›ci, OY jest do przodu?
+    DimHalf.z = 0.5 * Dim.H; // poÅ‚owa wysokoÅ›ci, OZ jest w gÃ³rÄ™?
+    // BrakeLevelSet(-2); //Pascal ustawia na 0, przestawimy na odciÄ™cie (CHK jest jeszcze nie
     // wczytane!)
-    bPantKurek3 = true; // domyœlnie zbiornik pantografu po³¹czony jest ze zbiornikiem g³ównym
-    iProblem = 0; // pojazd w pe³ni gotowy do ruchu
-    iLights[0] = iLights[1] = 0; //œwiat³a zgaszone
+    bPantKurek3 = true; // domyÅ›lnie zbiornik pantografu poÅ‚Ä…czony jest ze zbiornikiem gÅ‚Ã³wnym
+    iProblem = 0; // pojazd w peÅ‚ni gotowy do ruchu
+    iLights[0] = iLights[1] = 0; //Å›wiatÅ‚a zgaszone
 };
 
 double TMoverParameters::Distance(const TLocation &Loc1, const TLocation &Loc2,
                                              const TDimension &Dim1, const TDimension &Dim2)
-{ // zwraca odleg³oœæ pomiêdzy pojazdami (Loc1) i (Loc2) z uwzglêdnieneim ich d³ugoœci (kule!)
+{ // zwraca odlegÅ‚oÅ›Ä‡ pomiÄ™dzy pojazdami (Loc1) i (Loc2) z uwzglÄ™dnieneim ich dÅ‚ugoÅ›ci (kule!)
     return hypot(Loc2.X - Loc1.X, Loc1.Y - Loc2.Y) - 0.5 * (Dim2.L + Dim1.L);
 };
 
 double TMoverParameters::Distance(const vector3 &s1, const vector3 &s2,
                                              const vector3 &d1, const vector3 &d2){
-    // obliczenie odleg³oœci prostopad³oœcianów o œrodkach (s1) i (s2) i wymiarach (d1) i (d2)
-    // return 0.0; //bêdzie zg³aszaæ warning - funkcja do usuniêcia, chyba ¿e siê przyda...
+    // obliczenie odlegÅ‚oÅ›ci prostopadÅ‚oÅ›cianÃ³w o Å›rodkach (s1) i (s2) i wymiarach (d1) i (d2)
+    // return 0.0; //bÄ™dzie zgÅ‚aszaÄ‡ warning - funkcja do usuniÄ™cia, chyba Å¼e siÄ™ przyda...
 };
 
 double TMoverParameters::CouplerDist(Byte Coupler)
-{ // obliczenie odleg³oœci pomiêdzy sprzêgami (kula!)
+{ // obliczenie odlegÅ‚oÅ›ci pomiÄ™dzy sprzÄ™gami (kula!)
     return Couplers[Coupler].CoupleDist =
                Distance(Loc, Couplers[Coupler].Connected->Loc, Dim,
-                        Couplers[Coupler].Connected->Dim); // odleg³oœæ pomiêdzy sprzêgami (kula!)
+                        Couplers[Coupler].Connected->Dim); // odlegÅ‚oÅ›Ä‡ pomiÄ™dzy sprzÄ™gami (kula!)
 };
 
 bool TMoverParameters::Attach(Byte ConnectNo, Byte ConnectToNr,
                                          TMoverParameters *ConnectTo, Byte CouplingType,
                                          bool Forced)
-{ //³¹czenie do swojego sprzêgu (ConnectNo) pojazdu (ConnectTo) stron¹ (ConnectToNr)
-    // Ra: zwykle wykonywane dwukrotnie, dla ka¿dego pojazdu oddzielnie
-    // Ra: trzeba by odró¿niæ wymóg dociœniêcia od uszkodzenia sprzêgu przy podczepianiu AI do
-    // sk³adu
-    if (ConnectTo) // jeœli nie pusty
+{ //Å‚Ä…czenie do swojego sprzÄ™gu (ConnectNo) pojazdu (ConnectTo) stronÄ… (ConnectToNr)
+    // Ra: zwykle wykonywane dwukrotnie, dla kaÅ¼dego pojazdu oddzielnie
+    // Ra: trzeba by odrÃ³Å¼niÄ‡ wymÃ³g dociÅ›niÄ™cia od uszkodzenia sprzÄ™gu przy podczepianiu AI do
+    // skÅ‚adu
+    if (ConnectTo) // jeÅ›li nie pusty
     {
         if (ConnectToNr != 2)
-            Couplers[ConnectNo].ConnectedNr = ConnectToNr; // 2=nic nie pod³¹czone
+            Couplers[ConnectNo].ConnectedNr = ConnectToNr; // 2=nic nie podÅ‚Ä…czone
         TCouplerType ct = ConnectTo->Couplers[Couplers[ConnectNo].ConnectedNr]
-                              .CouplerType; // typ sprzêgu pod³¹czanego pojazdu
+                              .CouplerType; // typ sprzÄ™gu podÅ‚Ä…czanego pojazdu
         Couplers[ConnectNo].Connected =
-            ConnectTo; // tak podpi¹æ (do siebie) zawsze mo¿na, najwy¿ej bêdzie wirtualny
-        CouplerDist(ConnectNo); // przeliczenie odleg³oœci pomiêdzy sprzêgami
+            ConnectTo; // tak podpiÄ…Ä‡ (do siebie) zawsze moÅ¼na, najwyÅ¼ej bÄ™dzie wirtualny
+        CouplerDist(ConnectNo); // przeliczenie odlegÅ‚oÅ›ci pomiÄ™dzy sprzÄ™gami
         if (CouplingType == ctrain_virtual)
-            return false; // wirtualny wiêcej nic nie robi
+            return false; // wirtualny wiÄ™cej nic nie robi
         if (Forced ? true : ((Couplers[ConnectNo].CoupleDist <= dEpsilon) &&
                              (Couplers[ConnectNo].CouplerType != NoCoupler) &&
                              (Couplers[ConnectNo].CouplerType == ct)))
-        { // stykaja sie zderzaki i kompatybilne typy sprzegow, chyba ¿e ³¹czenie na starcie
+        { // stykaja sie zderzaki i kompatybilne typy sprzegow, chyba Å¼e Å‚Ä…czenie na starcie
             if (Couplers[ConnectNo].CouplingFlag ==
-                ctrain_virtual) // jeœli wczeœniej nie by³o po³¹czone
-            { // ustalenie z której strony rysowaæ sprzêg
-                Couplers[ConnectNo].Render = true; // tego rysowaæ
+                ctrain_virtual) // jeÅ›li wczeÅ›niej nie byÅ‚o poÅ‚Ä…czone
+            { // ustalenie z ktÃ³rej strony rysowaÄ‡ sprzÄ™g
+                Couplers[ConnectNo].Render = true; // tego rysowaÄ‡
                 ConnectTo->Couplers[Couplers[ConnectNo].ConnectedNr].Render = false; // a tego nie
             };
-            Couplers[ConnectNo].CouplingFlag = CouplingType; // ustawienie typu sprzêgu
-            // if (CouplingType!=ctrain_virtual) //Ra: wirtualnego nie ³¹czymy zwrotnie!
-            //{//jeœli ³¹czenie sprzêgiem niewirtualnym, ustawiamy po³¹czenie zwrotne
+            Couplers[ConnectNo].CouplingFlag = CouplingType; // ustawienie typu sprzÄ™gu
+            // if (CouplingType!=ctrain_virtual) //Ra: wirtualnego nie Å‚Ä…czymy zwrotnie!
+            //{//jeÅ›li Å‚Ä…czenie sprzÄ™giem niewirtualnym, ustawiamy poÅ‚Ä…czenie zwrotne
             ConnectTo->Couplers[Couplers[ConnectNo].ConnectedNr].CouplingFlag = CouplingType;
             ConnectTo->Couplers[Couplers[ConnectNo].ConnectedNr].Connected = this;
             ConnectTo->Couplers[Couplers[ConnectNo].ConnectedNr].CoupleDist =
                 Couplers[ConnectNo].CoupleDist;
             return true;
             //}
-            // pod³¹czenie nie uda³o siê - jest wirtualne
+            // podÅ‚Ä…czenie nie udaÅ‚o siÄ™ - jest wirtualne
         }
     }
-    return false; // brak pod³¹czanego pojazdu, zbyt du¿a odleg³oœæ, niezgodny typ sprzêgu, brak
-                  // sprzêgu, brak haka
+    return false; // brak podÅ‚Ä…czanego pojazdu, zbyt duÅ¼a odlegÅ‚oÅ›Ä‡, niezgodny typ sprzÄ™gu, brak
+                  // sprzÄ™gu, brak haka
 };
 
 bool TMoverParameters::Attach(Byte ConnectNo, Byte ConnectToNr,
                                          T_MoverParameters *ConnectTo, Byte CouplingType,
                                          bool Forced)
-{ //³¹czenie do (ConnectNo) pojazdu (ConnectTo) stron¹ (ConnectToNr)
+{ //Å‚Ä…czenie do (ConnectNo) pojazdu (ConnectTo) stronÄ… (ConnectToNr)
     return Attach(ConnectNo, ConnectToNr, (TMoverParameters *)ConnectTo, CouplingType, Forced);
 };
 
 int TMoverParameters::DettachStatus(Byte ConnectNo)
-{ // Ra: sprawdzenie, czy odleg³oœæ jest dobra do roz³¹czania
-    // powinny byæ 3 informacje: =0 sprzêg ju¿ roz³¹czony, <0 da siê roz³¹czyæ. >0 nie da siê
-    // roz³¹czyæ
+{ // Ra: sprawdzenie, czy odlegÅ‚oÅ›Ä‡ jest dobra do rozÅ‚Ä…czania
+    // powinny byÄ‡ 3 informacje: =0 sprzÄ™g juÅ¼ rozÅ‚Ä…czony, <0 da siÄ™ rozÅ‚Ä…czyÄ‡. >0 nie da siÄ™
+    // rozÅ‚Ä…czyÄ‡
     if (!Couplers[ConnectNo].Connected)
-        return 0; // nie ma nic, to roz³¹czanie jest OK
+        return 0; // nie ma nic, to rozÅ‚Ä…czanie jest OK
     if ((Couplers[ConnectNo].CouplingFlag & ctrain_coupler) == 0)
-        return -Couplers[ConnectNo].CouplingFlag; // hak nie po³¹czony - roz³¹czanie jest OK
+        return -Couplers[ConnectNo].CouplingFlag; // hak nie poÅ‚Ä…czony - rozÅ‚Ä…czanie jest OK
     if (TestFlag(DamageFlag, dtrain_coupling))
-        return -Couplers[ConnectNo].CouplingFlag; // hak urwany - roz³¹czanie jest OK
+        return -Couplers[ConnectNo].CouplingFlag; // hak urwany - rozÅ‚Ä…czanie jest OK
     // ABu021104: zakomentowane 'and (CouplerType<>Articulated)' w warunku, nie wiem co to bylo, ale
     // za to teraz dziala odczepianie... :) }
-    // if (CouplerType==Articulated) return false; //sprzêg nie do rozpiêcia - mo¿e byæ tylko urwany
+    // if (CouplerType==Articulated) return false; //sprzÄ™g nie do rozpiÄ™cia - moÅ¼e byÄ‡ tylko urwany
     // Couplers[ConnectNo].CoupleDist=Distance(Loc,Couplers[ConnectNo].Connected->Loc,Dim,Couplers[ConnectNo].Connected->Dim);
     CouplerDist(ConnectNo);
     if (Couplers[ConnectNo].CouplerType == Screw ? Couplers[ConnectNo].CoupleDist < 0.0 : true)
-        return -Couplers[ConnectNo].CouplingFlag; // mo¿na roz³¹czaæ, jeœli dociœniêty
+        return -Couplers[ConnectNo].CouplingFlag; // moÅ¼na rozÅ‚Ä…czaÄ‡, jeÅ›li dociÅ›niÄ™ty
     return (Couplers[ConnectNo].CoupleDist > 0.2) ? -Couplers[ConnectNo].CouplingFlag :
                                                     Couplers[ConnectNo].CouplingFlag;
 };
@@ -120,40 +120,40 @@ bool TMoverParameters::Dettach(Byte ConnectNo)
     if (!Couplers[ConnectNo].Connected)
         return true; // nie ma nic, to odczepiono
     // with Couplers[ConnectNo] do
-    int i = DettachStatus(ConnectNo); // stan sprzêgu
+    int i = DettachStatus(ConnectNo); // stan sprzÄ™gu
     if (i < 0)
     { // gdy scisniete zderzaki, chyba ze zerwany sprzeg (wirtualnego nie odpinamy z drugiej strony)
         // Couplers[ConnectNo].Connected=NULL; //lepiej zostawic bo przeciez trzeba kontrolowac
         // zderzenia odczepionych
         Couplers[ConnectNo].Connected->Couplers[Couplers[ConnectNo].ConnectedNr].CouplingFlag =
-            0; // pozostaje sprzêg wirtualny
-        Couplers[ConnectNo].CouplingFlag = 0; // pozostaje sprzêg wirtualny
+            0; // pozostaje sprzÄ™g wirtualny
+        Couplers[ConnectNo].CouplingFlag = 0; // pozostaje sprzÄ™g wirtualny
         return true;
     }
     else if (i > 0)
-    { // od³¹czamy wê¿e i resztê, pozostaje sprzêg fizyczny, który wymaga dociœniêcia (z wirtualnym
+    { // odÅ‚Ä…czamy wÄ™Å¼e i resztÄ™, pozostaje sprzÄ™g fizyczny, ktÃ³ry wymaga dociÅ›niÄ™cia (z wirtualnym
       // nic)
         Couplers[ConnectNo].CouplingFlag &= ctrain_coupler;
         Couplers[ConnectNo].Connected->Couplers[Couplers[ConnectNo].ConnectedNr].CouplingFlag =
             Couplers[ConnectNo].CouplingFlag;
     }
-    return false; // jeszcze nie roz³¹czony
+    return false; // jeszcze nie rozÅ‚Ä…czony
 };
 
 void TMoverParameters::SetCoupleDist()
-{ // przeliczenie odleg³oœci sprzêgów
+{ // przeliczenie odlegÅ‚oÅ›ci sprzÄ™gÃ³w
     if (Couplers[0].Connected)
     {
         CouplerDist(0);
         if (CategoryFlag & 2)
-        { // Ra: dla samochodów zderzanie kul to za ma³o
+        { // Ra: dla samochodÃ³w zderzanie kul to za maÅ‚o
         }
     }
     if (Couplers[1].Connected)
     {
         CouplerDist(1);
         if (CategoryFlag & 2)
-        { // Ra: dla samochodów zderzanie kul to za ma³o
+        { // Ra: dla samochodÃ³w zderzanie kul to za maÅ‚o
         }
     }
 };
@@ -165,8 +165,8 @@ bool TMoverParameters::DirectionForward()
         ++ActiveDir;
         DirAbsolute = ActiveDir * CabNo;
         if (DirAbsolute)
-            if (Battery) // jeœli bateria jest ju¿ za³¹czona
-                BatterySwitch(true); // to w ten oto durny sposób aktywuje siê CA/SHP
+            if (Battery) // jeÅ›li bateria jest juÅ¼ zaÅ‚Ä…czona
+                BatterySwitch(true); // to w ten oto durny sposÃ³b aktywuje siÄ™ CA/SHP
         SendCtrlToNext("Direction", ActiveDir, CabNo);
         return true;
     }
@@ -175,42 +175,42 @@ bool TMoverParameters::DirectionForward()
     return false;
 };
 
-// Nastawianie hamulców
+// Nastawianie hamulcÃ³w
 
 void TMoverParameters::BrakeLevelSet(double b)
-{ // ustawienie pozycji hamulca na wartoœæ (b) w zakresie od -2 do BrakeCtrlPosNo
-    // jedyny dopuszczalny sposób przestawienia hamulca zasadniczego
+{ // ustawienie pozycji hamulca na wartoÅ›Ä‡ (b) w zakresie od -2 do BrakeCtrlPosNo
+    // jedyny dopuszczalny sposÃ³b przestawienia hamulca zasadniczego
     if (fBrakeCtrlPos == b)
-        return; // nie przeliczaæ, jak nie ma zmiany
+        return; // nie przeliczaÄ‡, jak nie ma zmiany
     fBrakeCtrlPos = b;
     BrakeCtrlPosR = b;
     if (fBrakeCtrlPos < Handle->GetPos(bh_MIN))
-        fBrakeCtrlPos = Handle->GetPos(bh_MIN); // odciêcie
+        fBrakeCtrlPos = Handle->GetPos(bh_MIN); // odciÄ™cie
     else if (fBrakeCtrlPos > Handle->GetPos(bh_MAX))
         fBrakeCtrlPos = Handle->GetPos(bh_MAX);
-    int x = floor(fBrakeCtrlPos); // jeœli odwo³ujemy siê do BrakeCtrlPos w poœrednich, to musi byæ
-                                  // obciête a nie zaokr¹gone
-    while ((x > BrakeCtrlPos) && (BrakeCtrlPos < BrakeCtrlPosNo)) // jeœli zwiêkszy³o siê o 1
+    int x = floor(fBrakeCtrlPos); // jeÅ›li odwoÅ‚ujemy siÄ™ do BrakeCtrlPos w poÅ›rednich, to musi byÄ‡
+                                  // obciÄ™te a nie zaokrÄ…gone
+    while ((x > BrakeCtrlPos) && (BrakeCtrlPos < BrakeCtrlPosNo)) // jeÅ›li zwiÄ™kszyÅ‚o siÄ™ o 1
         if (!T_MoverParameters::IncBrakeLevelOld())
-            break; // wyjœcie awaryjne
-    while ((x < BrakeCtrlPos) && (BrakeCtrlPos >= -1)) // jeœli zmniejszy³o siê o 1
+            break; // wyjÅ›cie awaryjne
+    while ((x < BrakeCtrlPos) && (BrakeCtrlPos >= -1)) // jeÅ›li zmniejszyÅ‚o siÄ™ o 1
         if (!T_MoverParameters::DecBrakeLevelOld())
             break;
     BrakePressureActual = BrakePressureTable[BrakeCtrlPos + 2]; // skopiowanie pozycji
     /*
     //youBy: obawiam sie, ze tutaj to nie dziala :P
-    //Ra 2014-03: by³o tak zrobione, ¿e dzia³a³o - po ka¿dej zmianie pozycji by³a wywo³ywana ta
+    //Ra 2014-03: byÅ‚o tak zrobione, Å¼e dziaÅ‚aÅ‚o - po kaÅ¼dej zmianie pozycji byÅ‚a wywoÅ‚ywana ta
     funkcja
-    // if (BrakeSystem==Pneumatic?BrakeSubsystem==Oerlikon:false) //tylko Oerlikon akceptuje u³amki
+    // if (BrakeSystem==Pneumatic?BrakeSubsystem==Oerlikon:false) //tylko Oerlikon akceptuje uÅ‚amki
      if(false)
       if (fBrakeCtrlPos>0.0)
-      {//wartoœci poœrednie wyliczamy tylko dla hamowania
-       double u=fBrakeCtrlPos-double(x); //u³amek ponad wartoœæ ca³kowit¹
+      {//wartoÅ›ci poÅ›rednie wyliczamy tylko dla hamowania
+       double u=fBrakeCtrlPos-double(x); //uÅ‚amek ponad wartoÅ›Ä‡ caÅ‚kowitÄ…
        if (u>0.0)
-       {//wyliczamy wartoœci wa¿one
+       {//wyliczamy wartoÅ›ci waÅ¼one
         BrakePressureActual.PipePressureVal+=-u*BrakePressureActual.PipePressureVal+u*BrakePressureTable[BrakeCtrlPos+1+2].PipePressureVal;
         //BrakePressureActual.BrakePressureVal+=-u*BrakePressureActual.BrakePressureVal+u*BrakePressureTable[BrakeCtrlPos+1].BrakePressureVal;
-    //to chyba nie bêdzie tak dzia³aæ, zw³aszcza w EN57
+    //to chyba nie bÄ™dzie tak dziaÅ‚aÄ‡, zwÅ‚aszcza w EN57
         BrakePressureActual.FlowSpeedVal+=-u*BrakePressureActual.FlowSpeedVal+u*BrakePressureTable[BrakeCtrlPos+1+2].FlowSpeedVal;
        }
       }
@@ -218,19 +218,19 @@ void TMoverParameters::BrakeLevelSet(double b)
 };
 
 bool TMoverParameters::BrakeLevelAdd(double b)
-{ // dodanie wartoœci (b) do pozycji hamulca (w tym ujemnej)
-    // zwraca false, gdy po dodaniu by³o by poza zakresem
+{ // dodanie wartoÅ›ci (b) do pozycji hamulca (w tym ujemnej)
+    // zwraca false, gdy po dodaniu byÅ‚o by poza zakresem
     BrakeLevelSet(fBrakeCtrlPos + b);
     return b > 0.0 ? (fBrakeCtrlPos < BrakeCtrlPosNo) :
-                     (BrakeCtrlPos > -1.0); // true, jeœli mo¿na kontynuowaæ
+                     (BrakeCtrlPos > -1.0); // true, jeÅ›li moÅ¼na kontynuowaÄ‡
 };
 
 bool TMoverParameters::IncBrakeLevel()
-{ // nowa wersja na u¿ytek AI, false gdy osi¹gniêto pozycjê BrakeCtrlPosNo
+{ // nowa wersja na uÅ¼ytek AI, false gdy osiÄ…gniÄ™to pozycjÄ™ BrakeCtrlPosNo
   return BrakeLevelAdd(1.0); };
 
 bool TMoverParameters::DecBrakeLevel()
-{ // nowa wersja na u¿ytek AI, false gdy osi¹gniêto pozycjê -1 return BrakeLevelAdd(-1.0); };
+{ // nowa wersja na uÅ¼ytek AI, false gdy osiÄ…gniÄ™to pozycjÄ™ -1 return BrakeLevelAdd(-1.0); };
 
 bool TMoverParameters::ChangeCab(int direction)
 { // zmiana kabiny i resetowanie ustawien
@@ -240,7 +240,7 @@ bool TMoverParameters::ChangeCab(int direction)
         ActiveCab = ActiveCab + direction;
         if ((BrakeSystem == Pneumatic) && (BrakeCtrlPosNo > 0))
         {
-            //    if (BrakeHandle==FV4a)   //!!!POBIERAÆ WARTOŒÆ Z KLASY ZAWORU!!!
+            //    if (BrakeHandle==FV4a)   //!!!POBIERAÄ† WARTOÅšÄ† Z KLASY ZAWORU!!!
             //     BrakeLevelSet(-2); //BrakeCtrlPos=-2;
             //    else if ((BrakeHandle==FVel6)||(BrakeHandle==St113))
             //     BrakeLevelSet(2);
@@ -260,7 +260,7 @@ bool TMoverParameters::ChangeCab(int direction)
         //    BrakeStatus:=b_off; //z Megapacka
         MainCtrlPos = 0;
         ScndCtrlPos = 0;
-        // Ra: to poni¿ej jest bez sensu - mo¿na przejœæ nie wy³¹czaj¹c
+        // Ra: to poniÅ¼ej jest bez sensu - moÅ¼na przejÅ›Ä‡ nie wyÅ‚Ä…czajÄ…c
         // if ((EngineType!=DieselEngine)&&(EngineType!=DieselElectric))
         //{
         // Mains=false;
@@ -276,7 +276,7 @@ bool TMoverParameters::ChangeCab(int direction)
 
 bool TMoverParameters::CurrentSwitch(int direction)
 { // rozruch wysoki (true) albo niski (false)
-    // Ra: przenios³em z Train.cpp, nie wiem czy ma to sens
+    // Ra: przeniosÅ‚em z Train.cpp, nie wiem czy ma to sens
     if (MaxCurrentSwitch(direction))
     {
         if (TrainType != dt_EZT)
@@ -290,68 +290,68 @@ bool TMoverParameters::CurrentSwitch(int direction)
 };
 
 void TMoverParameters::UpdatePantVolume(double dt)
-{ // KURS90 - sprê¿arka pantografów; Ra 2014-07: teraz jest to zbiornik rozrz¹du, chocia¿ to jeszcze
+{ // KURS90 - sprÄ™Å¼arka pantografÃ³w; Ra 2014-07: teraz jest to zbiornik rozrzÄ…du, chociaÅ¼ to jeszcze
   // nie tak
-    if (EnginePowerSource.SourceType == CurrentCollector) // tylko jeœli pantografuj¹cy
+    if (EnginePowerSource.SourceType == CurrentCollector) // tylko jeÅ›li pantografujÄ…cy
     {
-        // Ra 2014-07: zasadniczo, to istnieje zbiornik rozrz¹du i zbiornik pantografów - na razie
+        // Ra 2014-07: zasadniczo, to istnieje zbiornik rozrzÄ…du i zbiornik pantografÃ³w - na razie
         // mamy razem
-        // Ra 2014-07: kurek trójdrogowy ³¹czy spr.pom. z pantografami i wy³¹cznikiem ciœnieniowym
+        // Ra 2014-07: kurek trÃ³jdrogowy Å‚Ä…czy spr.pom. z pantografami i wyÅ‚Ä…cznikiem ciÅ›nieniowym
         // WS
-        // Ra 2014-07: zbiornika rozrz¹du nie pompuje siê tu, tylko pantografy; potem mo¿na zamkn¹æ
-        // WS i odpaliæ resztê
+        // Ra 2014-07: zbiornika rozrzÄ…du nie pompuje siÄ™ tu, tylko pantografy; potem moÅ¼na zamknÄ…Ä‡
+        // WS i odpaliÄ‡ resztÄ™
         if ((TrainType == dt_EZT) ? (PantPress < ScndPipePress) :
-                                    bPantKurek3) // kurek zamyka po³¹czenie z ZG
-        { // zbiornik pantografu po³¹czony ze zbiornikiem g³ównym - ma³¹ sprê¿ark¹ siê tego nie
+                                    bPantKurek3) // kurek zamyka poÅ‚Ä…czenie z ZG
+        { // zbiornik pantografu poÅ‚Ä…czony ze zbiornikiem gÅ‚Ã³wnym - maÅ‚Ä… sprÄ™Å¼arkÄ… siÄ™ tego nie
           // napompuje
-            // Ra 2013-12: Niebugoc³aw mówi, ¿e w EZT nie ma potrzeby odcinaæ kurkiem
+            // Ra 2013-12: NiebugocÅ‚aw mÃ³wi, Å¼e w EZT nie ma potrzeby odcinaÄ‡ kurkiem
             PantPress = EnginePowerSource.CollectorParameters
-                            .MaxPress; // ograniczenie ciœnienia do MaxPress (tylko w pantografach!)
+                            .MaxPress; // ograniczenie ciÅ›nienia do MaxPress (tylko w pantografach!)
             if (PantPress > ScndPipePress)
                 PantPress = ScndPipePress; // oraz do ScndPipePress
-            PantVolume = (PantPress + 1) * 0.1; // objêtoœæ, na wypadek odciêcia kurkiem
+            PantVolume = (PantPress + 1) * 0.1; // objÄ™toÅ›Ä‡, na wypadek odciÄ™cia kurkiem
         }
         else
-        { // zbiornik g³ówny odciêty, mo¿na pompowaæ pantografy
-            if (PantCompFlag && Battery) // w³¹czona bateria i ma³a sprê¿arka
+        { // zbiornik gÅ‚Ã³wny odciÄ™ty, moÅ¼na pompowaÄ‡ pantografy
+            if (PantCompFlag && Battery) // wÅ‚Ä…czona bateria i maÅ‚a sprÄ™Å¼arka
                 PantVolume += dt * (TrainType == dt_EZT ? 0.003 : 0.005) *
                               (2 * 0.45 - ((0.1 / PantVolume / 10) - 0.1)) /
-                              0.45; // nape³nianie zbiornika pantografów
-            // Ra 2013-12: Niebugoc³aw mówi, ¿e w EZT nabija 1.5 raz wolniej ni¿ jak by³o 0.005
-            PantPress = (10.0 * PantVolume) - 1.0; // tu by siê przyda³a objêtoœæ zbiornika
+                              0.45; // napeÅ‚nianie zbiornika pantografÃ³w
+            // Ra 2013-12: NiebugocÅ‚aw mÃ³wi, Å¼e w EZT nabija 1.5 raz wolniej niÅ¼ jak byÅ‚o 0.005
+            PantPress = (10.0 * PantVolume) - 1.0; // tu by siÄ™ przydaÅ‚a objÄ™toÅ›Ä‡ zbiornika
         }
         if (!PantCompFlag && (PantVolume > 0.1))
-            PantVolume -= dt * 0.0003; // nieszczelnoœci: 0.0003=0.3l/s
-        if (Mains) // nie wchodziæ w funkcjê bez potrzeby
-            if (EngineType == ElectricSeriesMotor) // nie dotyczy... czego w³aœciwie?
+            PantVolume -= dt * 0.0003; // nieszczelnoÅ›ci: 0.0003=0.3l/s
+        if (Mains) // nie wchodziÄ‡ w funkcjÄ™ bez potrzeby
+            if (EngineType == ElectricSeriesMotor) // nie dotyczy... czego wÅ‚aÅ›ciwie?
                 if (PantPress < EnginePowerSource.CollectorParameters.MinPress)
                     if ((TrainType & (dt_EZT | dt_ET40 | dt_ET41 | dt_ET42)) ?
                             (GetTrainsetVoltage() < EnginePowerSource.CollectorParameters.MinV) :
-                            true) // to jest trochê proteza; zasilanie cz³onu mo¿e byæ przez sprzêg
+                            true) // to jest trochÄ™ proteza; zasilanie czÅ‚onu moÅ¼e byÄ‡ przez sprzÄ™g
                                   // WN
                         if (MainSwitch(false))
-                            EventFlag = true; // wywalenie szybkiego z powodu niskiego ciœnienia
-        if (TrainType != dt_EZT) // w EN57 pompuje siê tylko w silnikowym
-            // pierwotnie w CHK pantografy mia³y równie¿ rozrz¹dcze EZT
+                            EventFlag = true; // wywalenie szybkiego z powodu niskiego ciÅ›nienia
+        if (TrainType != dt_EZT) // w EN57 pompuje siÄ™ tylko w silnikowym
+            // pierwotnie w CHK pantografy miaÅ‚y rÃ³wnieÅ¼ rozrzÄ…dcze EZT
             for (int b = 0; b <= 1; ++b)
                 if (TestFlag(Couplers[b].CouplingFlag, ctrain_controll))
                     if (Couplers[b].Connected->PantVolume <
-                        PantVolume) // bo inaczej trzeba w obydwu cz³onach przestawiaæ
+                        PantVolume) // bo inaczej trzeba w obydwu czÅ‚onach przestawiaÄ‡
                         Couplers[b].Connected->PantVolume =
-                            PantVolume; // przekazanie ciœnienia do s¹siedniego cz³onu
-        // czy np. w ET40, ET41, ET42 pantografy cz³onów maj¹ po³¹czenie pneumatyczne?
-        // Ra 2014-07: raczej nie - najpierw siê za³¹cza jeden cz³on, a potem mo¿na podnieœæ w
+                            PantVolume; // przekazanie ciÅ›nienia do sÄ…siedniego czÅ‚onu
+        // czy np. w ET40, ET41, ET42 pantografy czÅ‚onÃ³w majÄ… poÅ‚Ä…czenie pneumatyczne?
+        // Ra 2014-07: raczej nie - najpierw siÄ™ zaÅ‚Ä…cza jeden czÅ‚on, a potem moÅ¼na podnieÅ›Ä‡ w
         // drugim
     }
     else
-    { // a tu coœ dla SM42 i SM31, aby pokazywaæ na manometrze
+    { // a tu coÅ› dla SM42 i SM31, aby pokazywaÄ‡ na manometrze
         PantPress = CntrlPipePress;
     }
 };
 
 void TMoverParameters::UpdateBatteryVoltage(double dt)
-{ // przeliczenie obci¹¿enia baterii
-    double sn1, sn2, sn3, sn4, sn5; // Ra: zrobiæ z tego amperomierz NN
+{ // przeliczenie obciÄ…Å¼enia baterii
+    double sn1, sn2, sn3, sn4, sn5; // Ra: zrobiÄ‡ z tego amperomierz NN
     if ((BatteryVoltage > 0) && (EngineType != DieselEngine) && (EngineType != WheelsDriven) &&
         (NominalBatteryVoltage > 0))
     {
@@ -369,12 +369,12 @@ void TMoverParameters::UpdateBatteryVoltage(double dt)
                 sn3 = (dt * 0.05);
             else
                 sn3 = 0;
-            if (iLights[0] & 63) // 64=blachy, nie ci¹gn¹ pr¹du //rozpisaæ na poszczególne
-                                 // ¿arówki...
+            if (iLights[0] & 63) // 64=blachy, nie ciÄ…gnÄ… prÄ…du //rozpisaÄ‡ na poszczegÃ³lne
+                                 // Å¼arÃ³wki...
                 sn4 = dt * 0.003;
             else
                 sn4 = 0;
-            if (iLights[1] & 63) // 64=blachy, nie ci¹gn¹ pr¹du
+            if (iLights[1] & 63) // 64=blachy, nie ciÄ…gnÄ… prÄ…du
                 sn5 = dt * 0.001;
             else
                 sn5 = 0;
@@ -393,11 +393,11 @@ void TMoverParameters::UpdateBatteryVoltage(double dt)
                 sn3 = (dt * 0.001);
             else
                 sn3 = 0;
-            if (iLights[0] & 63) // 64=blachy, nie ci¹gn¹ pr¹du
+            if (iLights[0] & 63) // 64=blachy, nie ciÄ…gnÄ… prÄ…du
                 sn4 = (dt * 0.0030);
             else
                 sn4 = 0;
-            if (iLights[1] & 63) // 64=blachy, nie ci¹gn¹ pr¹du
+            if (iLights[1] & 63) // 64=blachy, nie ciÄ…gnÄ… prÄ…du
                 sn5 = (dt * 0.0010);
             else
                 sn5 = 0;
@@ -411,14 +411,14 @@ void TMoverParameters::UpdateBatteryVoltage(double dt)
             sn2 = dt * 0.000001;
             sn3 = dt * 0.000001;
             sn4 = dt * 0.000001;
-            sn5 = dt * 0.000001; // bardzo powolny spadek przy wy³¹czonych bateriach
+            sn5 = dt * 0.000001; // bardzo powolny spadek przy wyÅ‚Ä…czonych bateriach
         };
         BatteryVoltage -= (sn1 + sn2 + sn3 + sn4 + sn5);
         if (NominalBatteryVoltage / BatteryVoltage > 1.57)
             if (MainSwitch(false) && (EngineType != DieselEngine) && (EngineType != WheelsDriven))
                 EventFlag = true; // wywalanie szybkiego z powodu zbyt niskiego napiecia
         if (BatteryVoltage > NominalBatteryVoltage)
-            BatteryVoltage = NominalBatteryVoltage; // wstrzymanie ³adowania pow. 110V
+            BatteryVoltage = NominalBatteryVoltage; // wstrzymanie Å‚adowania pow. 110V
         if (BatteryVoltage < 0.01)
             BatteryVoltage = 0.01;
     }
@@ -429,13 +429,13 @@ void TMoverParameters::UpdateBatteryVoltage(double dt)
 };
 
 /* Ukrotnienie EN57:
-1 //uk³ad szeregowy
-2 //uk³ad równoleg³y
+1 //ukÅ‚ad szeregowy
+2 //ukÅ‚ad rÃ³wnolegÅ‚y
 3 //bocznik 1
 4 //bocznik 2
 5 //bocznik 3
 6 //do przodu
-7 //do ty³u
+7 //do tyÅ‚u
 8 //1 przyspieszenie
 9 //minus obw. 2 przyspieszenia
 10 //jazda na oporach
@@ -443,26 +443,26 @@ void TMoverParameters::UpdateBatteryVoltage(double dt)
 12A //podnoszenie pantografu przedniego
 12B //podnoszenie pantografu tylnego
 13A //opuszczanie pantografu przedniego
-13B //opuszczanie wszystkich pantografów
-14 //za³¹czenie WS
-15 //rozrz¹d (WS, PSR, wa³ ku³akowy)
+13B //opuszczanie wszystkich pantografÃ³w
+14 //zaÅ‚Ä…czenie WS
+15 //rozrzÄ…d (WS, PSR, waÅ‚ kuÅ‚akowy)
 16 //odblok PN
-18 //sygnalizacja przetwornicy g³ównej
+18 //sygnalizacja przetwornicy gÅ‚Ã³wnej
 19 //luzowanie EP
 20 //hamowanie EP
 21 //rezerwa** (1900+: zamykanie drzwi prawych)
-22 //za³. przetwornicy g³ównej
-23 //wy³. przetwornicy g³ównej
-24 //za³. przetw. oœwietlenia
-25 //wy³. przetwornicy oœwietlenia
+22 //zaÅ‚. przetwornicy gÅ‚Ã³wnej
+23 //wyÅ‚. przetwornicy gÅ‚Ã³wnej
+24 //zaÅ‚. przetw. oÅ›wietlenia
+25 //wyÅ‚. przetwornicy oÅ›wietlenia
 26 //sygnalizacja WS
-28 //sprê¿arka
+28 //sprÄ™Å¼arka
 29 //ogrzewanie
 30 //rezerwa* (1900+: zamykanie drzwi lewych)
 31 //otwieranie drzwi prawych
-32H //zadzia³anie PN siln. trakcyjnych
-33 //sygna³ odjazdu
-34 //rezerwa (sygnalizacja poœlizgu)
+32H //zadziaÅ‚anie PN siln. trakcyjnych
+33 //sygnaÅ‚ odjazdu
+34 //rezerwa (sygnalizacja poÅ›lizgu)
 35 //otwieranie drzwi lewych
 ZN //masa
 */
@@ -471,11 +471,11 @@ double TMoverParameters::ComputeMovement(double dt, double dt1, const TTrackShap
                                                     TTrackParam &Track,
                                                     TTractionParam &ElectricTraction,
                                                     const TLocation &NewLoc, TRotation &NewRot)
-{ // trzeba po ma³u przenosiæ tu tê funkcjê
+{ // trzeba po maÅ‚u przenosiÄ‡ tu tÄ™ funkcjÄ™
     double d;
     T_MoverParameters::ComputeMovement(dt, dt1, Shape, Track, ElectricTraction, NewLoc, NewRot);
-    if (Power > 1.0) // w rozrz¹dczym nie (jest b³¹d w FIZ!) - Ra 2014-07: teraz we wszystkich
-        UpdatePantVolume(dt); // Ra 2014-07: obs³uga zbiornika rozrz¹du oraz pantografów
+    if (Power > 1.0) // w rozrzÄ…dczym nie (jest bÅ‚Ä…d w FIZ!) - Ra 2014-07: teraz we wszystkich
+        UpdatePantVolume(dt); // Ra 2014-07: obsÅ‚uga zbiornika rozrzÄ…du oraz pantografÃ³w
 
     if (EngineType == WheelsDriven)
         d = CabNo * dL; // na chwile dla testu
@@ -486,9 +486,9 @@ double TMoverParameters::ComputeMovement(double dt, double dt1, const TTrackShap
 
     // koniec procedury, tu nastepuja dodatkowe procedury pomocnicze
 
-    // sprawdzanie i ewentualnie wykonywanie->kasowanie poleceñ
-    if (LoadStatus > 0) // czas doliczamy tylko jeœli trwa (roz)³adowanie
-        LastLoadChangeTime = LastLoadChangeTime + dt; // czas (roz)³adunku
+    // sprawdzanie i ewentualnie wykonywanie->kasowanie poleceÅ„
+    if (LoadStatus > 0) // czas doliczamy tylko jeÅ›li trwa (roz)Å‚adowanie
+        LastLoadChangeTime = LastLoadChangeTime + dt; // czas (roz)Å‚adunku
     RunInternalCommand();
     // automatyczny rozruch
     if (EngineType == ElectricSeriesMotor)
@@ -515,18 +515,18 @@ double TMoverParameters::ComputeMovement(double dt, double dt1, const TTrackShap
         CompressorFlag = false;
     };
     ConverterCheck();
-    if (CompressorSpeed > 0.0) // sprê¿arka musi mieæ jak¹œ niezerow¹ wydajnoœæ
-        CompressorCheck(dt); //¿eby rozwa¿aæ jej za³¹czenie i pracê
+    if (CompressorSpeed > 0.0) // sprÄ™Å¼arka musi mieÄ‡ jakÄ…Å› niezerowÄ… wydajnoÅ›Ä‡
+        CompressorCheck(dt); //Å¼eby rozwaÅ¼aÄ‡ jej zaÅ‚Ä…czenie i pracÄ™
     UpdateBrakePressure(dt);
     UpdatePipePressure(dt);
     UpdateBatteryVoltage(dt);
     UpdateScndPipePressure(dt); // druga rurka, youBy
-    // hamulec antypoœlizgowy - wy³¹czanie
+    // hamulec antypoÅ›lizgowy - wyÅ‚Ä…czanie
     if ((BrakeSlippingTimer > 0.8) && (ASBType != 128)) // ASBSpeed=0.8
         Hamulec->ASB(0);
     // SetFlag(BrakeStatus,-b_antislip);
     BrakeSlippingTimer = BrakeSlippingTimer + dt;
-    // sypanie piasku - wy³¹czone i piasek siê nie koñczy - b³êdy AI
+    // sypanie piasku - wyÅ‚Ä…czone i piasek siÄ™ nie koÅ„czy - bÅ‚Ä™dy AI
     // if AIControllFlag then
     // if SandDose then
     //  if Sand>0 then
@@ -549,11 +549,11 @@ double TMoverParameters::ComputeMovement(double dt, double dt1, const TTrackShap
 double TMoverParameters::FastComputeMovement(double dt, const TTrackShape &Shape,
                                                         TTrackParam &Track, const TLocation &NewLoc,
                                                         TRotation &NewRot)
-{ // trzeba po ma³u przenosiæ tu tê funkcjê
+{ // trzeba po maÅ‚u przenosiÄ‡ tu tÄ™ funkcjÄ™
     double d;
     T_MoverParameters::FastComputeMovement(dt, Shape, Track, NewLoc, NewRot);
-    if (Power > 1.0) // w rozrz¹dczym nie (jest b³¹d w FIZ!)
-        UpdatePantVolume(dt); // Ra 2014-07: obs³uga zbiornika rozrz¹du oraz pantografów
+    if (Power > 1.0) // w rozrzÄ…dczym nie (jest bÅ‚Ä…d w FIZ!)
+        UpdatePantVolume(dt); // Ra 2014-07: obsÅ‚uga zbiornika rozrzÄ…du oraz pantografÃ³w
     if (EngineType == WheelsDriven)
         d = CabNo * dL; // na chwile dla testu
     else
@@ -563,9 +563,9 @@ double TMoverParameters::FastComputeMovement(double dt, const TTrackShape &Shape
 
     // koniec procedury, tu nastepuja dodatkowe procedury pomocnicze
 
-    // sprawdzanie i ewentualnie wykonywanie->kasowanie poleceñ
-    if (LoadStatus > 0) // czas doliczamy tylko jeœli trwa (roz)³adowanie
-        LastLoadChangeTime = LastLoadChangeTime + dt; // czas (roz)³adunku
+    // sprawdzanie i ewentualnie wykonywanie->kasowanie poleceÅ„
+    if (LoadStatus > 0) // czas doliczamy tylko jeÅ›li trwa (roz)Å‚adowanie
+        LastLoadChangeTime = LastLoadChangeTime + dt; // czas (roz)Å‚adunku
     RunInternalCommand();
     if (EngineType == DieselEngine)
         if (dizel_Update(dt))
@@ -579,13 +579,13 @@ double TMoverParameters::FastComputeMovement(double dt, const TTrackShape &Shape
         CompressorFlag = false;
     };
     ConverterCheck();
-    if (CompressorSpeed > 0.0) // sprê¿arka musi mieæ jak¹œ niezerow¹ wydajnoœæ
-        CompressorCheck(dt); //¿eby rozwa¿aæ jej za³¹czenie i pracê
+    if (CompressorSpeed > 0.0) // sprÄ™Å¼arka musi mieÄ‡ jakÄ…Å› niezerowÄ… wydajnoÅ›Ä‡
+        CompressorCheck(dt); //Å¼eby rozwaÅ¼aÄ‡ jej zaÅ‚Ä…czenie i pracÄ™
     UpdateBrakePressure(dt);
     UpdatePipePressure(dt);
     UpdateScndPipePressure(dt); // druga rurka, youBy
     UpdateBatteryVoltage(dt);
-    // hamulec antyposlizgowy - wy³¹czanie
+    // hamulec antyposlizgowy - wyÅ‚Ä…czanie
     if ((BrakeSlippingTimer > 0.8) && (ASBType != 128)) // ASBSpeed=0.8
         Hamulec->ASB(0);
     BrakeSlippingTimer = BrakeSlippingTimer + dt;
@@ -593,7 +593,7 @@ double TMoverParameters::FastComputeMovement(double dt, const TTrackShape &Shape
 };
 
 double TMoverParameters::ShowEngineRotation(int VehN)
-{ // pokazywanie obrotów silnika, równie¿ dwóch dalszych pojazdów (3×SN61)
+{ // pokazywanie obrotÃ³w silnika, rÃ³wnieÅ¼ dwÃ³ch dalszych pojazdÃ³w (3Ã—SN61)
     int b;
     switch (VehN)
     { // numer obrotomierza
@@ -605,7 +605,7 @@ double TMoverParameters::ShowEngineRotation(int VehN)
                 if (Couplers[b].Connected->Power > 0.01)
                     return fabs(Couplers[b].Connected->enrot);
         break;
-    case 3: // to nie uwzglêdnia ewentualnego odwrócenia pojazdu w œrodku
+    case 3: // to nie uwzglÄ™dnia ewentualnego odwrÃ³cenia pojazdu w Å›rodku
         for (b = 0; b <= 1; ++b)
             if (TestFlag(Couplers[b].CouplingFlag, ctrain_controll))
                 if (Couplers[b].Connected->Power > 0.01)
@@ -626,7 +626,7 @@ void TMoverParameters::ConverterCheck()
 };
 
 int TMoverParameters::ShowCurrent(Byte AmpN)
-{ // odczyt ampera¿u
+{ // odczyt amperaÅ¼u
     switch (EngineType)
     {
     case ElectricInductionMotor:

@@ -1,15 +1,7 @@
-//---------------------------------------------------------------------------
-
-#include "system.hpp"
-#include "classes.hpp"
-#pragma hdrstop
-
 #include "Timer.h"
 #include "AdvSound.h"
-//---------------------------------------------------------------------------
-#pragma package(smart_init)
 
-__fastcall TAdvancedSound::TAdvancedSound()
+TAdvancedSound::TAdvancedSound()
 {
     //    SoundStart=SoundCommencing=SoundShut= NULL;
     State = ss_Off;
@@ -18,8 +10,8 @@ __fastcall TAdvancedSound::TAdvancedSound()
     fShutLength = 0;
 }
 
-__fastcall TAdvancedSound::~TAdvancedSound()
-{ // Ra: stopowanie siÍ sypie
+TAdvancedSound::~TAdvancedSound()
+{   // Ra: stopowanie siƒô sypie
     // SoundStart.Stop();
     // SoundCommencing.Stop();
     // SoundShut.Stop();
@@ -27,8 +19,8 @@ __fastcall TAdvancedSound::~TAdvancedSound()
 
 void TAdvancedSound::Free() {}
 
-void TAdvancedSound::Init(char *NameOn, char *Name, char *NameOff,
-                                     double DistanceAttenuation, vector3 pPosition)
+void TAdvancedSound::Init(const std::string NameOn, const std::string Name,
+                          const std::string NameOff, double DistanceAttenuation, vector3 pPosition)
 {
     SoundStart.Init(NameOn, DistanceAttenuation, pPosition.x, pPosition.y, pPosition.z, true);
     SoundCommencing.Init(Name, DistanceAttenuation, pPosition.x, pPosition.y, pPosition.z, true);
@@ -51,13 +43,11 @@ void TAdvancedSound::Init(char *NameOn, char *Name, char *NameOff,
     SoundShut.FA = 0.0;
 }
 
-void TAdvancedSound::Load(TQueryParserComp *Parser, vector3 pPosition)
+void TAdvancedSound::Load(cParser &parser, vector3 pPosition)
 {
-    AnsiString NameOn = Parser->GetNextSymbol().LowerCase();
-    AnsiString Name = Parser->GetNextSymbol().LowerCase();
-    AnsiString NameOff = Parser->GetNextSymbol().LowerCase();
     double DistanceAttenuation = Parser->GetNextSymbol().ToDouble();
-    Init(NameOn.c_str(), Name.c_str(), NameOff.c_str(), DistanceAttenuation, pPosition);
+    Init(parser.readString(), parser.readString(), parser.readString(), parser.readDouble(),
+         pPosition);
 }
 
 void TAdvancedSound::TurnOn(bool ListenerInside, vector3 NewPosition)
@@ -124,8 +114,7 @@ void TAdvancedSound::Update(bool ListenerInside, vector3 NewPosition)
     }
 }
 
-void TAdvancedSound::UpdateAF(double A, double F, bool ListenerInside,
-                                         vector3 NewPosition)
+void TAdvancedSound::UpdateAF(double A, double F, bool ListenerInside, vector3 NewPosition)
 { // update, ale z amplituda i czestotliwoscia
     if ((State == ss_Commencing) && (SoundCommencing.AM > 0))
     {
@@ -162,9 +151,9 @@ void TAdvancedSound::UpdateAF(double A, double F, bool ListenerInside,
 }
 
 void TAdvancedSound::CopyIfEmpty(TAdvancedSound &s)
-{ // skopiowanie, gdyby by≥ potrzebny, a nie zosta≥ wczytany
+{ // skopiowanie, gdyby by≈Ç potrzebny, a nie zosta≈Ç wczytany
     if ((fStartLength > 0.0) || (fShutLength > 0.0))
-        return; // coú jest
+        return; // co≈õ jest
     SoundStart = s.SoundStart;
     SoundCommencing = s.SoundCommencing;
     SoundShut = s.SoundShut;

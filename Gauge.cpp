@@ -25,7 +25,7 @@ __fastcall TGauge::TGauge()
     fOffset = 0.0;
     fScale = 1.0;
     fStepSize = 5;
-    // iChannel=-1; //kana≥ analogowej komunikacji zwrotnej
+    // iChannel=-1; //kana≈Ç analogowej komunikacji zwrotnej
     SubModel = NULL;
 };
 
@@ -41,9 +41,9 @@ void TGauge::Clear()
 
 void TGauge::Init(TSubModel *NewSubModel, TGaugeType eNewType, double fNewScale,
                              double fNewOffset, double fNewFriction, double fNewValue)
-{ // ustawienie parametrÛw animacji submodelu
+{ // ustawienie parametr√≥w animacji submodelu
     if (NewSubModel)
-    { // warunek na wszelki wypadek, gdyby siÍ submodel nie pod≥πczy≥
+    { // warunek na wszelki wypadek, gdyby siƒô submodel nie pod≈ÇƒÖczy≈Ç
         fFriction = fNewFriction;
         fValue = fNewValue;
         fOffset = fNewOffset;
@@ -54,18 +54,18 @@ void TGauge::Init(TSubModel *NewSubModel, TGaugeType eNewType, double fNewScale,
         {
             TSubModel *sm = SubModel->ChildGet();
             do
-            { // pÍtla po submodelach potomnych i obracanie ich o kπt zaleøy od cyfry w (fValue)
+            { // pƒôtla po submodelach potomnych i obracanie ich o kƒÖt zale≈ºy od cyfry w (fValue)
                 if (sm->pName)
-                { // musi mieÊ niepustπ nazwÍ
+                { // musi mieƒá niepustƒÖ nazwƒô
                     if ((*sm->pName) >= '0')
                         if ((*sm->pName) <= '9')
-                            sm->WillBeAnimated(); // wy≥πczenie optymalizacji
+                            sm->WillBeAnimated(); // wy≈ÇƒÖczenie optymalizacji
                 }
                 sm = sm->NextGet();
             } while (sm);
         }
-        else // a banan moøe byÊ z optymalizacjπ?
-            NewSubModel->WillBeAnimated(); // wy≥πczenie ignowania jedynkowego transformu
+        else // a banan mo≈ºe byƒá z optymalizacjƒÖ?
+            NewSubModel->WillBeAnimated(); // wy≈ÇƒÖczenie ignowania jedynkowego transformu
     }
 };
 
@@ -77,10 +77,10 @@ bool TGauge::Load(TQueryParserComp *Parser, TModel3d *md1, TModel3d *md2, double
     double val4 = Parser->GetNextSymbol().ToDouble();
     double val5 = Parser->GetNextSymbol().ToDouble();
     TSubModel *sm = md1->GetFromName(str1.c_str());
-    if (sm) // jeúli nie znaleziony
-        md2 = NULL; // informacja, øe znaleziony
-    else if (md2) // a jest podany drugi model (np. zewnÍtrzny)
-        sm = md2->GetFromName(str1.c_str()); // to moøe tam bÍdzie, co za rÛønica gdzie
+    if (sm) // je≈õli nie znaleziony
+        md2 = NULL; // informacja, ≈ºe znaleziony
+    else if (md2) // a jest podany drugi model (np. zewnƒôtrzny)
+        sm = md2->GetFromName(str1.c_str()); // to mo≈ºe tam bƒôdzie, co za r√≥≈ºnica gdzie
     if (str2 == "mov")
         Init(sm, gt_Move, val3, val4, val5);
     else if (str2 == "wip")
@@ -89,7 +89,7 @@ bool TGauge::Load(TQueryParserComp *Parser, TModel3d *md1, TModel3d *md2, double
         Init(sm, gt_Digital, val3, val4, val5);
     else
         Init(sm, gt_Rotate, val3, val4, val5);
-    return (md2); // true, gdy podany model zewnÍtrzny, a w kabinie nie by≥o
+    return (md2); // true, gdy podany model zewnƒôtrzny, a w kabinie nie by≈Ço
 };
 
 void TGauge::PermIncValue(double fNewDesired)
@@ -103,21 +103,21 @@ void TGauge::PermIncValue(double fNewDesired)
 };
 
 void TGauge::IncValue(double fNewDesired)
-{ // uøywane tylko dla uniwersali
+{ // u≈ºywane tylko dla uniwersali
     fDesiredValue = fDesiredValue + fNewDesired * fScale + fOffset;
     if (fDesiredValue > fScale + fOffset)
         fDesiredValue = fScale + fOffset;
 };
 
 void TGauge::DecValue(double fNewDesired)
-{ // uøywane tylko dla uniwersali
+{ // u≈ºywane tylko dla uniwersali
     fDesiredValue = fDesiredValue - fNewDesired * fScale + fOffset;
     if (fDesiredValue < 0)
         fDesiredValue = 0;
 };
 
 void TGauge::UpdateValue(double fNewDesired)
-{ // ustawienie wartoúci docelowej
+{ // ustawienie warto≈õci docelowej
     fDesiredValue = fNewDesired * fScale + fOffset;
 };
 
@@ -137,7 +137,7 @@ void TGauge::Update()
     else
         fValue = fDesiredValue;
     if (SubModel)
-    { // warunek na wszelki wypadek, gdyby siÍ submodel nie pod≥πczy≥
+    { // warunek na wszelki wypadek, gdyby siƒô submodel nie pod≈ÇƒÖczy≈Ç
         TSubModel *sm;
         switch (eType)
         {
@@ -160,12 +160,12 @@ void TGauge::Update()
             break;
         case gt_Digital: // Ra 2014-07: licznik cyfrowy
             sm = SubModel->ChildGet();
-            AnsiString n = FormatFloat("0000000000", floor(fValue)); // na razie tak trochÍ bez
+            AnsiString n = FormatFloat("0000000000", floor(fValue)); // na razie tak trochƒô bez
                                                                      // sensu
             do
-            { // pÍtla po submodelach potomnych i obracanie ich o kπt zaleøy od cyfry w (fValue)
+            { // pƒôtla po submodelach potomnych i obracanie ich o kƒÖt zale≈ºy od cyfry w (fValue)
                 if (sm->pName)
-                { // musi mieÊ niepustπ nazwÍ
+                { // musi mieƒá niepustƒÖ nazwƒô
                     if ((*sm->pName) >= '0')
                         if ((*sm->pName) <= '9')
                             sm->SetRotate(float3(0, 1, 0),
@@ -196,9 +196,9 @@ void TGauge::AssignInt(int *iValue)
     iData = iValue;
 };
 void TGauge::UpdateValue()
-{ // ustawienie wartoúci docelowej z parametru
+{ // ustawienie warto≈õci docelowej z parametru
     switch (cDataType)
-    { // to nie jest zbyt optymalne, moøna by zrobiÊ osobne funkcje
+    { // to nie jest zbyt optymalne, mo≈ºna by zrobiƒá osobne funkcje
     case 'f':
         fDesiredValue = (*fData) * fScale + fOffset;
         break;

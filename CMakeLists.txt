@@ -1,4 +1,6 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.2.1)
+
+project(MaSzyna LANGUAGES C CXX)
 
 find_package(OpenGL REQUIRED)
 
@@ -18,7 +20,6 @@ set(MASZYNA_SRCS
     EvLaunch.h
     FadeSound.h
     Float3d.h
-    Forth.h
     Gauge.h
     Geom.h
     geometry.h
@@ -69,7 +70,6 @@ set(MASZYNA_SRCS
     EvLaunch.cpp
     FadeSound.cpp
     Float3d.cpp
-    Forth.cpp
     Gauge.cpp
     Geom.cpp
     geometry.cpp
@@ -82,7 +82,6 @@ set(MASZYNA_SRCS
     Model3d.cpp
     Mover.cpp
     Names.cpp
-    opengl/ARB_Multisample.cpp
     parser.cpp
     RealSound.cpp
     ResourceManager.cpp
@@ -107,12 +106,10 @@ set(MASZYNA_SRCS
 
 add_executable(eu07 ${MASZYNA_SRCS})
 
-if(NOT APPLE)
-    set_target_properties(eu07 PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON)
-else()
-    set_target_properties(eu07 PROPERTIES COMPILE_FLAGS "-std=c++11")
-endif()
+set_target_properties(eu07 PROPERTIES 
+    CXX_STANDARD 11 
+    CXX_EXTENSIONS OFF 
+    CXX_STANDARD_REQUIRED ON)
 
 target_include_directories(eu07 PRIVATE ${OPENGL_INCLUDE_DIR})
 target_link_libraries(eu07 ${OPENGL_LIBRARIES})
-

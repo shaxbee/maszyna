@@ -19,56 +19,56 @@
 
 // namespace Global {
 
-// parametry do uøytku wewnÍtrznego
+// parametry do u≈ºytku wewnƒôtrznego
 // double Global::tSinceStart=0;
 TGround *Global::pGround = NULL;
 // char Global::CreatorName1[30]="2001-2004 Maciej Czapkiewicz <McZapkie>";
-// char Global::CreatorName2[30]="2001-2003 Marcin Woüniak <Marcin_EU>";
+// char Global::CreatorName2[30]="2001-2003 Marcin Wo≈∫niak <Marcin_EU>";
 // char Global::CreatorName3[20]="2004-2005 Adam Bugiel <ABu>";
-// char Global::CreatorName4[30]="2004 Arkadiusz ålusarczyk <Winger>";
-// char Global::CreatorName5[30]="2003-2009 £ukasz Kirchner <Nbmx>";
+// char Global::CreatorName4[30]="2004 Arkadiusz ≈ölusarczyk <Winger>";
+// char Global::CreatorName5[30]="2003-2009 ≈Åukasz Kirchner <Nbmx>";
 AnsiString Global::asCurrentSceneryPath = "scenery/";
 AnsiString Global::asCurrentTexturePath = AnsiString(szTexturePath);
 AnsiString Global::asCurrentDynamicPath = "";
 int Global::iSlowMotion =
-    0; // info o malym FPS: 0-OK, 1-wy≥πczyÊ multisampling, 3-promieÒ 1.5km, 7-1km
+    0; // info o malym FPS: 0-OK, 1-wy≈ÇƒÖczyƒá multisampling, 3-promie≈Ñ 1.5km, 7-1km
 TDynamicObject *Global::changeDynObj = NULL; // info o zmianie pojazdu
 bool Global::detonatoryOK; // info o nowych detonatorach
 double Global::ABuDebug = 0;
 AnsiString Global::asSky = "1";
-double Global::fOpenGL = 0.0; // wersja OpenGL - do sprawdzania obecnoúci rozszerzeÒ
-bool Global::bOpenGL_1_5 = false; // czy sπ dostÍpne funkcje OpenGL 1.5
-double Global::fLuminance = 1.0; // jasnoúÊ úwiat≥a do automatycznego zapalania
-int Global::iReCompile = 0; // zwiÍkszany, gdy trzeba odúwieøyÊ siatki
+double Global::fOpenGL = 0.0; // wersja OpenGL - do sprawdzania obecno≈õci rozszerze≈Ñ
+bool Global::bOpenGL_1_5 = false; // czy sƒÖ dostƒôpne funkcje OpenGL 1.5
+double Global::fLuminance = 1.0; // jasno≈õƒá ≈õwiat≈Ça do automatycznego zapalania
+int Global::iReCompile = 0; // zwiƒôkszany, gdy trzeba od≈õwie≈ºyƒá siatki
 HWND Global::hWnd = NULL; // uchwyt okna
 int Global::iCameraLast = -1;
 AnsiString Global::asRelease = "15.3.1166.469";
 AnsiString Global::asVersion =
-    "Compilation 2015-03-25, release " + Global::asRelease + "."; // tutaj, bo wysy≥any
-int Global::iViewMode = 0; // co aktualnie widaÊ: 0-kabina, 1-latanie, 2-sprzÍgi, 3-dokumenty
-int Global::iTextMode = 0; // tryb pracy wyúwietlacza tekstowego
+    "Compilation 2015-03-25, release " + Global::asRelease + "."; // tutaj, bo wysy≈Çany
+int Global::iViewMode = 0; // co aktualnie widaƒá: 0-kabina, 1-latanie, 2-sprzƒôgi, 3-dokumenty
+int Global::iTextMode = 0; // tryb pracy wy≈õwietlacza tekstowego
 int Global::iScreenMode[12] = {0, 0, 0, 0, 0, 0,
-                               0, 0, 0, 0, 0, 0}; // numer ekranu wyúwietlacza tekstowego
-double Global::fSunDeclination = 0.0; // deklinacja S≥oÒca
-double Global::fTimeAngleDeg = 0.0; // godzina w postaci kπta
-float Global::fClockAngleDeg[6]; // kπty obrotu cylindrÛw dla zegara cyfrowego
+                               0, 0, 0, 0, 0, 0}; // numer ekranu wy≈õwietlacza tekstowego
+double Global::fSunDeclination = 0.0; // deklinacja S≈Ço≈Ñca
+double Global::fTimeAngleDeg = 0.0; // godzina w postaci kƒÖta
+float Global::fClockAngleDeg[6]; // kƒÖty obrotu cylindr√≥w dla zegara cyfrowego
 char *Global::szTexturesTGA[4] = {"tga", "dds", "tex", "bmp"}; // lista tekstur od TGA
 char *Global::szTexturesDDS[4] = {"dds", "tga", "tex", "bmp"}; // lista tekstur od DDS
-int Global::iKeyLast = 0; // ostatnio naciúniÍty klawisz w celu logowania
-GLuint Global::iTextureId = 0; // ostatnio uøyta tekstura 2D
+int Global::iKeyLast = 0; // ostatnio naci≈õniƒôty klawisz w celu logowania
+GLuint Global::iTextureId = 0; // ostatnio u≈ºyta tekstura 2D
 int Global::iPause = 0x10; // globalna pauza ruchu
 bool Global::bActive = true; // czy jest aktywnym oknem
-int Global::iErorrCounter = 0; // licznik sprawdzaÒ do úledzenia b≥ÍdÛw OpenGL
-int Global::iTextures = 0; // licznik uøytych tekstur
+int Global::iErorrCounter = 0; // licznik sprawdza≈Ñ do ≈õledzenia b≈Çƒôd√≥w OpenGL
+int Global::iTextures = 0; // licznik u≈ºytych tekstur
 TWorld *Global::pWorld = NULL;
 Queryparsercomp::TQueryParserComp *Global::qParser = NULL;
 cParser *Global::pParser = NULL;
-int Global::iSegmentsRendered = 90; // iloúÊ segmentÛw do regulacji wydajnoúci
+int Global::iSegmentsRendered = 90; // ilo≈õƒá segment√≥w do regulacji wydajno≈õci
 TCamera *Global::pCamera = NULL; // parametry kamery
-TDynamicObject *Global::pUserDynamic = NULL; // pojazd uøytkownika, renderowany bez trzÍsienia
-bool Global::bSmudge = false; // czy wyúwietlaÊ smugÍ, a pojazd uøytkownika na koÒcu
+TDynamicObject *Global::pUserDynamic = NULL; // pojazd u≈ºytkownika, renderowany bez trzƒôsienia
+bool Global::bSmudge = false; // czy wy≈õwietlaƒá smugƒô, a pojazd u≈ºytkownika na ko≈Ñcu
 AnsiString Global::asTranscript[5]; // napisy na ekranie (widoczne)
-TTranscripts Global::tranTexts; // obiekt obs≥ugujπcy stenogramy düwiÍkÛw na ekranie
+TTranscripts Global::tranTexts; // obiekt obs≈ÇugujƒÖcy stenogramy d≈∫wiƒôk√≥w na ekranie
 
 // parametry scenerii
 vector3 Global::pCameraPosition;
@@ -83,22 +83,22 @@ GLfloat Global::FogColor[] = {0.6f, 0.7f, 0.8f};
 GLfloat Global::ambientDayLight[] = {0.40f, 0.40f, 0.45f, 1.0f}; // robocze
 GLfloat Global::diffuseDayLight[] = {0.55f, 0.54f, 0.50f, 1.0f};
 GLfloat Global::specularDayLight[] = {0.95f, 0.94f, 0.90f, 1.0f};
-GLfloat Global::ambientLight[] = {0.80f, 0.80f, 0.85f, 1.0f}; // sta≥e
+GLfloat Global::ambientLight[] = {0.80f, 0.80f, 0.85f, 1.0f}; // sta≈Çe
 GLfloat Global::diffuseLight[] = {0.85f, 0.85f, 0.80f, 1.0f};
 GLfloat Global::specularLight[] = {0.95f, 0.94f, 0.90f, 1.0f};
 GLfloat Global::whiteLight[] = {1.00f, 1.00f, 1.00f, 1.0f};
 GLfloat Global::noLight[] = {0.00f, 0.00f, 0.00f, 1.0f};
-GLfloat Global::darkLight[] = {0.03f, 0.03f, 0.03f, 1.0f}; //úladowe
+GLfloat Global::darkLight[] = {0.03f, 0.03f, 0.03f, 1.0f}; //≈õladowe
 GLfloat Global::lightPos[4];
-bool Global::bRollFix = true; // czy wykonaÊ przeliczanie przechy≥ki
-bool Global::bJoinEvents = false; // czy grupowaÊ eventy o tych samych nazwach
-int Global::iHiddenEvents = 0; // czy ≥πczyÊ eventy z torami poprzez nazwÍ toru
+bool Global::bRollFix = true; // czy wykonaƒá przeliczanie przechy≈Çki
+bool Global::bJoinEvents = false; // czy grupowaƒá eventy o tych samych nazwach
+int Global::iHiddenEvents = 0; // czy ≈ÇƒÖczyƒá eventy z torami poprzez nazwƒô toru
 
-// parametry uøytkowe (jak komu pasuje)
+// parametry u≈ºytkowe (jak komu pasuje)
 int Global::Keys[MaxKeys];
 int Global::iWindowWidth = 800;
 int Global::iWindowHeight = 600;
-float Global::fDistanceFactor = 768.0; // baza do przeliczania odleg≥oúci dla LoD
+float Global::fDistanceFactor = 768.0; // baza do przeliczania odleg≈Ço≈õci dla LoD
 int Global::iFeedbackMode = 1; // tryb pracy informacji zwrotnej
 int Global::iFeedbackPort = 0; // dodatkowy adres dla informacji zwrotnych
 bool Global::bFreeFly = false;
@@ -108,51 +108,51 @@ float Global::fMouseXScale = 1.5;
 float Global::fMouseYScale = 0.2;
 char Global::szSceneryFile[256] = "td.scn";
 AnsiString Global::asHumanCtrlVehicle = "EU07-424";
-int Global::iMultiplayer = 0; // blokada dzia≥ania niektÛrych funkcji na rzecz komunikacji
-double Global::fMoveLight = -1; // ruchome úwiat≥o
-double Global::fLatitudeDeg = 52.0; // szerokoúÊ geograficzna
-float Global::fFriction = 1.0; // mnoønik tarcia - KURS90
+int Global::iMultiplayer = 0; // blokada dzia≈Çania niekt√≥rych funkcji na rzecz komunikacji
+double Global::fMoveLight = -1; // ruchome ≈õwiat≈Ço
+double Global::fLatitudeDeg = 52.0; // szeroko≈õƒá geograficzna
+float Global::fFriction = 1.0; // mno≈ºnik tarcia - KURS90
 double Global::fBrakeStep = 1.0; // krok zmiany hamulca dla klawiszy [Num3] i [Num9]
-AnsiString Global::asLang = "pl"; // domyúlny jÍzyk - http://tools.ietf.org/html/bcp47
+AnsiString Global::asLang = "pl"; // domy≈õlny jƒôzyk - http://tools.ietf.org/html/bcp47
 
-// parametry wydajnoúciowe (np. regulacja FPS, szybkoúÊ wczytywania)
+// parametry wydajno≈õciowe (np. regulacja FPS, szybko≈õƒá wczytywania)
 bool Global::bAdjustScreenFreq = true;
 bool Global::bEnableTraction = true;
 bool Global::bLoadTraction = true;
 bool Global::bLiveTraction = true;
-int Global::iDefaultFiltering = 9; // domyúlne rozmywanie tekstur TGA bez alfa
-int Global::iBallastFiltering = 9; // domyúlne rozmywanie tekstur podsypki
-int Global::iRailProFiltering = 5; // domyúlne rozmywanie tekstur szyn
-int Global::iDynamicFiltering = 5; // domyúlne rozmywanie tekstur pojazdÛw
-bool Global::bUseVBO = false; // czy jest VBO w karcie graficznej (czy uøyÊ)
+int Global::iDefaultFiltering = 9; // domy≈õlne rozmywanie tekstur TGA bez alfa
+int Global::iBallastFiltering = 9; // domy≈õlne rozmywanie tekstur podsypki
+int Global::iRailProFiltering = 5; // domy≈õlne rozmywanie tekstur szyn
+int Global::iDynamicFiltering = 5; // domy≈õlne rozmywanie tekstur pojazd√≥w
+bool Global::bUseVBO = false; // czy jest VBO w karcie graficznej (czy u≈ºyƒá)
 GLint Global::iMaxTextureSize = 16384; // maksymalny rozmiar tekstury
-bool Global::bSmoothTraction = false; // wyg≥adzanie drutÛw starym sposobem
-char **Global::szDefaultExt = Global::szTexturesDDS; // domyúlnie od DDS
+bool Global::bSmoothTraction = false; // wyg≈Çadzanie drut√≥w starym sposobem
+char **Global::szDefaultExt = Global::szTexturesDDS; // domy≈õlnie od DDS
 int Global::iMultisampling = 2; // tryb antyaliasingu: 0=brak,1=2px,2=4px,3=8px,4=16px
 bool Global::bGlutFont = false; // czy tekst generowany przez GLUT32.DLL
-int Global::iConvertModels = 7; // tworzenie plikÛw binarnych, +2-optymalizacja transformÛw
-int Global::iSlowMotionMask = -1; // maska wy≥πczanych w≥aúciwoúci dla zwiÍkszenia FPS
-int Global::iModifyTGA = 7; // czy korygowaÊ pliki TGA dla szybszego wczytywania
-// bool Global::bTerrainCompact=true; //czy zapisaÊ teren w pliku
+int Global::iConvertModels = 7; // tworzenie plik√≥w binarnych, +2-optymalizacja transform√≥w
+int Global::iSlowMotionMask = -1; // maska wy≈ÇƒÖczanych w≈Ça≈õciwo≈õci dla zwiƒôkszenia FPS
+int Global::iModifyTGA = 7; // czy korygowaƒá pliki TGA dla szybszego wczytywania
+// bool Global::bTerrainCompact=true; //czy zapisaƒá teren w pliku
 TAnimModel *Global::pTerrainCompact = NULL; // do zapisania terenu w pliku
 AnsiString Global::asTerrainModel = ""; // nazwa obiektu terenu do zapisania w pliku
-double Global::fFpsAverage = 20.0; // oczekiwana wartosÊ FPS
+double Global::fFpsAverage = 20.0; // oczekiwana wartosƒá FPS
 double Global::fFpsDeviation = 5.0; // odchylenie standardowe FPS
-double Global::fFpsMin = 0.0; // dolna granica FPS, przy ktÛrej promieÒ scenerii bÍdzie zmniejszany
-double Global::fFpsMax = 0.0; // gÛrna granica FPS, przy ktÛrej promieÒ scenerii bÍdzie zwiÍkszany
-double Global::fFpsRadiusMax = 3000.0; // maksymalny promieÒ renderowania
-int Global::iFpsRadiusMax = 225; // maksymalny promieÒ renderowania
-double Global::fRadiusFactor = 1.1; // wspÛ≥czynnik jednorazowej zmiany promienia scenerii
+double Global::fFpsMin = 0.0; // dolna granica FPS, przy kt√≥rej promie≈Ñ scenerii bƒôdzie zmniejszany
+double Global::fFpsMax = 0.0; // g√≥rna granica FPS, przy kt√≥rej promie≈Ñ scenerii bƒôdzie zwiƒôkszany
+double Global::fFpsRadiusMax = 3000.0; // maksymalny promie≈Ñ renderowania
+int Global::iFpsRadiusMax = 225; // maksymalny promie≈Ñ renderowania
+double Global::fRadiusFactor = 1.1; // wsp√≥≈Çczynnik jednorazowej zmiany promienia scenerii
 
-// parametry testowe (do testowania scenerii i obiektÛw)
+// parametry testowe (do testowania scenerii i obiekt√≥w)
 bool Global::bWireFrame = false;
 bool Global::bSoundEnabled = true;
-int Global::iWriteLogEnabled = 3; // maska bitowa: 1-zapis do pliku, 2-okienko, 4-nazwy torÛw
+int Global::iWriteLogEnabled = 3; // maska bitowa: 1-zapis do pliku, 2-okienko, 4-nazwy tor√≥w
 bool Global::bManageNodes = true;
 bool Global::bDecompressDDS = false; // czy programowa dekompresja DDS
 
 // parametry do kalibracji
-// kolejno wspÛ≥czynniki dla potÍg 0, 1, 2, 3 wartoúci odczytanej z urzπdzenia
+// kolejno wsp√≥≈Çczynniki dla potƒôg 0, 1, 2, 3 warto≈õci odczytanej z urzƒÖdzenia
 double Global::fCalibrateIn[6][4] = {
     {0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 0, 0}};
 double Global::fCalibrateOut[7][4] = {{0, 1, 0, 0},
@@ -163,14 +163,14 @@ double Global::fCalibrateOut[7][4] = {{0, 1, 0, 0},
                                       {0, 1, 0, 0},
                                       {0, 1, 0, 0}};
 
-// parametry przejúciowe (do usuniÍcia)
-// bool Global::bTimeChange=false; //Ra: ZiomalCl wy≥πczy≥ starπ wersjÍ nocy
-// bool Global::bRenderAlpha=true; //Ra: wywali≥am tÍ flagÍ
+// parametry przej≈õciowe (do usuniƒôcia)
+// bool Global::bTimeChange=false; //Ra: ZiomalCl wy≈ÇƒÖczy≈Ç starƒÖ wersjƒô nocy
+// bool Global::bRenderAlpha=true; //Ra: wywali≈Çam tƒô flagƒô
 bool Global::bnewAirCouplers = true;
-bool Global::bDoubleAmbient = false; // podwÛjna jasnoúÊ ambient
-double Global::fTimeSpeed = 1.0; // przyspieszenie czasu, zmienna do testÛw
+bool Global::bDoubleAmbient = false; // podw√≥jna jasno≈õƒá ambient
+double Global::fTimeSpeed = 1.0; // przyspieszenie czasu, zmienna do test√≥w
 bool Global::bHideConsole = false; // hunter-271211: ukrywanie konsoli
-int Global::iBpp = 32; // chyba juø nie uøywa siÍ kart, na ktÛrych 16bpp coú poprawi
+int Global::iBpp = 32; // chyba ju≈º nie u≈ºywa siƒô kart, na kt√≥rych 16bpp co≈õ poprawi
 
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -195,8 +195,8 @@ void Global::LoadIniFile(AnsiString asFileName)
     int i;
     for (i = 0; i < 10; ++i)
     { // zerowanie pozycji kamer
-        pFreeCameraInit[i] = vector3(0, 0, 0); // wspÛ≥rzÍdne w scenerii
-        pFreeCameraInitAngle[i] = vector3(0, 0, 0); // kπty obrotu w radianach
+        pFreeCameraInit[i] = vector3(0, 0, 0); // wsp√≥≈Çrzƒôdne w scenerii
+        pFreeCameraInitAngle[i] = vector3(0, 0, 0); // kƒÖty obrotu w radianach
     }
     TFileStream *fs;
     fs = new TFileStream(asFileName, fmOpenRead | fmShareCompat);
@@ -214,11 +214,11 @@ void Global::LoadIniFile(AnsiString asFileName)
     // Parser->LoadStringToParse(asFile);
     Parser->First();
     ConfigParse(Parser);
-    delete Parser; // Ra: tego jak zwykle nie by≥o wczeúniej :]
+    delete Parser; // Ra: tego jak zwykle nie by≈Ço wcze≈õniej :]
 };
 
 void Global::ConfigParse(TQueryParserComp *qp, cParser *cp)
-{ // Ra: trzeba by przerobiÊ na cParser, øeby to dzia≥a≥o w scenerii
+{ // Ra: trzeba by przerobiƒá na cParser, ≈ºeby to dzia≈Ça≈Ço w scenerii
     pParser = cp;
     qParser = qp;
     AnsiString str;
@@ -292,17 +292,17 @@ void Global::ConfigParse(TQueryParserComp *qp, cParser *cp)
             fMouseYScale = str.ToDouble();
         }
         else if (str == AnsiString("enabletraction"))
-        { // Winger 040204 - 'zywe' patyki dostosowujace sie do trakcji; Ra 2014-03: teraz ≥amanie
+        { // Winger 040204 - 'zywe' patyki dostosowujace sie do trakcji; Ra 2014-03: teraz ≈Çamanie
             bEnableTraction = (GetNextSymbol().LowerCase() == AnsiString("yes"));
         }
         else if (str == AnsiString("loadtraction"))
         { // Winger 140404 - ladowanie sie trakcji
             bLoadTraction = (GetNextSymbol().LowerCase() == AnsiString("yes"));
         }
-        else if (str == AnsiString("friction")) // mnoønik tarcia - KURS90
+        else if (str == AnsiString("friction")) // mno≈ºnik tarcia - KURS90
             fFriction = GetNextSymbol().ToDouble();
         else if (str == AnsiString("livetraction"))
-        { // Winger 160404 - zaleznosc napiecia loka od trakcji; Ra 2014-03: teraz prπd przy braku
+        { // Winger 160404 - zaleznosc napiecia loka od trakcji; Ra 2014-03: teraz prƒÖd przy braku
           // sieci
             bLiveTraction = (GetNextSymbol().LowerCase() == AnsiString("yes"));
         }
@@ -326,7 +326,7 @@ void Global::ConfigParse(TQueryParserComp *qp, cParser *cp)
         {
             str = GetNextSymbol().LowerCase(); // rozszerzenie
             if (str == "tga")
-                szDefaultExt = szTexturesTGA; // domyúlnie od TGA
+                szDefaultExt = szTexturesTGA; // domy≈õlnie od TGA
             // szDefaultExt=std::string(Parser->GetNextSymbol().LowerCase().c_str());
         }
         else if (str == AnsiString("newaircouplers"))
@@ -342,14 +342,14 @@ void Global::ConfigParse(TQueryParserComp *qp, cParser *cp)
         else if (str == AnsiString("usevbo"))
             bUseVBO = (GetNextSymbol().LowerCase() == AnsiString("yes"));
         else if (str == AnsiString("feedbackmode"))
-            iFeedbackMode = GetNextSymbol().ToIntDef(1); // domyúlnie 1
+            iFeedbackMode = GetNextSymbol().ToIntDef(1); // domy≈õlnie 1
         else if (str == AnsiString("feedbackport"))
-            iFeedbackPort = GetNextSymbol().ToIntDef(0); // domyúlnie 0
+            iFeedbackPort = GetNextSymbol().ToIntDef(0); // domy≈õlnie 0
         else if (str == AnsiString("multiplayer"))
-            iMultiplayer = GetNextSymbol().ToIntDef(0); // domyúlnie 0
+            iMultiplayer = GetNextSymbol().ToIntDef(0); // domy≈õlnie 0
         else if (str == AnsiString("maxtexturesize"))
         { // wymuszenie przeskalowania tekstur
-            i = GetNextSymbol().ToIntDef(16384); // domyúlnie duøe
+            i = GetNextSymbol().ToIntDef(16384); // domy≈õlnie du≈ºe
             if (i <= 64)
                 iMaxTextureSize = 64;
             else if (i <= 128)
@@ -369,7 +369,7 @@ void Global::ConfigParse(TQueryParserComp *qp, cParser *cp)
             else
                 iMaxTextureSize = 16384;
         }
-        else if (str == AnsiString("doubleambient")) // podwÛjna jasnoúÊ ambient
+        else if (str == AnsiString("doubleambient")) // podw√≥jna jasno≈õƒá ambient
             bDoubleAmbient = (GetNextSymbol().LowerCase() == AnsiString("yes"));
         else if (str == AnsiString("movelight")) // numer dnia w roku albo -1
         {
@@ -380,124 +380,124 @@ void Global::ConfigParse(TQueryParserComp *qp, cParser *cp)
                 TDate date = Now();
                 date.DecodeDate(&y, &m, &d);
                 fMoveLight =
-                    (double)date - (double)TDate(y, 1, 1) + 1; // numer bieøπcego dnia w roku
+                    (double)date - (double)TDate(y, 1, 1) + 1; // numer bie≈ºƒÖcego dnia w roku
             }
-            if (fMoveLight > 0.0) // tu jest nadal zwiÍkszone o 1
+            if (fMoveLight > 0.0) // tu jest nadal zwiƒôkszone o 1
             { // obliczenie deklinacji wg:
                 // http://naturalfrequency.com/Tregenza_Sharples/Daylight_Algorithms/algorithm_1_11.htm
                 // Spencer J W Fourier series representation of the position of the sun Search 2 (5)
                 // 172 (1971)
-                fMoveLight = M_PI / 182.5 * (Global::fMoveLight - 1.0); // numer dnia w postaci kπta
+                fMoveLight = M_PI / 182.5 * (Global::fMoveLight - 1.0); // numer dnia w postaci kƒÖta
                 fSunDeclination = 0.006918 - 0.3999120 * cos(fMoveLight) +
                                   0.0702570 * sin(fMoveLight) - 0.0067580 * cos(2 * fMoveLight) +
                                   0.0009070 * sin(2 * fMoveLight) -
                                   0.0026970 * cos(3 * fMoveLight) + 0.0014800 * sin(3 * fMoveLight);
             }
         }
-        else if (str == AnsiString("smoothtraction")) // podwÛjna jasnoúÊ ambient
+        else if (str == AnsiString("smoothtraction")) // podw√≥jna jasno≈õƒá ambient
             bSmoothTraction = (GetNextSymbol().LowerCase() == AnsiString("yes"));
-        else if (str == AnsiString("timespeed")) // przyspieszenie czasu, zmienna do testÛw
+        else if (str == AnsiString("timespeed")) // przyspieszenie czasu, zmienna do test√≥w
             fTimeSpeed = GetNextSymbol().ToIntDef(1);
         else if (str == AnsiString("multisampling")) // tryb antyaliasingu: 0=brak,1=2px,2=4px
-            iMultisampling = GetNextSymbol().ToIntDef(2); // domyúlnie 2
+            iMultisampling = GetNextSymbol().ToIntDef(2); // domy≈õlnie 2
         else if (str == AnsiString("glutfont")) // tekst generowany przez GLUT
             bGlutFont = (GetNextSymbol().LowerCase() == AnsiString("yes"));
-        else if (str == AnsiString("latitude")) // szerokoúÊ geograficzna
+        else if (str == AnsiString("latitude")) // szeroko≈õƒá geograficzna
             fLatitudeDeg = GetNextSymbol().ToDouble();
-        else if (str == AnsiString("convertmodels")) // tworzenie plikÛw binarnych
-            iConvertModels = GetNextSymbol().ToIntDef(7); // domyúlnie 7
+        else if (str == AnsiString("convertmodels")) // tworzenie plik√≥w binarnych
+            iConvertModels = GetNextSymbol().ToIntDef(7); // domy≈õlnie 7
         else if (str == AnsiString("inactivepause")) // automatyczna pauza, gdy okno nieaktywne
             bInactivePause = (GetNextSymbol().LowerCase() == AnsiString("yes"));
-        else if (str == AnsiString("slowmotion")) // tworzenie plikÛw binarnych
-            iSlowMotionMask = GetNextSymbol().ToIntDef(-1); // domyúlnie -1
-        else if (str == AnsiString("modifytga")) // czy korygowaÊ pliki TGA dla szybszego
+        else if (str == AnsiString("slowmotion")) // tworzenie plik√≥w binarnych
+            iSlowMotionMask = GetNextSymbol().ToIntDef(-1); // domy≈õlnie -1
+        else if (str == AnsiString("modifytga")) // czy korygowaƒá pliki TGA dla szybszego
                                                  // wczytywania
-            iModifyTGA = GetNextSymbol().ToIntDef(0); // domyúlnie 0
+            iModifyTGA = GetNextSymbol().ToIntDef(0); // domy≈õlnie 0
         else if (str == AnsiString("hideconsole")) // hunter-271211: ukrywanie konsoli
             bHideConsole = (GetNextSymbol().LowerCase() == AnsiString("yes"));
         else if (str ==
                  AnsiString(
-                     "rollfix")) // Ra: poprawianie przechy≥ki, aby wewnÍtrzna szyna by≥a "pozioma"
+                     "rollfix")) // Ra: poprawianie przechy≈Çki, aby wewnƒôtrzna szyna by≈Ça "pozioma"
             bRollFix = (GetNextSymbol().LowerCase() == AnsiString("yes"));
-        else if (str == AnsiString("fpsaverage")) // oczekiwana wartosÊ FPS
+        else if (str == AnsiString("fpsaverage")) // oczekiwana wartosƒá FPS
             fFpsAverage = GetNextSymbol().ToDouble();
         else if (str == AnsiString("fpsdeviation")) // odchylenie standardowe FPS
             fFpsDeviation = GetNextSymbol().ToDouble();
-        else if (str == AnsiString("fpsradiusmax")) // maksymalny promieÒ renderowania
+        else if (str == AnsiString("fpsradiusmax")) // maksymalny promie≈Ñ renderowania
             fFpsRadiusMax = GetNextSymbol().ToDouble();
-        else if (str == AnsiString("calibratein")) // parametry kalibracji wejúÊ
+        else if (str == AnsiString("calibratein")) // parametry kalibracji wej≈õƒá
         { //
-            i = GetNextSymbol().ToIntDef(-1); // numer wejúcia
+            i = GetNextSymbol().ToIntDef(-1); // numer wej≈õcia
             if ((i < 0) || (i > 5))
-                i = 5; // na ostatni, bo i tak trzeba pominπÊ wartoúci
+                i = 5; // na ostatni, bo i tak trzeba pominƒÖƒá warto≈õci
             fCalibrateIn[i][0] = GetNextSymbol().ToDouble(); // wyraz wolny
-            fCalibrateIn[i][1] = GetNextSymbol().ToDouble(); // mnoønik
-            fCalibrateIn[i][2] = GetNextSymbol().ToDouble(); // mnoønik dla kwadratu
-            fCalibrateIn[i][3] = GetNextSymbol().ToDouble(); // mnoønik dla szeúcianu
+            fCalibrateIn[i][1] = GetNextSymbol().ToDouble(); // mno≈ºnik
+            fCalibrateIn[i][2] = GetNextSymbol().ToDouble(); // mno≈ºnik dla kwadratu
+            fCalibrateIn[i][3] = GetNextSymbol().ToDouble(); // mno≈ºnik dla sze≈õcianu
         }
-        else if (str == AnsiString("calibrateout")) // parametry kalibracji wyjúÊ
+        else if (str == AnsiString("calibrateout")) // parametry kalibracji wyj≈õƒá
         { //
-            i = GetNextSymbol().ToIntDef(-1); // numer wejúcia
+            i = GetNextSymbol().ToIntDef(-1); // numer wej≈õcia
             if ((i < 0) || (i > 6))
-                i = 6; // na ostatni, bo i tak trzeba pominπÊ wartoúci
+                i = 6; // na ostatni, bo i tak trzeba pominƒÖƒá warto≈õci
             fCalibrateOut[i][0] = GetNextSymbol().ToDouble(); // wyraz wolny
-            fCalibrateOut[i][1] = GetNextSymbol().ToDouble(); // mnoønik liniowy
-            fCalibrateOut[i][2] = GetNextSymbol().ToDouble(); // mnoønik dla kwadratu
-            fCalibrateOut[i][3] = GetNextSymbol().ToDouble(); // mnoønik dla szeúcianu
+            fCalibrateOut[i][1] = GetNextSymbol().ToDouble(); // mno≈ºnik liniowy
+            fCalibrateOut[i][2] = GetNextSymbol().ToDouble(); // mno≈ºnik dla kwadratu
+            fCalibrateOut[i][3] = GetNextSymbol().ToDouble(); // mno≈ºnik dla sze≈õcianu
         }
         else if (str == AnsiString("brakestep")) // krok zmiany hamulca dla klawiszy [Num3] i [Num9]
             fBrakeStep = GetNextSymbol().ToDouble();
         else if (str ==
-                 AnsiString("joinduplicatedevents")) // czy grupowaÊ eventy o tych samych nazwach
+                 AnsiString("joinduplicatedevents")) // czy grupowaƒá eventy o tych samych nazwach
             bJoinEvents = (GetNextSymbol().LowerCase() == AnsiString("yes"));
-        else if (str == AnsiString("hiddenevents")) // czy ≥πczyÊ eventy z torami poprzez nazwÍ toru
+        else if (str == AnsiString("hiddenevents")) // czy ≈ÇƒÖczyƒá eventy z torami poprzez nazwƒô toru
             iHiddenEvents = GetNextSymbol().ToIntDef(0);
-        else if (str == AnsiString("pause")) // czy po wczytaniu ma byÊ pauza?
+        else if (str == AnsiString("pause")) // czy po wczytaniu ma byƒá pauza?
             iPause |= (GetNextSymbol().LowerCase() == AnsiString("yes")) ? 1 : 0;
         else if (str == AnsiString("lang"))
-            asLang = GetNextSymbol(); // domyúlny jÍzyk - http://tools.ietf.org/html/bcp47
-        else if (str == AnsiString("opengl")) // deklarowana wersja OpenGL, øeby powstrzymaÊ b≥Ídy
+            asLang = GetNextSymbol(); // domy≈õlny jƒôzyk - http://tools.ietf.org/html/bcp47
+        else if (str == AnsiString("opengl")) // deklarowana wersja OpenGL, ≈ºeby powstrzymaƒá b≈Çƒôdy
             fOpenGL = GetNextSymbol().ToDouble(); // wymuszenie wersji OpenGL
     } while (str != "endconfig"); //(!Parser->EndOfFile)
-    // na koniec trochÍ zaleønoúci
-    if (!bLoadTraction) // wczytywanie drutÛw i s≥upÛw
-    { // tutaj wy≥πczenie, bo mogπ nie byÊ zdefiniowane w INI
-        bEnableTraction = false; // false = pantograf siÍ nie po≥amie
-        bLiveTraction = false; // false = pantografy zawsze zbierajπ 95% MaxVoltage
+    // na koniec trochƒô zale≈ºno≈õci
+    if (!bLoadTraction) // wczytywanie drut√≥w i s≈Çup√≥w
+    { // tutaj wy≈ÇƒÖczenie, bo mogƒÖ nie byƒá zdefiniowane w INI
+        bEnableTraction = false; // false = pantograf siƒô nie po≈Çamie
+        bLiveTraction = false; // false = pantografy zawsze zbierajƒÖ 95% MaxVoltage
     }
-    // if (fMoveLight>0) bDoubleAmbient=false; //wtedy tylko jedno úwiat≥o ruchome
-    // if (fOpenGL<1.3) iMultisampling=0; //moøna by z gÛry wy≥πczyÊ, ale nie mamy jeszcze fOpenGL
+    // if (fMoveLight>0) bDoubleAmbient=false; //wtedy tylko jedno ≈õwiat≈Ço ruchome
+    // if (fOpenGL<1.3) iMultisampling=0; //mo≈ºna by z g√≥ry wy≈ÇƒÖczyƒá, ale nie mamy jeszcze fOpenGL
     if (iMultisampling)
-    { // antyaliasing ca≥oekranowy wy≥πcza rozmywanie drutÛw
+    { // antyaliasing ca≈Çoekranowy wy≈ÇƒÖcza rozmywanie drut√≥w
         bSmoothTraction = false;
     }
     if (iMultiplayer > 0)
     {
-        bInactivePause = false; // okno "w tle" nie moøe pauzowaÊ, jeúli w≥πczona komunikacja
-        // pauzowanie jest zablokowane dla (iMultiplayer&2)>0, wiÍc iMultiplayer=1 da siÍ zapauzowaÊ
+        bInactivePause = false; // okno "w tle" nie mo≈ºe pauzowaƒá, je≈õli w≈ÇƒÖczona komunikacja
+        // pauzowanie jest zablokowane dla (iMultiplayer&2)>0, wiƒôc iMultiplayer=1 da siƒô zapauzowaƒá
         // (tryb instruktora)
     }
     fFpsMin = fFpsAverage -
-              fFpsDeviation; // dolna granica FPS, przy ktÛrej promieÒ scenerii bÍdzie zmniejszany
+              fFpsDeviation; // dolna granica FPS, przy kt√≥rej promie≈Ñ scenerii bƒôdzie zmniejszany
     fFpsMax = fFpsAverage +
-              fFpsDeviation; // gÛrna granica FPS, przy ktÛrej promieÒ scenerii bÍdzie zwiÍkszany
+              fFpsDeviation; // g√≥rna granica FPS, przy kt√≥rej promie≈Ñ scenerii bƒôdzie zwiƒôkszany
     if (iPause)
-        iTextMode = VK_F1; // jak pauza, to pokazaÊ zegar
+        iTextMode = VK_F1; // jak pauza, to pokazaƒá zegar
     if (qp)
-    { // to poniøej wykonywane tylko raz, jedynie po wczytaniu eu07.ini
+    { // to poni≈ºej wykonywane tylko raz, jedynie po wczytaniu eu07.ini
         Console::ModeSet(iFeedbackMode, iFeedbackPort); // tryb pracy konsoli sterowniczej
         iFpsRadiusMax = 0.000025 * fFpsRadiusMax *
-                        fFpsRadiusMax; // maksymalny promieÒ renderowania 3000.0 -> 225
+                        fFpsRadiusMax; // maksymalny promie≈Ñ renderowania 3000.0 -> 225
         if (iFpsRadiusMax > 400)
             iFpsRadiusMax = 400;
         if (fDistanceFactor > 1.0)
         { // dla 1.0 specjalny tryb bez przeliczania
             fDistanceFactor =
                 iWindowHeight /
-                fDistanceFactor; // fDistanceFactor>1.0 dla rozdzielczoúci wiÍkszych niø bazowa
+                fDistanceFactor; // fDistanceFactor>1.0 dla rozdzielczo≈õci wiƒôkszych ni≈º bazowa
             fDistanceFactor *=
                 (iMultisampling + 1.0) *
-                fDistanceFactor; // do kwadratu, bo wiÍkszoúÊ odleg≥oúci to ich kwadraty
+                fDistanceFactor; // do kwadratu, bo wiƒôkszo≈õƒá odleg≈Ço≈õci to ich kwadraty
         }
     }
 }
@@ -506,7 +506,7 @@ void Global::InitKeys(AnsiString asFileName)
 {
     //    if (FileExists(asFileName))
     //    {
-    //       Error("Chwilowo plik keys.ini nie jest obs≥ugiwany. £adujÍ standardowe
+    //       Error("Chwilowo plik keys.ini nie jest obs≈Çugiwany. ≈Åadujƒô standardowe
     //       ustawienia.\nKeys.ini file is temporarily not functional, loading default keymap...");
     /*        TQueryParserComp *Parser;
             Parser=new TQueryParserComp(NULL);
@@ -639,7 +639,7 @@ void Global::SetCameraPosition(vector3 pNewCameraPosition)
 }
 
 void Global::SetCameraRotation(double Yaw)
-{ // ustawienie bezwzglÍdnego kierunku kamery z korekcjπ do przedzia≥u <-M_PI,M_PI>
+{ // ustawienie bezwzglƒôdnego kierunku kamery z korekcjƒÖ do przedzia≈Çu <-M_PI,M_PI>
     pCameraRotation = Yaw;
     while (pCameraRotation < -M_PI)
         pCameraRotation += 2 * M_PI;
@@ -649,7 +649,7 @@ void Global::SetCameraRotation(double Yaw)
 }
 
 void Global::BindTexture(GLuint t)
-{ // ustawienie aktualnej tekstury, tylko gdy siÍ zmienia
+{ // ustawienie aktualnej tekstury, tylko gdy siƒô zmienia
     if (t != iTextureId)
     {
         iTextureId = t;
@@ -657,18 +657,18 @@ void Global::BindTexture(GLuint t)
 };
 
 void Global::TrainDelete(TDynamicObject *d)
-{ // usuniÍcie pojazdu prowadzonego przez uøytkownika
+{ // usuniƒôcie pojazdu prowadzonego przez u≈ºytkownika
     if (pWorld)
         pWorld->TrainDelete(d);
 };
 
 TDynamicObject *__fastcall Global::DynamicNearest()
-{ // ustalenie pojazdu najbliøszego kamerze
+{ // ustalenie pojazdu najbli≈ºszego kamerze
     return pGround->DynamicNearest(pCamera->Pos);
 };
 
 TDynamicObject *__fastcall Global::CouplerNearest()
-{ // ustalenie pojazdu najbliøszego kamerze
+{ // ustalenie pojazdu najbli≈ºszego kamerze
     return pGround->CouplerNearest(pCamera->Pos);
 };
 
@@ -679,7 +679,7 @@ bool Global::AddToQuery(TEvent *event, TDynamicObject *who)
 //---------------------------------------------------------------------------
 
 bool Global::DoEvents()
-{ // wywo≥ywaÊ czasem, øeby nie robi≥ wraøenia zawieszonego
+{ // wywo≈Çywaƒá czasem, ≈ºeby nie robi≈Ç wra≈ºenia zawieszonego
     MSG msg;
     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
     {
@@ -694,141 +694,141 @@ bool Global::DoEvents()
 
 __fastcall TTranscripts::TTranscripts()
 {
-    iCount = 0; // brak linijek do wyúwietlenia
-    iStart = 0; // wype≥niaÊ od linijki 0
+    iCount = 0; // brak linijek do wy≈õwietlenia
+    iStart = 0; // wype≈Çniaƒá od linijki 0
     for (int i = 0; i < MAX_TRANSCRIPTS; ++i)
-    { // to do konstruktora moøna by daÊ
+    { // to do konstruktora mo≈ºna by daƒá
         aLines[i].fHide = -1.0; // wolna pozycja (czas symulacji, 360.0 to doba)
         aLines[i].iNext = -1; // nie ma kolejnej
     }
-    fRefreshTime = 360.0; // wartoúc zaporowa
+    fRefreshTime = 360.0; // warto≈õc zaporowa
 };
 __fastcall TTranscripts::~TTranscripts(){};
 void TTranscripts::AddLine(char *txt, float show, float hide, bool it)
 { // dodanie linii do tabeli, (show) i (hide) w [s] od aktualnego czasu
     if (show == hide)
         return; // komentarz jest ignorowany
-    show = Global::fTimeAngleDeg + show / 240.0; // jeúli doba to 360, to 1s bÍdzie rÛwne 1/240
+    show = Global::fTimeAngleDeg + show / 240.0; // je≈õli doba to 360, to 1s bƒôdzie r√≥wne 1/240
     hide = Global::fTimeAngleDeg + hide / 240.0;
-    int i = iStart, j, k; // od czegoú trzeba zaczπÊ
+    int i = iStart, j, k; // od czego≈õ trzeba zaczƒÖƒá
     while ((aLines[i].iNext >= 0) ? (aLines[aLines[i].iNext].fShow <= show) :
-                                    false) // pÛki nie koniec i wczeúniej puszczane
-        i = aLines[i].iNext; // przejúcie do kolejnej linijki
-    //(i) wskazuje na liniÍ, po ktÛrej naleøy wstawiÊ dany tekst, chyba øe
+                                    false) // p√≥ki nie koniec i wcze≈õniej puszczane
+        i = aLines[i].iNext; // przej≈õcie do kolejnej linijki
+    //(i) wskazuje na liniƒô, po kt√≥rej nale≈ºy wstawiƒá dany tekst, chyba ≈ºe
     while (txt ? *txt : false)
         for (j = 0; j < MAX_TRANSCRIPTS; ++j)
             if (aLines[j].fHide < 0.0)
             { // znaleziony pierwszy wolny
-                aLines[j].iNext = aLines[i].iNext; // dotychczasowy nastÍpny bÍdzie za nowym
-                if (aLines[iStart].fHide < 0.0) // jeúli tablica jest pusta
-                    iStart = j; // fHide trzeba sprawdziÊ przed ewentualnym nadpisaniem, gdy i=j=0
+                aLines[j].iNext = aLines[i].iNext; // dotychczasowy nastƒôpny bƒôdzie za nowym
+                if (aLines[iStart].fHide < 0.0) // je≈õli tablica jest pusta
+                    iStart = j; // fHide trzeba sprawdziƒá przed ewentualnym nadpisaniem, gdy i=j=0
                 else
-                    aLines[i].iNext = j; // a nowy bÍdzie za tamtym wczeúniejszym
-                aLines[j].fShow = show; // wyúwietlaÊ od
-                aLines[j].fHide = hide; // wyúwietlaÊ do
+                    aLines[i].iNext = j; // a nowy bƒôdzie za tamtym wcze≈õniejszym
+                aLines[j].fShow = show; // wy≈õwietlaƒá od
+                aLines[j].fHide = hide; // wy≈õwietlaƒá do
                 aLines[j].bItalic = it;
-                aLines[j].asText = AnsiString(txt); // bez sensu, wystarczy≥by wskaünik
+                aLines[j].asText = AnsiString(txt); // bez sensu, wystarczy≈Çby wska≈∫nik
                 if ((k = aLines[j].asText.Pos("|")) > 0)
-                { // jak jest podzia≥ linijki na wiersze
+                { // jak jest podzia≈Ç linijki na wiersze
                     aLines[j].asText = aLines[j].asText.SubString(1, k - 1);
                     txt += k;
-                    i = j; // kolejna linijka dopisywana bÍdzie na koniec w≥aúnie dodanej
+                    i = j; // kolejna linijka dopisywana bƒôdzie na koniec w≈Ça≈õnie dodanej
                 }
                 else
                     txt = NULL; // koniec dodawania
-                if (fRefreshTime > show) // jeúli odúwieøacz ustawiony jest na pÛüniej
-                    fRefreshTime = show; // to odúwieøyÊ wczeúniej
-                break; // wiÍcej juø nic
+                if (fRefreshTime > show) // je≈õli od≈õwie≈ºacz ustawiony jest na p√≥≈∫niej
+                    fRefreshTime = show; // to od≈õwie≈ºyƒá wcze≈õniej
+                break; // wiƒôcej ju≈º nic
             }
 };
 void TTranscripts::Add(char *txt, float len, bool backgorund)
-{ // dodanie tekstÛw, d≥ugoúÊ düwiÍku, czy istotne
+{ // dodanie tekst√≥w, d≈Çugo≈õƒá d≈∫wiƒôku, czy istotne
     if (!txt)
         return; // pusty tekst
     int i = 0, j = int(0.5 + 10.0 * len); //[0.1s]
     if (*txt == '[')
-    { // powinny byÊ dwa nawiasy
+    { // powinny byƒá dwa nawiasy
         while (*++txt ? *txt != ']' : false)
             if ((*txt >= '0') && (*txt <= '9'))
-                i = 10 * i + int(*txt - '0'); // pierwsza liczba aø do ]
+                i = 10 * i + int(*txt - '0'); // pierwsza liczba a≈º do ]
         if (*txt ? *++txt == '[' : false)
         {
-            j = 0; // drugi nawias okreúla czas zakoÒczenia wyúwietlania
+            j = 0; // drugi nawias okre≈õla czas zako≈Ñczenia wy≈õwietlania
             while (*++txt ? *txt != ']' : false)
                 if ((*txt >= '0') && (*txt <= '9'))
-                    j = 10 * j + int(*txt - '0'); // druga liczba aø do ]
+                    j = 10 * j + int(*txt - '0'); // druga liczba a≈º do ]
             if (*txt)
-                ++txt; // pominiÍcie drugiego ]
+                ++txt; // pominiƒôcie drugiego ]
         }
     }
     AddLine(txt, 0.1 * i, 0.1 * j, false);
 };
 void TTranscripts::Update()
-{ // usuwanie niepotrzebnych (nie czÍúciej niø 10 razy na sekundÍ)
+{ // usuwanie niepotrzebnych (nie czƒô≈õciej ni≈º 10 razy na sekundƒô)
     if (fRefreshTime > Global::fTimeAngleDeg)
         return; // nie czas jeszcze na zmiany
-    // czas odúwieøenia moøna ustaliÊ wg tabelki, kiedy coú siÍ w niej zmienia
-    fRefreshTime = Global::fTimeAngleDeg + 360.0; // wartoúÊ zaporowa
-    int i = iStart, j = -1; // od czegoú trzeba zaczπÊ
-    bool change = false; // czy zmieniaÊ napisy?
+    // czas od≈õwie≈ºenia mo≈ºna ustaliƒá wg tabelki, kiedy co≈õ siƒô w niej zmienia
+    fRefreshTime = Global::fTimeAngleDeg + 360.0; // warto≈õƒá zaporowa
+    int i = iStart, j = -1; // od czego≈õ trzeba zaczƒÖƒá
+    bool change = false; // czy zmieniaƒá napisy?
     do
     {
         if (aLines[i].fHide >= 0.0) // o ile aktywne
             if (aLines[i].fHide < Global::fTimeAngleDeg)
-            { // gdy czas wyúwietlania up≥ynπ≥
-                aLines[i].fHide = -1.0; // teraz bÍdzie wolnπ pozycjπ
+            { // gdy czas wy≈õwietlania up≈ÇynƒÖ≈Ç
+                aLines[i].fHide = -1.0; // teraz bƒôdzie wolnƒÖ pozycjƒÖ
                 if (i == iStart)
                     iStart = aLines[i].iNext >= 0 ? aLines[i].iNext : 0; // przestawienie pierwszego
                 else if (j >= 0)
-                    aLines[j].iNext = aLines[i].iNext; // usuniÍcie ze úrodka
+                    aLines[j].iNext = aLines[i].iNext; // usuniƒôcie ze ≈õrodka
                 change = true;
             }
             else
-            { // gdy ma byÊ pokazane
-                if (aLines[i].fShow > Global::fTimeAngleDeg) // bÍdzie pokazane w przysz≥oúci
-                    if (fRefreshTime > aLines[i].fShow) // a nie ma nic wczeúniej
+            { // gdy ma byƒá pokazane
+                if (aLines[i].fShow > Global::fTimeAngleDeg) // bƒôdzie pokazane w przysz≈Ço≈õci
+                    if (fRefreshTime > aLines[i].fShow) // a nie ma nic wcze≈õniej
                         fRefreshTime = aLines[i].fShow;
                 if (fRefreshTime > aLines[i].fHide)
                     fRefreshTime = aLines[i].fHide;
             }
-        // moøna by jeszcze wykrywaÊ, ktÛre nowe majπ byÊ pokazane
+        // mo≈ºna by jeszcze wykrywaƒá, kt√≥re nowe majƒÖ byƒá pokazane
         j = i;
         i = aLines[i].iNext; // kolejna linijka
-    } while (i >= 0); // pÛki po tablicy
-    change = true; // bo na razie nie ma warunku, øe coú siÍ doda≥o
+    } while (i >= 0); // p√≥ki po tablicy
+    change = true; // bo na razie nie ma warunku, ≈ºe co≈õ siƒô doda≈Ço
     if (change)
     { // aktualizacja linijek ekranowych
         i = iStart;
         j = -1;
         do
         {
-            if (aLines[i].fHide > 0.0) // jeúli nie ukryte
-                if (aLines[i].fShow < Global::fTimeAngleDeg) // to dodanie linijki do wyúwietlania
+            if (aLines[i].fHide > 0.0) // je≈õli nie ukryte
+                if (aLines[i].fShow < Global::fTimeAngleDeg) // to dodanie linijki do wy≈õwietlania
                     if (j < 5 - 1) // ograniczona liczba linijek
                         Global::asTranscript[++j] = aLines[i].asText; // skopiowanie tekstu
             i = aLines[i].iNext; // kolejna linijka
-        } while (i >= 0); // pÛki po tablicy
+        } while (i >= 0); // p√≥ki po tablicy
         for (++j; j < 5; ++j)
-            Global::asTranscript[j] = ""; // i czyszczenie nieuøywanych linijek
+            Global::asTranscript[j] = ""; // i czyszczenie nieu≈ºywanych linijek
     }
 };
 
-// Ra: tymczasowe rozwiπzanie kwestii zagranicznych (czeskich) napisÛw
+// Ra: tymczasowe rozwiƒÖzanie kwestii zagranicznych (czeskich) napis√≥w
 char bezogonkowo[128] = "E?,?\"_++?%S<STZZ?`'\"\".--??s>stzz"
-                        "†^^L$A|S^CS<--RZo±,l'uP.,as>L\"lz"
+                        "¬†^^L$A|S^CS<--RZo¬±,l'uP.,as>L\"lz"
                         "RAAAALCCCEEEEIIDDNNOOOOxRUUUUYTB"
                         "raaaalccceeeeiiddnnoooo-ruuuuyt?";
 
 AnsiString Global::Bezogonkow(AnsiString str, bool _)
-{ // wyciÍcie liter z ogonkami, bo OpenGL nie umie wyúwietliÊ
+{ // wyciƒôcie liter z ogonkami, bo OpenGL nie umie wy≈õwietliƒá
     for (int i = 1; i <= str.Length(); ++i)
         if (str[i] & 0x80)
             str[i] = bezogonkowo[str[i] & 0x7F];
-        else if (str[i] < ' ') // znaki sterujπce nie sπ obs≥ugiwane
+        else if (str[i] < ' ') // znaki sterujƒÖce nie sƒÖ obs≈Çugiwane
             str[i] = ' ';
         else if (_)
-            if (str[i] == '_') // nazwy stacji nie mogπ zawieraÊ spacji
-                str[i] = ' '; // wiÍc trzeba wyúwietlaÊ inaczej
+            if (str[i] == '_') // nazwy stacji nie mogƒÖ zawieraƒá spacji
+                str[i] = ' '; // wiƒôc trzeba wy≈õwietlaƒá inaczej
     return str;
 }
 

@@ -11,8 +11,8 @@
 #include <iostream>
 #include <fstream>
 
-std::ofstream output; // standardowy "log.txt", mo¿na go wy³¹czyæ
-std::ofstream errors; // lista b³êdów "errors.txt", zawsze dzia³a
+std::ofstream output; // standardowy "log.txt", moÅ¼na go wyÅ‚Ä…czyÄ‡
+std::ofstream errors; // lista bÅ‚Ä™dÃ³w "errors.txt", zawsze dziaÅ‚a
 
 char endstring[10] = "\n";
 
@@ -65,7 +65,7 @@ void WriteLog(const char *str)
     }
 };
 void ErrorLog(const char *str)
-{ // Ra: bezwarunkowa rejestracja powa¿nych b³êdów
+{ // Ra: bezwarunkowa rejestracja powaÅ¼nych bÅ‚Ä™dÃ³w
     if (!errors.is_open())
     {
         errors.open("errors.txt", std::ios::trunc);
@@ -84,9 +84,9 @@ void Error(const AnsiString &asMessage, bool box)
     WriteLog(asMessage.c_str());
 }
 void ErrorLog(const AnsiString &asMessage)
-{ // zapisywanie b³êdów "errors.txt"
+{ // zapisywanie bÅ‚Ä™dÃ³w "errors.txt"
     ErrorLog(asMessage.c_str());
-    WriteLog(asMessage.c_str()); // do "log.txt" ewentualnie te¿
+    WriteLog(asMessage.c_str()); // do "log.txt" ewentualnie teÅ¼
 }
 
 void WriteLog(const AnsiString &str) { // Ra: wersja z AnsiString jest zamienna z Error() WriteLog(str.c_str()); };
