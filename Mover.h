@@ -19,6 +19,31 @@ enum TProblem               // lista problemów taboru, które uniemożliwiają 
     pr_Ostatni = 0x80000000 // ostatnia flaga bitowa
 };
 
+struct TTrackShape
+{
+	double R;
+	double Len;
+	double dHtrack;
+	double dHrail;
+};
+
+struct TTrackParam
+{
+	double Width;
+	double friction;
+	std::uint8_t CategoryFlag;
+	std::uint8_t QualityFlag;
+	std::uint8_t DamageFlag;
+	double Velmax;
+};
+
+struct TTractionParam
+{
+	double TractionVoltage;
+	double TractionFreq;
+	double TractionMaxCurrent;
+	double TractionResistivity;
+} ;
 class TMoverParameters
 { // Ra: wrapper na kod pascalowy, przejmujący jego funkcje
   public:
@@ -54,10 +79,10 @@ class TMoverParameters
     bool CurrentSwitch(int direction);
     void UpdateBatteryVoltage(double dt);
     double ComputeMovement(double dt, double dt1, const TTrackShape &Shape, TTrackParam &Track,
-                           TTractionParam &ElectricTraction, const TLocation &NewLoc,
-                           TRotation &NewRot);
+                           TTractionParam &ElectricTraction, const vector3 &NewLoc,
+                           vector3 &NewRot);
     double FastComputeMovement(double dt, const TTrackShape &Shape, TTrackParam &Track,
-                               const TLocation &NewLoc, TRotation &NewRot);
+                               const vector3 &NewLoc, vector3  &NewRot);
     double ShowEngineRotation(int VehN);
     // double GetTrainsetVoltage(void);
     // bool Physic_ReActivation(void);

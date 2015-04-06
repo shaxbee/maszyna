@@ -6,79 +6,13 @@
 */
 
 #include "opengl/glew.h"
-#include "opengl/glut.h"
-#include "opengl/ARB_Multisample.h"
 
-#include "system.hpp"
-#include "classes.hpp"
 #include "Globals.h"
 #include "Console.h"
-#include "QueryParserComp.hpp"
 #include "Mover.h"
 #include "Logs.h"
-#pragma hdrstop
 
-#include <dsound.h> //_clear87() itp.
-
-USERES("EU07.res");
-USEUNIT("dumb3d.cpp");
-USEUNIT("Camera.cpp");
-USEUNIT("Texture.cpp");
-USEUNIT("World.cpp");
-USELIB("opengl\glut32.lib");
-USEUNIT("Model3d.cpp");
-USEUNIT("MdlMngr.cpp");
-USEUNIT("Train.cpp");
-USEUNIT("wavread.cpp");
-USEUNIT("Timer.cpp");
-USEUNIT("Event.cpp");
-USEUNIT("MemCell.cpp");
-USEUNIT("Logs.cpp");
-USELIB("DirectX\Dsound.lib");
-USEUNIT("Spring.cpp");
-USEUNIT("Button.cpp");
-USEUNIT("Globals.cpp");
-USEUNIT("Gauge.cpp");
-USEUNIT("AnimModel.cpp");
-USEUNIT("Ground.cpp");
-USEUNIT("TrkFoll.cpp");
-USEUNIT("Segment.cpp");
-USEUNIT("Sound.cpp");
-USEUNIT("AdvSound.cpp");
-USEUNIT("Track.cpp");
-USEUNIT("DynObj.cpp");
-USEUNIT("RealSound.cpp");
-USEUNIT("EvLaunch.cpp");
-USEUNIT("QueryParserComp.pas");
-USEUNIT("FadeSound.cpp");
-USEUNIT("Traction.cpp");
-USEUNIT("TractionPower.cpp");
-USEUNIT("parser.cpp");
-USEUNIT("sky.cpp");
-USEUNIT("AirCoupler.cpp");
-USEUNIT("opengl\glew.c");
-USEUNIT("ResourceManager.cpp");
-USEUNIT("VBO.cpp");
-USEUNIT("McZapkie\mtable.pas");
-USEUNIT("TextureDDS.cpp");
-USEUNIT("opengl\ARB_Multisample.cpp");
-USEUNIT("Float3d.cpp");
-USEUNIT("Classes.cpp");
-USEUNIT("Driver.cpp");
-USEUNIT("Names.cpp");
-USEUNIT("Console.cpp");
-USEUNIT("Mover.cpp");
-USEUNIT("McZapkie\_mover.pas");
-USEUNIT("McZapkie\hamulce.pas");
-USEUNIT("Console\PoKeys55.cpp");
-USEUNIT("Forth.cpp");
-USEUNIT("Console\LPT.cpp");
-//---------------------------------------------------------------------------
 #include "World.h"
-
-HDC hDC = NULL;   // Private GDI Device Context
-HGLRC hRC = NULL; // Permanent Rendering Context
-HWND hWnd = NULL; // Holds Our Window Handle
 
 TWorld World;
 
@@ -88,15 +22,15 @@ int WindowWidth = 800;
 int WindowHeight = 600;
 int Bpp = 32;
 
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM); // Declaration For WndProc
-
 //#include "dbgForm.h"
 //---------------------------------------------------------------------------
 
 int InitGL(GLvoid) // All Setup For OpenGL Goes Here
 {
-    _clear87();
-    _control87(MCW_EM, MCW_EM);
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
     glewInit();
     // hunter-271211: przeniesione
     // AllocConsole();
@@ -106,7 +40,7 @@ int InitGL(GLvoid) // All Setup For OpenGL Goes Here
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    Global::pWorld = &World; // Ra: wskaźnik potrzebny do usuwania pojazdów
+    Global::pWorld = &World;      // Ra: wskaźnik potrzebny do usuwania pojazdów
     return World.Init(hWnd, hDC); // true jeśli wszystko pójdzie dobrze
 }
 //---------------------------------------------------------------------------
@@ -202,11 +136,11 @@ BOOL CreateGLWindow(char *title, int width, int height, int bits, bool fullscree
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);      // load the arrow pointer
     wc.hbrBackground = NULL;                       // no background required for GL
     wc.lpszMenuName = NULL;                        // we don't want a menu
-    wc.lpszClassName = "EU07"; // nazwa okna do komunikacji zdalnej
-                               // // Set The Class Name
+    wc.lpszClassName = "EU07";                     // nazwa okna do komunikacji zdalnej
+                                                   // // Set The Class Name
 
     if (!arbMultisampleSupported) // tylko dla pierwszego okna
-        if (!RegisterClass(&wc)) // Attempt To Register The Window Class
+        if (!RegisterClass(&wc))  // Attempt To Register The Window Class
         {
             ErrorLog("Fail: window class registeration");
             MessageBox(NULL, "Failed to register the window class.", "ERROR",
@@ -432,8 +366,8 @@ static int test = 0;
 
 PCOPYDATASTRUCT pDane;
 
-LRESULT CALLBACK WndProc(HWND hWnd, // handle for this window
-                         UINT uMsg, // message for this window
+LRESULT CALLBACK WndProc(HWND hWnd,     // handle for this window
+                         UINT uMsg,     // message for this window
                          WPARAM wParam, // additional message information
                          LPARAM lParam) // additional message information
 {
@@ -474,16 +408,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, // handle for this window
         case 61696: // F10
             World.OnKeyDown(VK_F10);
             return 0;
-        case SC_SCREENSAVE: // screensaver trying to start?
+        case SC_SCREENSAVE:   // screensaver trying to start?
         case SC_MONITORPOWER: // monitor trying to enter powersave?
-            return 0; // prevent from happening
+            return 0;         // prevent from happening
         }
         break; // exit
     }
     case WM_CLOSE: // did we receive a close message?
     {
         PostQuitMessage(0); // send a quit message [Alt]+[F4]
-        return 0; // jump back
+        return 0;           // jump back
     }
     case WM_MOUSEMOVE:
     {
@@ -509,7 +443,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, // handle for this window
     case WM_KEYDOWN:
         if (Global::bActive)
         {
-            if (wParam != 17) // bo naciśnięcia [Ctrl] nie ma po co przekazywać
+            if (wParam != 17)      // bo naciśnięcia [Ctrl] nie ma po co przekazywać
                 if (wParam != 145) //[Scroll Lock] też nie
                     World.OnKeyDown(wParam);
             switch (wParam)
@@ -517,10 +451,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, // handle for this window
             case VK_ESCAPE: //[Esc] pauzuje tylko bez Debugmode
                 if (DebugModeFlag)
                     break;
-            case 19: //[Pause]
-                if (Global::iPause & 1) // jeśli pauza startowa
+            case 19:                      //[Pause]
+                if (Global::iPause & 1)   // jeśli pauza startowa
                     Global::iPause &= ~1; // odpauzowanie, gdy po wczytaniu miało nie startować
-                else if (!(Global::iMultiplayer & 2)) // w multiplayerze pauza nie ma sensu
+                else if (!(Global::iMultiplayer & 2))  // w multiplayerze pauza nie ma sensu
                     if (!Console::Pressed(VK_CONTROL)) // z [Ctrl] to radiostop jest
                         // Ra: poniższe nie ma sensu, bo brak komunikacji natychmiast zapauzuje
                         // ponownie
@@ -529,8 +463,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, // handle for this window
                         // Global::iPause&=~10; //odpauzowanie pauzy PoKeys (chyba nic nie da) i
                         // ewentualnie klawiszowej również
                         // else
-                        Global::iPause ^= 2; // zmiana stanu zapauzowania
-                if (Global::iPause) // jak pauza
+                        Global::iPause ^= 2;   // zmiana stanu zapauzowania
+                if (Global::iPause)            // jak pauza
                     Global::iTextMode = VK_F1; // to wyświetlić zegar i informację
                 break;
             case VK_F7:
@@ -563,7 +497,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, // handle for this window
     {
         ReSizeGLScene(LOWORD(lParam), HIWORD(lParam)); // LoWord=Width, HiWord=Height
         if (GetWindowRect(hWnd, &rect))
-        { // Ra: zmiana rozmiaru okna bez przesuwania myszy
+        {   // Ra: zmiana rozmiaru okna bez przesuwania myszy
             // mx=WindowWidth/2+rect.left;    // horizontal position
             // my=WindowHeight/2+rect.top;    // vertical position
             // SetCursorPos(mx,my);
@@ -603,12 +537,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, // handle for this window
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 };
 
-int WINAPI WinMain(HINSTANCE hInstance, // instance
+int WINAPI WinMain(HINSTANCE hInstance,     // instance
                    HINSTANCE hPrevInstance, // previous instance
-                   LPSTR lpCmdLine, // command line parameters
-                   int nCmdShow) // window show state
+                   LPSTR lpCmdLine,         // command line parameters
+                   int nCmdShow)            // window show state
 {
-    MSG msg; // windows message structure
+    MSG msg;           // windows message structure
     BOOL done = FALSE; // bool variable to exit loop
     fullscreen = true;
     DecimalSeparator = '.';
@@ -620,9 +554,9 @@ int WINAPI WinMain(HINSTANCE hInstance, // instance
      try {Global::fOpenGL=glver.ToDouble();} catch (...) {Global::fOpenGL=0.0;}
      Global::bOpenGL_1_5=(Global::fOpenGL>=1.5);
     */
-    DeleteFile("errors.txt"); // usunięcie starego
+    DeleteFile("errors.txt");        // usunięcie starego
     Global::LoadIniFile("eu07.ini"); // teraz dopiero można przejrzeć plik z ustawieniami
-    Global::InitKeys("keys.ini"); // wczytanie mapowania klawiszy - jest na stałe
+    Global::InitKeys("keys.ini");    // wczytanie mapowania klawiszy - jest na stałe
 
     // hunter-271211: ukrywanie konsoli
     if (Global::iWriteLogEnabled & 2)
@@ -651,7 +585,7 @@ int WINAPI WinMain(HINSTANCE hInstance, // instance
                 Global::asHumanCtrlVehicle = str;
             }
             else if (str == AnsiString("-modifytga"))
-            { // wykonanie modyfikacji wszystkich plików TGA
+            {                            // wykonanie modyfikacji wszystkich plików TGA
                 Global::iModifyTGA = -1; // specjalny tryb wykonania totalnej modyfikacji
             }
             else if (str == AnsiString("-e3d"))
@@ -697,9 +631,9 @@ int WINAPI WinMain(HINSTANCE hInstance, // instance
     if (!joyGetNumDevs())
         WriteLog("No joystick");
     if (Global::iModifyTGA < 0)
-    { // tylko modyfikacja TGA, bez uruchamiania symulacji
+    {                                 // tylko modyfikacja TGA, bez uruchamiania symulacji
         Global::iMaxTextureSize = 64; //żeby nie zamulać pamięci
-        World.ModifyTGA(); // rekurencyjne przeglądanie katalogów
+        World.ModifyTGA();            // rekurencyjne przeglądanie katalogów
     }
     else
     {
@@ -712,18 +646,18 @@ int WINAPI WinMain(HINSTANCE hInstance, // instance
         // else
         //{//główna pętla programu
         Console::On(); // włączenie konsoli
-        while (!done) // loop that runs while done=FALSE
+        while (!done)  // loop that runs while done=FALSE
         {
             if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) // is there a message waiting?
             {
                 if (msg.message == WM_QUIT) // have we received a quit message?
-                    done = TRUE; // if so
-                else // if not, deal with window messages
+                    done = TRUE;            // if so
+                else                        // if not, deal with window messages
                 {
                     // if (msg.message==WM_CHAR)
                     // World.OnKeyDown(msg.wParam);
                     TranslateMessage(&msg); // translate the message
-                    DispatchMessage(&msg); // dispatch the message
+                    DispatchMessage(&msg);  // dispatch the message
                 }
             }
             else // if there are no messages
@@ -744,6 +678,6 @@ int WINAPI WinMain(HINSTANCE hInstance, // instance
     SystemParametersInfo(SPI_SETKEYBOARDDELAY, iOldDelay, NULL, 0);
     delete pConsole; // deaktywania sterownika
     // shutdown
-    KillGLWindow(); // kill the window
+    KillGLWindow();      // kill the window
     return (msg.wParam); // exit the program
 }

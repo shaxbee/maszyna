@@ -5,13 +5,14 @@ project(MaSzyna LANGUAGES C CXX)
 find_package(OpenGL REQUIRED)
 
 set(MASZYNA_SRCS
+    Console.h
+    Console.cpp
     AdvSound.h
     AirCoupler.h
     AnimModel.h
     Button.h
     Camera.h
     Classes.h
-    Curve.h
     Data.h
     Driver.h
     dumb3d.h
@@ -61,7 +62,6 @@ set(MASZYNA_SRCS
     AnimModel.cpp
     Button.cpp
     Camera.cpp
-    Curve.cpp
     Driver.cpp
     dumb3d.cpp
     DynObj.cpp

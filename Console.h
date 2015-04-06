@@ -5,7 +5,6 @@
 //---------------------------------------------------------------------------
 class TConsoleDevice; // urządzenie podłączalne za pomocą DLL
 class TPoKeys55;
-class TLPT;
 
 // klasy konwersji znaków wprowadzanych z klawiatury
 class TKeyTrans
@@ -15,15 +14,14 @@ class TKeyTrans
 };
 
 class Console
-{ // Ra: klasa statyczna gromadząca sygnały sterujące oraz informacje zwrotne
+{   // Ra: klasa statyczna gromadząca sygnały sterujące oraz informacje zwrotne
     // Ra: stan wejścia zmieniany klawiaturą albo dedykowanym urządzeniem
     // Ra: stan wyjścia zmieniany przez symulację (mierniki, kontrolki)
   private:
-    static int iMode; // tryb pracy
-    static int iConfig; // dodatkowa informacja o sprzęcie (np. numer LPT)
-    static int iBits; // podstawowy zestaw lampek
+    static int iMode;              // tryb pracy
+    static int iConfig;            // dodatkowa informacja o sprzęcie (np. numer LPT)
+    static int iBits;              // podstawowy zestaw lampek
     static TPoKeys55 *PoKeys55[2]; // może ich być kilka
-    static TLPT *LPT;
     static void BitsUpdate(int mask);
     // zmienne dla trybu "jednokabinowego", potrzebne do współpracy z pulpitem (PoKeys)
     // używając klawiatury, każdy pojazd powinien mieć własny stan przełączników

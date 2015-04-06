@@ -1,16 +1,8 @@
-//---------------------------------------------------------------------------
-
-#include <vcl.h>
-#pragma hdrstop
-
 #include "Console.h"
 #include "Globals.h"
 #include "Logs.h"
-#include "PoKeys55.h"
-#include "LPT.h"
+#include "Console/PoKeys55.h"
 
-//---------------------------------------------------------------------------
-#pragma package(smart_init)
 // Ra: klasa statyczna gromadząca sygnały sterujące oraz informacje zwrotne
 // Ra: stan wejścia zmieniany klawiaturą albo dedykowanym urządzeniem
 // Ra: stan wyjścia zmieniany przez symulację (mierniki, kontrolki)
@@ -74,24 +66,24 @@ public static Int32 GetScreenSaverTimeout()
 */
 
 // Ra: do poprawienia
-void SetLedState(char Code, bool bOn)
-{ // Ra: bajer do migania LED-ami w klawiaturze
-    if (Win32Platform == VER_PLATFORM_WIN32_NT)
-    {
-        // WriteLog(AnsiString(int(GetAsyncKeyState(Code))));
-        if (bool(GetAsyncKeyState(Code)) != bOn)
-        {
-            keybd_event(Code, MapVirtualKey(Code, 0), KEYEVENTF_EXTENDEDKEY, 0);
-            keybd_event(Code, MapVirtualKey(Code, 0), KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-        }
-    }
-    else
-    {
-        TKeyboardState KBState;
-        GetKeyboardState(KBState);
-        KBState[Code] = bOn ? 1 : 0;
-        SetKeyboardState(KBState);
-    };
+void SetLedState(char Code, bool bOn){
+    // Ra: bajer do migania LED-ami w klawiaturze
+    // if (Win32Platform == VER_PLATFORM_WIN32_NT)
+    // {
+    // WriteLog(AnsiString(int(GetAsyncKeyState(Code))));
+    // if (bool(GetAsyncKeyState(Code)) != bOn)
+    // {
+    //    keybd_event(Code, MapVirtualKey(Code, 0), KEYEVENTF_EXTENDEDKEY, 0);
+    //    keybd_event(Code, MapVirtualKey(Code, 0), KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+    //}
+    // }
+    // else
+    // {
+    // TKeyboardState KBState;
+    // GetKeyboardState(KBState);
+    // KBState[Code] = bOn ? 1 : 0;
+    // SetKeyboardState(KBState);
+    // };
 };
 
 //---------------------------------------------------------------------------
@@ -100,21 +92,20 @@ int Console::iBits = 0; // zmienna statyczna - obiekt Console jest jednen wspól
 int Console::iMode = 0;
 int Console::iConfig = 0;
 TPoKeys55 *Console::PoKeys55[2] = {NULL, NULL};
-TLPT *Console::LPT = NULL;
 int Console::iSwitch[8]; // bistabilne w kabinie, załączane z [Shift], wyłączane bez
 int Console::iButton[8]; // monostabilne w kabinie, załączane podczas trzymania klawisza
 
-__fastcall Console::Console()
+Console::Console()
 {
     PoKeys55[0] = PoKeys55[1] = NULL;
     for (int i = 0; i < 8; ++i)
-    { // zerowanie przełączników
+    {                   // zerowanie przełączników
         iSwitch[i] = 0; // bity 0..127 - bez [Ctrl], 128..255 - z [Ctrl]
         iButton[i] = 0; // bity 0..127 - bez [Shift], 128..255 - z [Shift]
     }
 };
 
-__fastcall Console::~Console()
+Console::~Console()
 {
     delete PoKeys55[0];
     delete PoKeys55[1];
@@ -132,22 +123,22 @@ int Console::On()
     iSwitch[4] = iSwitch[5] = iSwitch[6] = iSwitch[7] = 0; // bity 128..255 - z [Ctrl]
     switch (iMode)
     {
-    case 1: // kontrolki klawiatury
-    case 2: // kontrolki klawiatury
+    case 1:          // kontrolki klawiatury
+    case 2:          // kontrolki klawiatury
         iConfig = 0; // licznik użycia Scroll Lock
         break;
     case 3: // LPT
-        LPT = new TLPT(); // otwarcie inpout32.dll
-        if (LPT ? LPT->Connect(iConfig) : false)
-        { // wysłać 0?
-            BitsUpdate(-1); // aktualizacjia stanów, bo przy wczytywaniu mogło być nieaktywne
-            WriteLog("Feedback Mode 3: InpOut32.dll OK");
-        }
-        else
-        { // połączenie nie wyszło, ma być NULL
-            delete LPT;
-            LPT = NULL;
-        }
+        // LPT = new TLPT(); // otwarcie inpout32.dll
+        // if (LPT ? LPT->Connect(iConfig) : false)
+        // { // wysłać 0?
+        //    BitsUpdate(-1); // aktualizacjia stanów, bo przy wczytywaniu mogło być nieaktywne
+        //    WriteLog("Feedback Mode 3: InpOut32.dll OK");
+        // }
+        // else
+        // { // połączenie nie wyszło, ma być NULL
+        //    delete LPT;
+        //    LPT = NULL;
+        // }
         break;
     case 4: // PoKeys
         PoKeys55[0] = new TPoKeys55();
@@ -170,9 +161,9 @@ void Console::Off()
 { // wyłączenie informacji zwrotnych (reset pulpitu)
     BitsClear(-1);
     if ((iMode == 1) || (iMode == 2))
-        if (iConfig & 1) // licznik użycia Scroll Lock
-        { // bez sensu to jest, ale mi się samo włącza
-            SetLedState(VK_SCROLL, true); // przyciśnięty
+        if (iConfig & 1)                   // licznik użycia Scroll Lock
+        {                                  // bez sensu to jest, ale mi się samo włącza
+            SetLedState(VK_SCROLL, true);  // przyciśnięty
             SetLedState(VK_SCROLL, false); // zwolniony
         }
     delete PoKeys55[0];
@@ -184,7 +175,7 @@ void Console::Off()
 };
 
 void Console::BitsSet(int mask, int entry)
-{ // ustawienie bitów o podanej masce (mask) na wejściu (entry)
+{                               // ustawienie bitów o podanej masce (mask) na wejściu (entry)
     if ((iBits & mask) != mask) // jeżeli zmiana
     {
         int old = iBits; // poprzednie stany
@@ -194,7 +185,7 @@ void Console::BitsSet(int mask, int entry)
 };
 
 void Console::BitsClear(int mask, int entry)
-{ // zerowanie bitów o podanej masce (mask) na wejściu (entry)
+{                     // zerowanie bitów o podanej masce (mask) na wejściu (entry)
     if (iBits & mask) // jeżeli zmiana
     {
         int old = iBits; // poprzednie stany
@@ -207,24 +198,24 @@ void Console::BitsUpdate(int mask)
 { // aktualizacja stanu interfejsu informacji zwrotnej; (mask) - zakres zmienianych bitów
     switch (iMode)
     {
-    case 1: // sterowanie światełkami klawiatury: CA/SHP+opory
+    case 1:           // sterowanie światełkami klawiatury: CA/SHP+opory
         if (mask & 3) // gdy SHP albo CA
             SetLedState(VK_CAPITAL, iBits & 3);
         if (mask & 4) // gdy jazda na oporach
-        { // Scroll Lock ma jakoś dziwnie... zmiana stanu na przeciwny
-            SetLedState(VK_SCROLL, true); // przyciśnięty
+        {             // Scroll Lock ma jakoś dziwnie... zmiana stanu na przeciwny
+            SetLedState(VK_SCROLL, true);  // przyciśnięty
             SetLedState(VK_SCROLL, false); // zwolniony
-            ++iConfig; // licznik użycia Scroll Lock
+            ++iConfig;                     // licznik użycia Scroll Lock
         }
         break;
-    case 2: // sterowanie światełkami klawiatury: CA+SHP
+    case 2:           // sterowanie światełkami klawiatury: CA+SHP
         if (mask & 2) // gdy CA
             SetLedState(VK_CAPITAL, iBits & 2);
         if (mask & 1) // gdy SHP
-        { // Scroll Lock ma jakoś dziwnie... zmiana stanu na przeciwny
-            SetLedState(VK_SCROLL, true); // przyciśnięty
+        {             // Scroll Lock ma jakoś dziwnie... zmiana stanu na przeciwny
+            SetLedState(VK_SCROLL, true);  // przyciśnięty
             SetLedState(VK_SCROLL, false); // zwolniony
-            ++iConfig; // licznik użycia Scroll Lock
+            ++iConfig;                     // licznik użycia Scroll Lock
         }
         break;
     case 3: // LPT Marcela z modyfikacją (jazda na oporach zamiast brzęczyka)
@@ -267,84 +258,85 @@ void Console::BitsUpdate(int mask)
     }
 };
 
-bool Console::Pressed(int x) { // na razie tak - czyta się tylko klawiatura return Global::bActive && (GetKeyState(x) < 0); };
+bool Console::Pressed(int x)
+{ // na razie tak - czyta się tylko klawiatura return Global::bActive && (GetKeyState(x) < 0); };
 
-void Console::ValueSet(int x, double y)
-{ // ustawienie wartości (y) na kanale analogowym (x)
-    if (iMode == 4)
-        if (PoKeys55[0])
-        {
-            PoKeys55[0]->PWM(
-                x, (((Global::fCalibrateOut[x][3] * y) + Global::fCalibrateOut[x][2]) * y +
-                    Global::fCalibrateOut[x][1]) *
-                           y +
-                       Global::fCalibrateOut[x][0]); // zakres <0;1>
-        }
-};
-
-void Console::Update()
-{ // funkcja powinna być wywoływana regularnie, np. raz w każdej ramce ekranowej
-    if (iMode == 4)
-        if (PoKeys55[0])
-            if (PoKeys55[0]->Update((Global::iPause & 8) > 0))
-            { // wykrycie przestawionych przełączników?
-                Global::iPause &= ~8;
+    void Console::ValueSet(int x, double y)
+    { // ustawienie wartości (y) na kanale analogowym (x)
+        if (iMode == 4)
+            if (PoKeys55[0])
+            {
+                PoKeys55[0]->PWM(
+                    x, (((Global::fCalibrateOut[x][3] * y) + Global::fCalibrateOut[x][2]) * y +
+                        Global::fCalibrateOut[x][1]) *
+                               y +
+                           Global::fCalibrateOut[x][0]); // zakres <0;1>
             }
+    };
+
+    void Console::Update()
+    { // funkcja powinna być wywoływana regularnie, np. raz w każdej ramce ekranowej
+        if (iMode == 4)
+            if (PoKeys55[0])
+                if (PoKeys55[0]->Update((Global::iPause & 8) > 0))
+                { // wykrycie przestawionych przełączników?
+                    Global::iPause &= ~8;
+                }
+                else
+                {                                  // błąd komunikacji - zapauzować symulację?
+                    if (!(Global::iPause & 8))     // jeśli jeszcze nie oflagowana
+                        Global::iTextMode = VK_F1; // pokazanie czasu/pauzy
+                    Global::iPause |= 8;           // tak???
+                    PoKeys55[0]->Connect();        // próba ponownego podłączenia
+                }
+    };
+
+    float Console::AnalogGet(int x)
+    { // pobranie wartości analogowej
+        if (iMode == 4)
+            if (PoKeys55[0])
+                return PoKeys55[0]->fAnalog[x];
+        return -1.0;
+    };
+
+    unsigned char Console::DigitalGet(int x)
+    { // pobranie wartości cyfrowej
+        if (iMode == 4)
+            if (PoKeys55[0])
+                return PoKeys55[0]->iInputs[x];
+        return 0;
+    };
+
+    void Console::OnKeyDown(int k)
+    {                        // naciśnięcie klawisza z powoduje wyłączenie, a
+        if (k & 0x10000)     // jeśli [Shift]
+        {                    // ustawienie bitu w tabeli przełączników bistabilnych
+            if (k & 0x20000) // jeśli [Ctrl], to zestaw dodatkowy
+                iSwitch[4 + (char(k) >> 5)] |= 1 << (k & 31); // załącz bistabliny dodatkowy
             else
-            { // błąd komunikacji - zapauzować symulację?
-                if (!(Global::iPause & 8)) // jeśli jeszcze nie oflagowana
-                    Global::iTextMode = VK_F1; // pokazanie czasu/pauzy
-                Global::iPause |= 8; // tak???
-                PoKeys55[0]->Connect(); // próba ponownego podłączenia
+            { // z [Shift] włączenie bitu bistabilnego i dodatkowego monostabilnego
+                iSwitch[char(k) >> 5] |= 1 << (k & 31);         // załącz bistabliny podstawowy
+                iButton[4 + (char(k) >> 5)] |= (1 << (k & 31)); // załącz monostabilny dodatkowy
             }
-};
-
-float Console::AnalogGet(int x)
-{ // pobranie wartości analogowej
-    if (iMode == 4)
-        if (PoKeys55[0])
-            return PoKeys55[0]->fAnalog[x];
-    return -1.0;
-};
-
-unsigned char Console::DigitalGet(int x)
-{ // pobranie wartości cyfrowej
-    if (iMode == 4)
-        if (PoKeys55[0])
-            return PoKeys55[0]->iInputs[x];
-    return 0;
-};
-
-void Console::OnKeyDown(int k)
-{ // naciśnięcie klawisza z powoduje wyłączenie, a
-    if (k & 0x10000) // jeśli [Shift]
-    { // ustawienie bitu w tabeli przełączników bistabilnych
-        if (k & 0x20000) // jeśli [Ctrl], to zestaw dodatkowy
-            iSwitch[4 + (char(k) >> 5)] |= 1 << (k & 31); // załącz bistabliny dodatkowy
-        else
-        { // z [Shift] włączenie bitu bistabilnego i dodatkowego monostabilnego
-            iSwitch[char(k) >> 5] |= 1 << (k & 31); // załącz bistabliny podstawowy
-            iButton[4 + (char(k) >> 5)] |= (1 << (k & 31)); // załącz monostabilny dodatkowy
         }
-    }
-    else
-    { // zerowanie bitu w tabeli przełączników bistabilnych
-        if (k & 0x20000) // jeśli [Ctrl], to zestaw dodatkowy
-            iSwitch[4 + (char(k) >> 5)] &= ~(1 << (k & 31)); // wyłącz bistabilny dodatkowy
         else
-        {
-            iSwitch[char(k) >> 5] &= ~(1 << (k & 31)); // wyłącz bistabilny podstawowy
-            iButton[char(k) >> 5] |= 1 << (k & 31); // załącz monostabilny podstawowy
+        {                    // zerowanie bitu w tabeli przełączników bistabilnych
+            if (k & 0x20000) // jeśli [Ctrl], to zestaw dodatkowy
+                iSwitch[4 + (char(k) >> 5)] &= ~(1 << (k & 31)); // wyłącz bistabilny dodatkowy
+            else
+            {
+                iSwitch[char(k) >> 5] &= ~(1 << (k & 31)); // wyłącz bistabilny podstawowy
+                iButton[char(k) >> 5] |= 1 << (k & 31);    // załącz monostabilny podstawowy
+            }
         }
-    }
-};
-void Console::OnKeyUp(int k)
-{ // puszczenie klawisza w zasadzie nie ma znaczenia dla iSwitch, ale zeruje iButton
-    if ((k & 0x20000) == 0) // monostabilne tylko bez [Ctrl]
-        if (k & 0x10000) // jeśli [Shift]
-            iButton[4 + (char(k) >> 5)] &= ~(1 << (k & 31)); // wyłącz monostabilny dodatkowy
-        else
-            iButton[char(k) >> 5] &= ~(1 << (k & 31)); // wyłącz monostabilny podstawowy
-};
-int Console::KeyDownConvert(int k) { return int(ktTable[k & 0x3FF].iDown); };
-int Console::KeyUpConvert(int k) { return int(ktTable[k & 0x3FF].iUp); };
+    };
+    void Console::OnKeyUp(int k)
+    { // puszczenie klawisza w zasadzie nie ma znaczenia dla iSwitch, ale zeruje iButton
+        if ((k & 0x20000) == 0)                                  // monostabilne tylko bez [Ctrl]
+            if (k & 0x10000)                                     // jeśli [Shift]
+                iButton[4 + (char(k) >> 5)] &= ~(1 << (k & 31)); // wyłącz monostabilny dodatkowy
+            else
+                iButton[char(k) >> 5] &= ~(1 << (k & 31)); // wyłącz monostabilny podstawowy
+    };
+    int Console::KeyDownConvert(int k) { return int(ktTable[k & 0x3FF].iDown); };
+    int Console::KeyUpConvert(int k) { return int(ktTable[k & 0x3FF].iUp); };

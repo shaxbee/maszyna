@@ -29,16 +29,16 @@ void TButton::Init(const std::string name, TModel3d *pModel, bool bNewOn)
     Update();
 };
 
-void TButton::Load(TQueryParserComp *Parser, TModel3d *pModel1, TModel3d *pModel2)
+void TButton::Load(cParser &parser, TModel3d *pModel1, TModel3d *pModel2)
 {
-    AnsiString str = Parser->GetNextSymbol().LowerCase();
+    auto str = parser.readString();
     if (pModel1)
     { // poszukiwanie submodeli w modelu
         Init(str, pModel1, false);
-        if (pModel2)
-            if (!pModelOn && !pModelOff)
-                Init(str, pModel2,
-                     false); // może w drugim będzie (jak nie w kabinie, to w zewnętrznym)
+        if (pModel2 && (!pModelOn && !pModelOff))
+        {
+            Init(str, pModel2, false); // może w drugim będzie (jak nie w kabinie, to w zewnętrznym)
+        }
     }
     else
     {

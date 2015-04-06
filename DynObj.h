@@ -312,7 +312,7 @@ class TDynamicObject
     // TTrackFollower Axle3; //Ra: wyłączyłem, bo kąty są liczone w Segment.cpp
     int iNumAxles; // ilość osi
     int CouplCounter;
-    AnsiString asModel;
+    std::string asModel;
 
   public:
     void ABuScanObjects(int ScanDir, double ScanDist);
