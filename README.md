@@ -1,2 +1,0 @@
-# maszyna
-MaSzyna Train Simulator
