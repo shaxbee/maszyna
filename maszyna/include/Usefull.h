@@ -2,8 +2,10 @@
 #ifndef UsefullH
 #define UsefullH
 
-#include "dumb3d.h"
-#include "Logs.h"
+//#include "include\dumb3d.h"
+//#include "include\Logs.h"
+#include "commons.h"
+#include "commons_usr.h"
 
 //#define	B1(t)     (t*t*t)
 //#define	B2(t)     (3*t*t*(1-t))
@@ -25,8 +27,8 @@
 
 #define Fix(a,b,c) {if (a<b) a=b; if (a>c) a=c;}
 
-#define asModelsPath AnsiString("models\\")
-#define asSceneryPath AnsiString("scenery\\")
+//#define asModelsPath AnsiString("models\\")
+//#define asSceneryPath AnsiString("scenery\\")
 //#define asTexturePath AnsiString("textures\\")
 //#define asTextureExt AnsiString(".bmp")
 #define szSceneryPath "scenery\\"

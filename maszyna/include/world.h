@@ -1,10 +1,8 @@
-//---------------------------------------------------------------------------
-
 #ifndef _World_H_
 #define _World_H_
 
-
-//#include "commons.h"
+#include "commons.h"
+#include "commons_usr.h"
 
 class TWorld
 {
@@ -13,15 +11,19 @@ public:
     bool  Init();
 	bool  Render(double dt);
 	bool  Update(double dt);
+	void  OnKeyDown(int cKey, int scancode, int action, int mode, std::string command);
+	void  OnKeyUp(int cKey, int scancode, int action, int mode, std::string command);
+	void  OnMouseMove(double x, double y);
 	GLvoid glPrint(const char *fmt);
     TWorld();
    ~TWorld();
+  
 private:
 
     bool  RenderX();
 
 public:
+	
 };
 
-//---------------------------------------------------------------------------
 #endif

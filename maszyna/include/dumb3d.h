@@ -3,7 +3,6 @@
 
 #include <cmath>
 #include <math.h>
-//#include <fastmath.h>
 
 namespace Math3D {
 

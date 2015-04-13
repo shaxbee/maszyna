@@ -1,6 +1,8 @@
-#include "dumb3d.h"
+#include "commons.h"
+#include "commons_usr.h"
+
 //#include "fastmath.h"
-#include <cassert>
+
 
 namespace Math3D {
 

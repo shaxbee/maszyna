@@ -2,7 +2,7 @@
 #ifndef CameraH
 #define CameraH
 
-
+#include "commons_usr.h"
 #include "dumb3d.h"
 using namespace Math3D;
 
@@ -32,11 +32,11 @@ public: //McZapkie: potrzebuje do kiwania na boki
  vector3 OldVelocity; //lepiej usredniac zeby nie bylo rozbiezne przy malym FPS
  vector3 CrossPos;
  double CrossDist;
- void __fastcall Init(vector3 NPos, vector3 NAngle);
- void __fastcall Reset() { Pitch=Yaw=Roll= 0; };
- void __fastcall OnCursorMove(double x, double y);
- void __fastcall Update();
- vector3 __fastcall GetDirection();
+ void Init(vector3 NPos, vector3 NAngle);
+ void Reset() { Pitch=Yaw=Roll= 0; };
+ void OnCursorMove(double x, double y);
+ void Update();
+ vector3 GetDirection();
  //vector3 inline __fastcall GetCrossPos() { return Pos+GetDirection()*CrossDist+CrossPos; };
 
  bool __fastcall SetMatrix();

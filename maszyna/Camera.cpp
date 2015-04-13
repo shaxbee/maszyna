@@ -1,20 +1,10 @@
-//---------------------------------------------------------------------------
-//#include    "system.hpp"
-//#include    "classes.hpp"
-
-#include "opengl/glew.h"
-#include "opengl/glut.h"
-
 #pragma hdrstop
-
-#include "Camera.h"
-#include "Usefull.h"
-#include "Globals.h"
+#include "include\Usefull.h"
+#include "commons.h"
+#include "commons_usr.h"
 //#include "Timer.h"
 //#include "mover.h"
-#include "Console.h"
 //---------------------------------------------------------------------------
-#pragma package(smart_init)
 
 //TViewPyramid TCamera::OrgViewPyramid;
 //={vector3(-1,1,1),vector3(1,1,1),vector3(-1,-1,1),vector3(1,-1,1),vector3(0,0,0)};
@@ -66,7 +56,7 @@ void __fastcall TCamera::Update()
     if (Console::Pressed(VK_CONTROL))
      a=a*100; 
 //    OldVelocity=Velocity;
-    if (FreeFlyModeFlag==true)
+    if (Global::bFreeFlyModeFlag==true)
       Type=tp_Free;
     else
       Type=tp_Follow;
