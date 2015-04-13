@@ -39,8 +39,8 @@ ExternalProject_Add(
     maszyna
     DEPENDS glfw glew glm
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/maszyna
-	CMAKE_CACHE_ARGS
-		-Dglfw_DIR:STRING=${CMAKE_BINARY_DIR}/Build/glfw
+	CMAKE_ARGS
+		-Dglfw3_DIR:STRING=${CMAKE_BINARY_DIR}/Build/glfw
 		-Dglew_DIR:STRING=${CMAKE_BINARY_DIR}/Build/glew
 		-Dglm_DIR:STRING=${CMAKE_BINARY_DIR}/Build/glm
     INSTALL_COMMAND ""
