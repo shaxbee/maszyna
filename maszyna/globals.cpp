@@ -8,7 +8,6 @@
 
 #include "commons.h"
 #include "commons_usr.h"
-#include "include\usefull.h"
 
 char **Global::argv = NULL;
 GLFWwindow* Global::window;
@@ -31,12 +30,13 @@ GLfloat  Global::whiteLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 GLfloat  Global::noLight[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 GLfloat  Global::lightPos[4];
 GLfloat Global::darkLight[] = { 0.03f, 0.03f, 0.03f, 1.0f }; //œladowe
-float Global::fMouseXScale = 3.5;
-float Global::fMouseYScale = 2.4;
-float Global::FPS = 0.0;
-float Global::fms = 0.0;
-float Global::fdt = 0.0;
-float Global::FOV = 45.0;
+float Global::fMouseXScale = 3.5f;
+float Global::fMouseYScale = 2.4f;
+float Global::fTimeSpeed = 1.0f;
+double Global::FPS = 0.0f;
+float Global::fdt = 0.0f;
+float Global::fms = 0.0f;
+float Global::FOV = 45.0f;
 
 bool Global::detonatoryOK = false;
 bool Global::bFreeFly = false;
@@ -47,6 +47,7 @@ bool Global::bInactivePause = false;
 bool Global::bGlutFont = false;
 bool Global::bSCNLOADED = false;
 bool Global::bfirstloadingscn = true;
+bool Global::bSoundEnabled = false;
 int Global::iPARSERBYTESPASSED = 0;
 int Global::iNODES = 0;
 int Global::postep = 0;
@@ -65,6 +66,8 @@ std::string Global::asCWD = "";
 std::string Global::logfilenm1 = "log.txt";
 std::string Global::szDefaultExt = ".bmp";
 std::string Global::asCurrentDynamicPath = "dynamic\\eu07\\";
+std::string Global::asCurrentSceneryPath = "scenery\\";
+std::string Global::asLang = "pl";
 
 GLuint Global::logotex = NULL;
 GLuint Global::bfonttex = NULL;
@@ -85,9 +88,9 @@ GLfloat Global::lastY = 1024 / 2.0;
 bool Global::keys[1024];
 CCamera Global::CAMERA;
 
-double Global::frameTime = 0;
-double Global::previousFrameTime = 0; // Holds the amount of milliseconds since the last frame
-double Global::timeAccumulator = 0; // Holds a sum of the time from all passed frame times
+float Global::frameTime = 0;
+float Global::previousFrameTime = 0; // Holds the amount of milliseconds since the last frame
+float Global::timeAccumulator = 0; // Holds a sum of the time from all passed frame times
 float Global::fpsMeasureInterval = 1.0f; // The interval where we would like to take an FPS sample. Currently simply each second.
 int Global::frameCount = 0; // The current amount of frames which have passed
 
@@ -132,7 +135,7 @@ GLvoid Global::glPrintxy(GLint x, GLint y, char *string, int set)	// Where The P
 	glLoadIdentity();									// Reset The Modelview Matrix
 	glTranslated(x, y, 0);								// Position The Text (0,0 - Bottom Left)
 	glListBase(Global::fbase - 32 + (128 * set));						// Choose The Font Set (0 or 1)
-	glCallLists(strlen(string), GL_UNSIGNED_BYTE, string);// Write The Text To The Screen
+	glCallLists((int)strlen(string), GL_UNSIGNED_BYTE, string);// Write The Text To The Screen
 	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
 	glPopMatrix();										// Restore The Old Projection Matrix
 	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix

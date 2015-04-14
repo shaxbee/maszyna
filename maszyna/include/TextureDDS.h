@@ -1,7 +1,8 @@
 #ifndef TEXTURE_DDS_H
 #define TEXTURE_DDS_H 1
 
-#include "opengl/glew.h"
+#include "commons.h"
+#include "commons_usr.h"
 
 #pragma hdrstop
 
@@ -15,8 +16,8 @@ struct Color8888
 
 struct DDS_IMAGE_DATA
 {
-	GLint  width;
-	GLint  height;
+	GLuint  width;
+	GLuint  height;
     GLint    components;
     GLenum   format;
     GLuint   blockSize;

@@ -8,40 +8,42 @@ bool first= true;
 char endstring[10]= "\n";
 char LOGFILENAME[200];
 
-void WriteConsoleOnly(char *str, double value)
+void WriteConsoleOnly(CString str, double value)
 {
     char buf[255];
     sprintf_s(buf,"%s %f \n",str,value);
 
 //    stdout=  GetStdHandle(STD_OUTPUT_HANDLE);
     DWORD wr= 0;
-	WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), buf, qstrlen(buf), &wr, NULL);  //strlen = sizeof
+	WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), buf, (int)strlen(buf), &wr, NULL);  //strlen = sizeof
     //WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE),endstring,strlen(endstring),&wr,NULL);
 }
 
-void WriteConsoleOnly(char *str)
+void WriteConsoleOnly(CString str)
 {
 //    printf("%n ffafaf /n",str);
     DWORD wr= 0;
-	WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), str, strlen(str), &wr, NULL);  //strlen = sizeof
-	WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), endstring, strlen(endstring), &wr, NULL); //strlen = sizeof
+	WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), str, (int)strlen(str), &wr, NULL);  //strlen = sizeof
+	WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), endstring, (int)strlen(endstring), &wr, NULL); //strlen = sizeof
 }
 
-void WriteLog(char *str, double value)
+void WriteLog(CString str, double value)
 {
+
  if (Global::bWriteLogEnabled)
   {
     if (str)
     {
         char buf[255];
-        sprintf_s(buf,"%s %f",str,value);
+        sprintf_s(buf,"%s %f", str, value);
         WriteLog(buf);
     }
   };
 }
 
-void WriteLog(char *str)
-{   
+void WriteLog(CString str)
+{  
+
    FILE *qstream = NULL;
    errno_t err;
    std::string cwd;
@@ -83,6 +85,7 @@ char am_pm[] = "AM";
 
 std::time(&rawtime);
 timeinfo = std::localtime(&rawtime);
+errno_t err; 
 
 
 
@@ -92,13 +95,16 @@ str = FN;
    if (str)
    {
         FILE *stream=NULL;
+
         if (first)
         {
-            stream = fopen("log\\executes.log", "w");
+			err = fopen_s(&stream, "log\\executes.log", "w");
+          //stream = fopen("log\\executes.log", "w");
             first= false;
         }
         else
-            stream = fopen("log\\executes.log", "a+");
+			err = fopen_s(&stream, "log\\executes.log", "a+");
+           // stream = fopen("log\\executes.log", "a+");
         fprintf(stream, str);
         fprintf(stream, "\n");
         fclose(stream);

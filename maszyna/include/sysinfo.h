@@ -113,7 +113,7 @@ inline void SetProcessorAffinity()
 
 inline double CALCULATEFPS()
 {
-	double newTime = glfwGetTime();
+	float newTime = float(glfwGetTime());
 
 	Global::frameTime = newTime - Global::previousFrameTime;
 

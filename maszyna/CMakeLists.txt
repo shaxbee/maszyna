@@ -10,6 +10,7 @@ set(MASZYNA_SOURCES
 	globals.cpp
 	logs.cpp
 	console.cpp
+	pokeys55.cpp
 	camera.cpp
 	camerax.cpp
 	dumb3d.cpp
@@ -20,14 +21,30 @@ set(MASZYNA_SOURCES
 	xbitmap_font.cpp
 	sound.cpp
 	wavread.cpp
+    parser.cpp
+	timer.cpp
+	realsound.cpp
+	fadesound.cpp
+	advsound.cpp
 )
 
 set(MASZYNA_HEADERS
 	include/Globals.h
+	include/qglutils.h
+	include/qstrutils.h
 	include/Logs.h
 	include/Console.h
 	include/Camera.h
-	include/Sound.h)
+	include/Sound.h
+    include/parser.h
+	include/wavread.h
+	include/realsound.h
+	include/advsound.h
+	include/realsound.h
+	include/timer.h
+	include/advsound.h
+	include/fadesound.h
+)
 
 add_executable(maszyna ${MASZYNA_SOURCES} ${MASZYNA_HEADERS})
 target_include_directories(maszyna PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")

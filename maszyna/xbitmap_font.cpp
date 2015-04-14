@@ -1,7 +1,6 @@
-
 #include "commons.h"
 #include "commons_usr.h"
-#include "include/xbitmap_font.h"
+
 
 GLuint	texture[2];
 GLuint	base;				// Base Display List For The Font
@@ -12,7 +11,6 @@ GLfloat	cnt2;				// 2nd Counter Used To Move Text & For Coloring
 
 int xscreenw = 0; //Global::iWindowWidth;
 int xscreenh = 0; //Global::iWindowHeight;
-
 
 
 GLvoid QBuildFontX(GLvoid)								// Build Our Font Display List
@@ -86,7 +84,7 @@ GLvoid QglPrint(GLint x, GLint y, char *string, int set, TColor rgba)	// Where T
 	glLoadIdentity();									// Reset The Modelview Matrix
 	glTranslatef((float)x, (float)y, 0);								// Position The Text (0,0 - Bottom Left)
 	glListBase(base-32+(128*set));						// Choose The Font Set (0 or 1)
-	glCallLists(qstrlen(string), GL_BYTE, string);			// Write The Text To The Screen
+	glCallLists((int)strlen(string), GL_BYTE, string);			// Write The Text To The Screen
 	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
 	glPopMatrix();										// Restore The Old Projection Matrix
 	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
@@ -120,7 +118,7 @@ GLvoid QglPrint_(GLint x, GLint y, char *string, int set, TColor rgba)	// Where 
 	glLoadIdentity();									// Reset The Modelview Matrix
 	glTranslatef((float)x,(float)y,0);					// Position The Text (0,0 - Bottom Left)
 	glListBase(base-32+(128*set));						// Choose The Font Set (0 or 1)
-	glCallLists(qstrlen(string), GL_BYTE, string);			// Write The Text To The Screen
+	glCallLists((int)strlen(string), GL_BYTE, string);			// Write The Text To The Screen
 	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
 	glPopMatrix();										// Restore The Old Projection Matrix
 	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
@@ -153,7 +151,7 @@ glBindTexture(GL_TEXTURE_2D, Global::fonttexturex);				// Select Our Font Textur
 //	glLoadIdentity();									// Reset The Modelview Matrix
 	glTranslatef((float)x,(float)y,0);					// Position The Text (0,0 - Bottom Left)
 	glListBase(base-32+(128*set));						// Choose The Font Set (0 or 1)
-	glCallLists(qstrlen(string), GL_BYTE, string);			// Write The Text To The Screen
+	glCallLists((int)strlen(string), GL_BYTE, string);			// Write The Text To The Screen
 //	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
 //	glPopMatrix();										// Restore The Old Projection Matrix
 //	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
@@ -197,7 +195,7 @@ GLvoid QglPrint3D(float x, float y, float z, float s, char *string, int set, TCo
 
  glScalef(s, s, s);
 	glListBase(base-32+(128*set));						// Choose The Font Set (0 or 1)
-	glCallLists(qstrlen(string), GL_BYTE, string);			// Write The Text To The Screen
+	glCallLists((int)strlen(string), GL_BYTE, string);			// Write The Text To The Screen
  glPopMatrix();
  
  glPushMatrix();
@@ -205,7 +203,7 @@ GLvoid QglPrint3D(float x, float y, float z, float s, char *string, int set, TCo
  glScalef(s, s, s);
  glRotatef(180,0,1,0);
 	glListBase(base-32+(128*set));						// Choose The Font Set (0 or 1)
-	glCallLists(qstrlen(string), GL_BYTE, string);			// Write The Text To The Screen
+	glCallLists((int)strlen(string), GL_BYTE, string);			// Write The Text To The Screen
  glPopMatrix();
  
  glEnable(GL_DEPTH_TEST);							// Enables Depth Testing

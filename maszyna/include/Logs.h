@@ -4,11 +4,12 @@
 #define LogsH
 
 #include "../commons.h"
+#include "cstring.h"
 
-void WriteConsoleOnly(char *str, double value);
-void WriteConsoleOnly(char *str);
-void WriteLog(char *str, double value);
-void WriteLog(char *str);
+void WriteConsoleOnly(CString str, double value);
+void WriteConsoleOnly(CString str);
+void WriteLog(CString str, double value);
+void WriteLog(CString str);
 char* stdstrtochara(std::string var);
 void WriteLogSS(std::string text, std::string token);
 void WriteExecute(char *str);

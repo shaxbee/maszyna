@@ -19,6 +19,8 @@
 #include <direct.h>
 #include <MATH.H>
 #include <FLOAT.H>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define GLFW_INCLUDE_GLU
 #include <GL/glew.h> // include GLEW and new version of GL on Windows
@@ -29,10 +31,10 @@
 
 //#include "opengl\glew.h"
 //#include "opengl\glext.h"
-#include "opengl\gl.h"			// Header File For The OpenGL32 Library
-#include "opengl\glu.h"			// Header File For The GLu32 Library
-#include "opengl\glut.h"	
-#include "opengl\glaux.h"		// Header File For The Glaux Library
+//#include "opengl\gl.h"			// Header File For The OpenGL32 Library
+//#include "opengl\glu.h"			// Header File For The GLu32 Library
+//#include "opengl\glut.h"	
+//#include "opengl\glaux.h"		// Header File For The Glaux Library
 
 //#include <glbinding/gl/gl33core.h>
 //#include <glbinding/gl/gl.h>

@@ -3,17 +3,13 @@
     MaSzyna EU07 locomotive simulator
     Copyright (C) 2001-2004  Marcin Wozniak, Maciej Czapkiewicz and others
 */
+// 2015.04.13 has included other soundsystem files
+// 2015.04.13 starts changing char pointer type into CString (more flexible)
+// 2015.04.14 removed many compiler warnings
 
 #include "commons.h"
 #include "commons_usr.h"
-#include "include\Sound.h"
-
 #pragma hdrstop
-
-//#pragma comment(lib,"glaux.lib")
-//#pragma comment(lib,"glut32.lib")
-#pragma comment(lib,"glu32.lib")
-
 
 GLuint	texture;			// Storage For Our Font Texture
 GLYPHMETRICSFLOAT gmf[256];	// Storage For Information About Our Outline Font Characters
@@ -125,7 +121,7 @@ GLuint LoadTexture(const char * filename)
 */
 
 
-GLvoid TWorld::glPrint(const char *fmt)					// Custom GL "Print" Routine
+GLvoid TWorld::glPrint( CString fmt)					// Custom GL "Print" Routine
 {
 
 	if (fmt == NULL)									// If There's No Text
@@ -133,11 +129,11 @@ GLvoid TWorld::glPrint(const char *fmt)					// Custom GL "Print" Routine
 	glColor3ub(255, 205, 0);
 	glPushAttrib(GL_LIST_BIT);							// Pushes The Display List Bits
 	glListBase(Global::fbase - 32);								// Sets The Base Character to 32
-	glCallLists(strlen(fmt), GL_UNSIGNED_BYTE, fmt);	// Draws The Display List Text
+	glCallLists((int)strlen(fmt), GL_UNSIGNED_BYTE, fmt);	// Draws The Display List Text
 	glPopAttrib();										// Pops The Display List Bits
 }
 
-GLvoid glPrint3D(float x, float y, float z, const char *fmt, ...)					// Custom GL "Print" Routine
+GLvoid glPrint3D(float x, float y, float z, CString fmt, ...)					// Custom GL "Print" Routine
 {
 	float		length = 0;								// Used To Find The Length Of The Text
 	char		text[256];								// Holds Our String
@@ -147,10 +143,11 @@ GLvoid glPrint3D(float x, float y, float z, const char *fmt, ...)					// Custom 
 		return;											// Do Nothing
 
 	va_start(ap, fmt);									// Parses The String For Variables
-	vsprintf_s(text, fmt, ap);						// And Converts Symbols To Actual Numbers
+	vsprintf_s(text, fmt, ap);					    	// And Converts Symbols To Actual Numbers
 	va_end(ap);											// Results Are Stored In Text
+	GLsizei siz = (int)strlen(fmt);
 
-	for (unsigned int loop = 0; loop<(qstrlen(text)); loop++)	// Loop To Find Text Length
+	for (unsigned int loop = 0; loop<(strlen(text)); loop++)	// Loop To Find Text Length
 	{
 		length += gmf[text[loop]].gmfCellIncX;			// Increase Length By Each Characters Width
 	}
@@ -161,7 +158,7 @@ GLvoid glPrint3D(float x, float y, float z, const char *fmt, ...)					// Custom 
 
 	glPushAttrib(GL_LIST_BIT);							// Pushes The Display List Bits
 	glListBase(baseF3D);									// Sets The Base Character to 0
-	glCallLists(strlen(text), GL_UNSIGNED_BYTE, text);	// Draws The Display List Text
+	glCallLists(siz, GL_UNSIGNED_BYTE, text);	// Draws The Display List Text
 	glPopAttrib();										// Pops The Display List Bits
 	glFrontFace(GL_CCW);
 	glPopMatrix();
@@ -196,7 +193,7 @@ GLvoid glPrint3D(float x, float y, float z, const char *fmt, ...)					// Custom 
 	 glOrtho(0, Global::iWindowWidth, Global::iWindowHeight, 0, -100, 100);
 	 glMatrixMode(GL_MODELVIEW);
 	 glLoadIdentity();
-	 glClearColor(0.8, 0.8, 0.8, 0.9);     // 09 07 04 07
+	 glClearColor(0.8f, 0.8f, 0.8f, 0.9f);     // 09 07 04 07
 
 	 //glDisable(GL_DEPTH_TEST);			// Disables depth testing
 	 glDisable(GL_LIGHTING);
@@ -218,7 +215,7 @@ GLvoid glPrint3D(float x, float y, float z, const char *fmt, ...)					// Custom 
 	 //currloading_b = text;
 
 	 //glColor4f(1.0,1.0,1.0,1);
-	 glColor4f(0.9, 0.7, 0.7, 1.0);
+	 glColor4f(0.9f, 0.7f, 0.7f, 1.0f);
 	 int margin = 1;
 
 	 //glBlendFunc(GL_SRC_ALPHA,GL_ONE);
@@ -294,18 +291,18 @@ GLvoid glPrint3D(float x, float y, float z, const char *fmt, ...)					// Custom 
 
 	 //PROGRESSBAR ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-	 int PBARY, PBY;
-	 PBY = Global::iWindowHeight - (200 - 8);
-	 PBARY= PBY + 68;
-	 float PBARLEN = Global::iWindowWidth / 100; //LDR_PBARLEN;
+	 float PBARY, PBY;
+	 PBY = Global::iWindowHeight - (200.0f - 8.0f);
+	 PBARY= PBY + 68.0f;
+	 float PBARLEN = Global::iWindowWidth / 100.0f; //LDR_PBARLEN;
 
 	 glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	 glEnable(GL_BLEND);
 	 glBegin(GL_QUADS);
-	 glColor4f(1, 1, 1, 1); glVertex2f(20, PBARY - 2);                                   // gorny lewy
-	 glColor4f(1, 1, 1, 1); glVertex2f(20, PBARY - 1);                                   // dolny lewy
-	 glColor4f(1, 1, 1, 1); glVertex2f(100 * PBARLEN, PBARY - 1);                          // dolny prawy
-	 glColor4f(1, 1, 1, 1); glVertex2f(100 * PBARLEN, PBARY - 2);                          // gorny prawy
+	 glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(20.0f, PBARY - 2.0f);                                   // gorny lewy
+	 glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(20.0f, PBARY - 1.0f);                                   // dolny lewy
+	 glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(100.0f * PBARLEN, PBARY - 1.0f);                          // dolny prawy
+	 glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(100.0f * PBARLEN, PBARY - 2.0f);                          // gorny prawy
 	 glEnd();
 
 	   if (Global::bfirstloadingscn) Global::postep = 0;
@@ -317,7 +314,7 @@ GLvoid glPrint3D(float x, float y, float z, const char *fmt, ...)					// Custom 
 	 {
 		 glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		 //glEnable(GL_BLEND);
-		 glColor4f(0.9, 0.7, 0.1, 0.5);
+		 glColor4f(0.9f, 0.7f, 0.1f, 0.5f);
 		 glBegin(GL_QUADS);
 		 glVertex2f(20, PBARY + 2);    // gorny lewy
 		 glVertex2f(20, PBARY + 10);   // dolny lewy
@@ -332,10 +329,10 @@ GLvoid glPrint3D(float x, float y, float z, const char *fmt, ...)					// Custom 
 		 //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 		 //glEnable(GL_BLEND);
 		 glDisable(GL_TEXTURE_2D);
-		 glColor4f(0.9, 0.7, 0.1, 0.5);
+		 glColor4f(0.9f, 0.7f, 0.1f, 0.5f);
 		 glBegin(GL_QUADS);
-		 glVertex2f(20, PBARY + 2);    // gorny lewy
-		 glVertex2f(20, PBARY + 10);   // dolny lewy
+		 glVertex2f(20.0, PBARY + 2);    // gorny lewy
+		 glVertex2f(20.0, PBARY + 10);   // dolny lewy
 		 glVertex2f(Global::postep*PBARLEN, PBARY + 10);   // dolny prawy
 		 glVertex2f(Global::postep*PBARLEN, PBARY + 2);   // gorny prawy
 		 glEnd();
@@ -356,23 +353,26 @@ GLvoid glPrint3D(float x, float y, float z, const char *fmt, ...)					// Custom 
 
 bool  TWorld::Init()
 {
-	Global::asCWD = GETCWD();
+	std::string subpath = Global::asCurrentSceneryPath.c_str(); //   "scenery/";
+	cParser parser("scenery.scn", cParser::buffer_FILE, subpath, false);
 
+	CString ax = stdstrtocstr("opopoa13123");
+	WriteLog("string to CString test: " + ax);
+	
 	WriteLog("Starting MaSzyna rail vehicle simulator.");
 	WriteLog("Online documentation and additional files on http://eu07.pl");
 	WriteLog("Authors: Marcin_EU, McZapkie, ABu, Winger, Tolaris, nbmx_EU, OLO_EU, Bart, Quark-t, ShaXbee, Oli_EU, youBy, KURS90, Ra, hunter and others");
-	WriteLog("Renderer:");
-	WriteLog((char *)glGetString(GL_RENDERER));
-	WriteLog("Vendor:");
+
 	// Winger030405: sprawdzanie sterownikow
-	WriteLog((char *)glGetString(GL_VENDOR));
-	WriteLog("OpenGL Version:");
-	WriteLog((char *)glGetString(GL_VERSION));
-	std::string glverstr = chartostdstr((char *)glGetString(GL_VERSION));
+	CString glrndstr = (char *)glGetString(GL_RENDERER);
+	CString glvenstr = (char *)glGetString(GL_VENDOR);
+	CString glverstr = (char *)glGetString(GL_VERSION);
+	WriteLog("Renderer: " + glrndstr);
+	WriteLog("Vendor: " + glvenstr);
+	WriteLog("OpenGL Version: " + glverstr);	
 	WriteLog("Supported extensions:");
 	WriteLog((char *)glGetString(GL_EXTENSIONS));
-
-	WriteLog(stdstrtochar(glverstr));
+  //WriteLog(glverstr);
 	Global::detonatoryOK = true;
 	if ((glverstr == "1.5.1") || (glverstr == "1.5.2")) 
 	{
@@ -388,10 +388,11 @@ bool  TWorld::Init()
 
 	//WriteLogSS(glverstr, glverstr);
 	std::vector<std::string> sglver;
-	sglver = split(glverstr, '.');
+	sglver = split(chartostdstr(glverstr), '.');
 	sprintf_s(tolog, "%s.%s", sglver[0].c_str(), sglver[1].c_str());
-	Global::fOpenGL = atof(tolog);
+	Global::fOpenGL = float(atof(tolog));
 	sprintf_s(glver, "glverdouble: %f", Global::fOpenGL);
+	WriteLog("");
 	WriteLog(glver);
 
 
@@ -414,7 +415,7 @@ bool  TWorld::Init()
 
 	glClearDepth(1.0f);                                                         // ZBuffer Value
 
-	glClearColor(0.2, 0.4, 0.33, 1.0); // Background Color
+	glClearColor(0.2f, 0.4f, 0.33f, 1.0f); // Background Color
 
 	WriteLog("glFogfv(GL_FOG_COLOR, FogColor);");
 	glFogfv(GL_FOG_COLOR, FogColor); // Set Fog Color
@@ -482,12 +483,12 @@ bool  TWorld::Init()
 	glPointSize(2.0f);
   
 // ----------- LIGHTING SETUP ------------------------------------------------------------------------------------------
-	vector3 lp = Normalize(vector3(100, 30, 40));
+	glm::vec3 lp = normalize(glm::vec3(-5100, 500, 500));
 
-	Global::lightPos[0] = lp.x;
-	Global::lightPos[1] = lp.y;
-	Global::lightPos[2] = lp.z;
-	Global::lightPos[3] = 0.0f;
+	Global::lightPos[0] = GLfloat(lp.x);
+	Global::lightPos[1] = GLfloat(lp.y);
+	Global::lightPos[2] = GLfloat(lp.z);
+	Global::lightPos[3] = GLfloat(0.0f);
 
 
 	// Ra: światła by sensowniej było ustawiać po wczytaniu scenerii
@@ -692,21 +693,30 @@ void __fastcall TWorld::OnKeyDown(int cKey, int scancode, int action, int mode, 
 
 	float camspeed = 2.0f * Global::fdt;
 
-	if (GetKeyState(VK_CONTROL) & 0x80) camspeed = 16.0f * Global::fdt;
-	if (GetKeyState(VK_SHIFT) & 0x80) camspeed = 32.0f * Global::fdt;
-	if (GetKeyState(VK_TAB) & 0x80) camspeed = 64.0f * Global::fdt;
+	if (GetKeyState(VK_CONTROL) & 0x80) camspeed = 16.0f * (float)Global::fdt;
+	if (GetKeyState(VK_SHIFT) & 0x80) camspeed = 32.0f * (float)Global::fdt;
+	if (GetKeyState(VK_TAB) & 0x80) camspeed = 64.0f * (float)Global::fdt;
 
-	if ((GetKeyState('W') & 0x80)) Global::CAMERA.Move_Camera(CAMERASPEED*camspeed);
+	Global::KEYCOMMAND = ReplaceCharInString(Global::KEYCOMMAND, '"', "");
 
-	if ((GetKeyState('S') & 0x80)) Global::CAMERA.Move_Camera(-CAMERASPEED*camspeed);
+	//WriteLogSS("KEYCOMMAND=[", Global::KEYCOMMAND + "]");
+	if ((GetKeyState('W') & 0x80)) 
+	 Global::CAMERA.Move_Camera(CAMERASPEED*float(camspeed));
 
-	if ((GetKeyState('A') & 0x80)) Global::CAMERA.Rotate_View(0, -ROTATESPEED*camspeed, 0);
+	if ((GetKeyState('S') & 0x80)) 
+		Global::CAMERA.Move_Camera(-CAMERASPEED*float(camspeed));
 
-	if ((GetKeyState('D') & 0x80)) Global::CAMERA.Rotate_View(0, ROTATESPEED*camspeed, 0);
+	if ((GetKeyState('A') & 0x80)) 
+	 Global::CAMERA.Rotate_View(0, -ROTATESPEED*camspeed, 0);
 
-	if ((GetKeyState('Q') & 0x80)) Global::CAMERA.Move_CameraU(CAMERASPEED*camspeed);
+	if ((GetKeyState('D') & 0x80)) 
+	 Global::CAMERA.Rotate_View(0, ROTATESPEED*camspeed, 0);
 
-	if ((GetKeyState('E') & 0x80)) Global::CAMERA.Move_CameraD(-CAMERASPEED*camspeed);
+	if ((GetKeyState('Q') & 0x80)) 
+	 Global::CAMERA.Move_CameraU(CAMERASPEED*camspeed);
+
+	if ((GetKeyState('E') & 0x80)) 
+	 Global::CAMERA.Move_CameraD(-CAMERASPEED*camspeed);
 
 }
 
@@ -759,10 +769,10 @@ bool  TWorld::RenderX()
  glPushMatrix(); 
  glTranslatef(-4.6f, 1.75f, 6.0f);
  glBegin(GL_LINE_LOOP);
- glVertex2f(0.25, 0.25);
- glVertex2f(0.90, 0.25);
- glVertex2f(0.90, 0.90);
- glVertex2f(0.25, 0.90);
+ glVertex2f(0.25f, 0.25f);
+ glVertex2f(0.90f, 0.25f);
+ glVertex2f(0.90f, 0.90f);
+ glVertex2f(0.25f, 0.90f);
  glEnd();
  glPopMatrix();
 
@@ -835,11 +845,11 @@ bool  TWorld::Render(double dt)
 
 	ENTEX(1);
 	sprintf_s(szBuffer, "Symulator Pojazdow Trakcyjnych MaSZyna 2");
-	TColor rgba = Global::SetColor(0.9, 0.7, 0.0 ,0.9);
+	TColor rgba = Global::SetColor(0.9f, 0.7f, 0.0f, 0.9f);
 	QglPrint_(2, 1, szBuffer, 1, rgba);
 
 	sprintf_s(szBuffer, "Symulator Pojazdow Trakcyjnych MaSZyna 4");
-    rgba = Global::SetColor(0.2, 0.2, 0.2, 0.9);
+    rgba = Global::SetColor(0.2f, 0.2f, 0.2f, 0.9f);
 	QglPrint(10, 1015, szBuffer, 0, rgba);
  return true;
 };

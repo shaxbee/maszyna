@@ -70,7 +70,7 @@ public:
   //  {
 //        struct
 //        {
-            double x,y,z;
+            double x,y,z; 
 //        };
 //    	scalar_t e[3];
 //    };

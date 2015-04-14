@@ -4,7 +4,7 @@
 #include <math.h>
 
 #define CAMERASPEED	0.01f				// The Camera Speed
-#define ROTATESPEED	0.001f				// The Camera Speed
+#define ROTATESPEED	0.001f		    	// The Camera Speed
 
 
 

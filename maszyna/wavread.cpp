@@ -6,8 +6,9 @@
 //
 // Copyright (c) 1999 Microsoft Corp. All rights reserved.
 //-----------------------------------------------------------------------------
-#include <windows.h>
-#include "include\WavRead.h"
+
+#include "commons.h"
+#include "commons_usr.h"
 
 //-----------------------------------------------------------------------------
 // Defines, constants, and global variables

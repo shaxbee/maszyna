@@ -161,14 +161,14 @@ __fastcall TTexture::TTexture(char* szFileName, TTexture *NNext )
     char buff[255]= "Loading texture: ";
     strcat_s(buff,szFileName);
     WriteLog(buff);
-//    TWorld.UpdateWindow();
 
 	// POBIERANIE ROZSZERZENIA, 4 ZNAKI OD KONCA. NP: .jpg
 	std::string qext;
     qext.append(szFileName);
-    int size = qext.length();
+	int size;
+	size = qext.length();
     qext = qext.substr(size-4,4);
-    //WriteLogSS("QEXT=", qext);
+   // WriteLogSS("QEXT=", qext);
 
     char ext[100]; //= strchr(szFileName,'.'); // ZLE POBIERANIE ROZSZERZENIA - BIERZE PO PIERWSZEJ KROPCE !!!!
 

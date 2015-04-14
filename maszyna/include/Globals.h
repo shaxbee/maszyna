@@ -159,6 +159,15 @@ const int k_Cupboard1 = 76;
 const int k_Cupboard2 = 77;
 const int MaxKeys = 78;
 
+static bool FileExists(const std::string & fileName)
+{
+	struct stat info;
+	int ret = -1;
+
+	ret = stat(fileName.c_str(), &info);
+	return 0 == ret;
+}
+
 class Global
 {
 public:
@@ -175,9 +184,9 @@ public:
 	static GLfloat lastY;
 	static bool keys[1024];
 	static CCamera CAMERA;
-	static double frameTime;
-	static double previousFrameTime; // Holds the amount of milliseconds since the last frame
-	static double timeAccumulator; // Holds a sum of the time from all passed frame times
+	static float frameTime;
+	static float previousFrameTime; // Holds the amount of milliseconds since the last frame
+	static float timeAccumulator; // Holds a sum of the time from all passed frame times
 	static float fpsMeasureInterval; // The interval where we would like to take an FPS sample. Currently simply each second.
 	static int frameCount; // The current amount of frames which have passed
 
@@ -203,9 +212,10 @@ public:
 	static GLfloat darkLight[];
 	static float Global::fMouseXScale;
 	static float Global::fMouseYScale;
-	static float FPS;
-	static float fms;
+	static float fTimeSpeed;
+	static double FPS;
 	static float fdt;
+	static float fms;
 	static float FOV;
 
 	static bool detonatoryOK;
@@ -217,6 +227,7 @@ public:
 	static bool bGlutFont;
 	static bool bSCNLOADED;
 	static bool bfirstloadingscn;
+	static bool bSoundEnabled;
 	static int iPARSERBYTESPASSED;
 	static int iNODES;
 	static int postep;
@@ -235,6 +246,8 @@ public:
 	static std::string logfilenm1;
 	static std::string szDefaultExt;
 	static std::string asCurrentDynamicPath;
+	static std::string asCurrentSceneryPath;
+	static std::string asLang;
 
 	static GLuint logotex;
 	static GLuint bfonttex;

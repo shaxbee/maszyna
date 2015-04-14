@@ -52,7 +52,7 @@ void LOADKEYBINDINGS()
 	{ 
 		int ishash;
 		ishash = str.find('#');
-
+		
 		if ((str.length() > 5) && (ishash <0))
 		{// example line: 2 1 kQ "APPEXIT"
 			MASZYNA_TRACE_WRITELINE(AppMain, Debug, "line %i: %s", cl, str.c_str());
@@ -76,13 +76,37 @@ void LOADKEYBINDINGS()
 
 void PROCESSKEYACTION(std::string str)
 {
-	std::string test, command;
+	std::string test, testcam, command;
 	MASZYNA_TRACE_WRITELINE(AppMain, Debug, "checking %s", str.c_str());
 	for (int i = 0; i < Global::keybindsnum; i++)
 	{
 		test = Global::KBD[i].keymod + ":" + Global::KBD[i].keyaction + ":" + Global::KBD[i].key;
+		testcam = "?:" + Global::KBD[i].keyaction + ":" + Global::KBD[i].key;
 		MASZYNA_TRACE_WRITELINE(AppMain, Debug, "comparing %s", test.c_str());
 		if (test == str)
+		{
+			Global::KEYCOMMAND = Global::KBD[i].keycommand;
+			break;
+		}
+		if (test == str)
+		{
+			Global::KEYCOMMAND = Global::KBD[i].keycommand;
+			break;
+		}
+	}
+}
+
+void PROCESSKEYACTIONCAM(std::string str)
+{
+	std::string test, testcam, command;
+	MASZYNA_TRACE_WRITELINE(AppMain, Debug, "checking %s", str.c_str());
+	for (int i = 0; i < Global::keybindsnum; i++)
+	{
+
+		testcam = "?:" + Global::KBD[i].keyaction + ":" + Global::KBD[i].key;
+		MASZYNA_TRACE_WRITELINE(AppMain, Debug, "comparing %s", test.c_str());
+
+		if (testcam == str)
 		{
 			Global::KEYCOMMAND = Global::KBD[i].keycommand;
 			break;
@@ -288,6 +312,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	std::string kaction = std::to_string(action);
 
 	PROCESSKEYACTION(kmode + ":" + kaction + ":" + Global::KEYCODE);
+	PROCESSKEYACTIONCAM(    "?:" + kaction + ":" + Global::KEYCODE);
 
 }
 
@@ -335,6 +360,8 @@ int main(int, char const* [])
 	Global::bWriteLogEnabled = true;
 	// Initialize tracing with 'maszyna.log' file as a target.
 	Maszyna::Diagnostics::Trace::Initialize("debuglog.log");
+
+	Global::asCWD = GETCWD();
 
 	argc = ParseCommandline();
 	GetAppVersion(Global::argv[0], &vmajor, &vminor, &vbuild, &vrev);
@@ -450,7 +477,7 @@ int main(int, char const* [])
 
 	glfwSetTime(0);
 
-	Global::previousFrameTime = glfwGetTime(); // Holds the amount of milliseconds since the last frame
+	Global::previousFrameTime = float(glfwGetTime()); // Holds the amount of milliseconds since the last frame
 	Global::timeAccumulator = 0; // Holds a sum of the time from all passed frame times
 	Global::fpsMeasureInterval = 1.0f; // The interval where we would like to take an FPS sample. Currently simply each second.
 	Global::frameCount = 0; // The current amount of frames which have passed
@@ -481,8 +508,9 @@ int main(int, char const* [])
 
 	fout.close();
 	
-	ShellExecute(0,"open", "notepad.exe", "info.txt", NULL, SW_SHOW);
-	Sleep(100);
+	ShellExecute(0, "open", "notepad.exe", "info.txt", NULL, SW_SHOW);
+	ShellExecute(0, "open", "notepad.exe", "log.txt", NULL, SW_SHOW);
+	Sleep(140);
 	DeleteFile("info.txt");
 
 	glfwDestroyWindow(Global::window);

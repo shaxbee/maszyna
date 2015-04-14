@@ -1,4 +1,4 @@
-#include "include\TextureDDS.h"
+#include "TextureDDS.h"
 
 void DxtcReadColors(const GLubyte* Data, Color8888* result)
 {

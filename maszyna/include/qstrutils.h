@@ -37,6 +37,30 @@ std::string ReplaceCharInString( std::string source, char ToReplace, const std::
 */
 
 
+// **************************************************************************************************************************
+// ReplaceCharInString() - REPLACES ALL CHOSED CHAR TO OTHER GIVEN
+// **************************************************************************************************************************
+
+inline std::string ReplaceCharInString(std::string source, char ToReplace, const std::string newString)
+{
+	std::string result;
+
+	// For each character in source string: 
+	const char * pch = source.c_str();
+	while (*pch != '\0')
+	{
+		// Found character to be replaced? 
+		if (*pch == ToReplace)  result += newString;
+		else  result += (*pch); // Just copy original character 
+
+		++pch; // Move to next character 
+	}
+
+	return result;
+}
+
+
+
 inline std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
 	std::stringstream ss(s);
 	std::string item;
@@ -91,6 +115,7 @@ inline std::string __fastcall GETCWD()
 // *****************************************************************************
 // stdstrtochar()
 // *****************************************************************************
+
 inline char* stdstrtochar(std::string var)
 {
 //	char* ReturnString = new char[100];
@@ -99,15 +124,25 @@ inline char* stdstrtochar(std::string var)
 	//LPCSTR lpMyString = var.c_str();
     //sprintf_s(szBuffer,"%s",lpMyString);
 	//strcpy_s( ReturnString, szBuffer );
-
 	char *cstr = new char[var.length() + 1];
 	strcpy(cstr, var.c_str());
 
 	return cstr; // ReturnString;
+	delete[] cstr;
 }
 
 
+// *****************************************************************************
+// stdstrtocstr()
+// *****************************************************************************
+inline CString stdstrtocstr(std::string var)
+{
+	 //TCHAR* cstr = var;
 
+	CString cstr(var.c_str());
+
+	return cstr; // ReturnString;
+}
 
 // *****************************************************************************
 // chartostdstr()
@@ -230,7 +265,7 @@ inline std::string ToLowerCase(std::string text)
    return text; 
 }
 
-
+/*
 inline int qstrlen(char *inp)
 {
 	char *p = inp;
@@ -240,6 +275,6 @@ inline int qstrlen(char *inp)
 
 	return p - inp;
 }
-
+*/
 //---------------------------------------------------------------------------
 #endif

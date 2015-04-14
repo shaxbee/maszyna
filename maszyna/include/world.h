@@ -3,7 +3,7 @@
 
 #include "commons.h"
 #include "commons_usr.h"
-
+#include "cstring.h"
 class TWorld
 {
 public:
@@ -14,7 +14,7 @@ public:
 	void  OnKeyDown(int cKey, int scancode, int action, int mode, std::string command);
 	void  OnKeyUp(int cKey, int scancode, int action, int mode, std::string command);
 	void  OnMouseMove(double x, double y);
-	GLvoid glPrint(const char *fmt);
+	GLvoid glPrint(CString fmt);
     TWorld();
    ~TWorld();
   

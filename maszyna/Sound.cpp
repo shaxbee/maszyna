@@ -2,9 +2,9 @@
 
 #define STRICT
 #include <sys/stat.h>
-#include "include\Sound.h"
-#include "include\Usefull.h"
-#include "include\Globals.h"
+#include "commons.h"
+#include "commons_usr.h"
+
 //#define SAFE_DELETE(p)  { if(p) { delete (p);     (p)=NULL; } }
 #define SAFE_RELEASE(p)                                                        \
   {                                                                            \
@@ -48,7 +48,7 @@ TSoundContainer::TSoundContainer( LPDIRECTSOUND8 pDS8, char *Directory, char *st
       WriteLogSS("Missed sound: strFileName", "?");
     }
 
-  strcpy(Name, strFileName);
+  strcpy_s(Name, strFileName);
 
   // Set up the direct sound buffer, and only request the flags needed
   // since each requires some overhead and limits if the buffer can
@@ -63,7 +63,7 @@ TSoundContainer::TSoundContainer( LPDIRECTSOUND8 pDS8, char *Directory, char *st
                                          // słyszalne
   dsbd.dwBufferBytes = pWaveSoundRead->m_ckIn.cksize;
   dsbd.lpwfxFormat = pWaveSoundRead->m_pwfx;
-  fSamplingRate = pWaveSoundRead->m_pwfx->nSamplesPerSec;
+  fSamplingRate = float(pWaveSoundRead->m_pwfx->nSamplesPerSec);
   iBitsPerSample = pWaveSoundRead->m_pwfx->wBitsPerSample;
 
   //    pDSBuffer= (LPDIRECTSOUNDBUFFER*)
@@ -255,7 +255,7 @@ void TSoundsManager::RestoreAll() {
 
   for (int i = 0; i < Count; i++) {
 
-    if (FAILED(hr = Next->DSBuffer->GetStatus(&dwStatus)));
+   if (FAILED(hr = Next->DSBuffer->GetStatus(&dwStatus))) // TU NA KONCU BYL ;
     //        return hr;
 
     if (dwStatus & DSBSTATUS_BUFFERLOST) {

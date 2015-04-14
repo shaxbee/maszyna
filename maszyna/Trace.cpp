@@ -1,10 +1,7 @@
-#include "include\Trace.h"
-#include <cstdio>
-#include <cstdarg>
-#include <cstdlib>
-#include <stdio.h>
-#include <stdarg.h>
-#include <ctype.h>
+#include "commons.h"
+#include "commons_usr.h"
+
+
 namespace Maszyna
 {
 namespace Diagnostics

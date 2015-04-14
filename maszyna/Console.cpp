@@ -160,15 +160,15 @@ void __fastcall Console::BitsUpdate(int mask)
 {//aktualizacja stanu interfejsu informacji zwrotnej; (mask) - zakres zmienianych bitów
  switch (iMode)
  {case 1: //sterowanie œwiate³kami klawiatury: CA/SHP+opory
-   if (mask&3) //gdy SHP albo CA
-    SetLedState(VK_CAPITAL,iBits&3);
-   if (mask&4) //gdy jazda na oporach
-   {//Scroll Lock ma jakoœ dziwnie... zmiana stanu na przeciwny
-    //-SetLedState(VK_SCROLL,true); //przyciœniêty
-    //-SetLedState(VK_SCROLL,false); //zwolniony
-    ++iConfig; //licznik u¿ycia Scroll Lock
-   }
-   break;
+  // if (mask&3) //gdy SHP albo CA
+  //  SetLedState(VK_CAPITAL,iBits&3);
+  // if (mask&4) //gdy jazda na oporach
+  // {//Scroll Lock ma jakoœ dziwnie... zmiana stanu na przeciwny
+  //  //-SetLedState(VK_SCROLL,true); //przyciœniêty
+  //  //-SetLedState(VK_SCROLL,false); //zwolniony
+  //  ++iConfig; //licznik u¿ycia Scroll Lock
+  // }
+  break;
   case 2: //sterowanie œwiate³kami klawiatury: CA+SHP
 	  /*
    if (mask&2) //gdy CA
