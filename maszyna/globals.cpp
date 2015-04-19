@@ -9,7 +9,9 @@
 #include "commons.h"
 #include "commons_usr.h"
 
+TGround *Global::pGround = NULL;
 char **Global::argv = NULL;
+HWND Global::hWnd = NULL; // 
 GLFWwindow* Global::window;
 int Global::Keys[MaxKeys];
 vector3 Global::pCameraPosition;
@@ -48,6 +50,12 @@ bool Global::bGlutFont = false;
 bool Global::bSCNLOADED = false;
 bool Global::bfirstloadingscn = true;
 bool Global::bSoundEnabled = false;
+bool Global::bManageNodes = false;
+bool Global::bUseVBO = false;
+bool Global::bWireFrame = false;
+bool Global::bOpenGL_1_5 = false;
+bool Global::bRenderAlpha = true;
+int Global::iReCompile = 0;
 int Global::iPARSERBYTESPASSED = 0;
 int Global::iNODES = 0;
 int Global::postep = 0;
@@ -59,6 +67,10 @@ int Global::keyaction = 0;
 int Global::keyscancode = 0;
 int Global::keymods = 0;
 int Global::keybindsnum = 0;
+int Global::iRailProFiltering = 0;
+int Global::iBallastFiltering = 0;
+int Global::iWriteLogEnabled = 1;
+int Global::iMultiplayer = 0;
 float Global::fOpenGL = 0.0;
 std::string Global::KEYCODE = "0";
 std::string Global::KEYCOMMAND = "NONE";
@@ -69,6 +81,9 @@ std::string Global::asCurrentDynamicPath = "dynamic\\eu07\\";
 std::string Global::asCurrentSceneryPath = "scenery\\";
 std::string Global::asLang = "pl";
 
+GLuint Global::boxtex = NULL;
+GLuint Global::balltex = NULL;
+GLuint Global::dirttex = NULL;
 GLuint Global::logotex = NULL;
 GLuint Global::bfonttex = NULL;
 GLuint Global::loaderbackg = NULL;
@@ -88,6 +103,7 @@ GLfloat Global::lastY = 1024 / 2.0;
 bool Global::keys[1024];
 CCamera Global::CAMERA;
 
+float Global::tracksegmentlen = 2.0;
 float Global::frameTime = 0;
 float Global::previousFrameTime = 0; // Holds the amount of milliseconds since the last frame
 float Global::timeAccumulator = 0; // Holds a sum of the time from all passed frame times
@@ -178,4 +194,117 @@ GLvoid Global::BuildFont(GLvoid)								// Build Our Font Display List
 GLvoid Global::KillFont(GLvoid)									// Delete The Font From Memory
 {
 	glDeleteLists(fbase, 256);							// Delete All 256 Display Lists
+}
+
+
+double Global::CALCULATEFPS()
+{
+	float newTime = float(glfwGetTime());
+
+	Global::frameTime = newTime - Global::previousFrameTime;
+
+	Global::fdt = Global::frameTime;
+
+	Global::previousFrameTime = newTime;
+
+	Global::timeAccumulator += Global::frameTime;
+
+	Global::frameCount++;
+
+	// If our timeAccumulator passes 1 second, it means we should take a sample of our FPS
+	if (Global::timeAccumulator > Global::fpsMeasureInterval)
+	{
+		Global::FPS = (double)Global::frameCount;
+		Global::frameCount = 0;
+		Global::timeAccumulator = 0;
+	}
+	return Global::FPS;
+}
+
+
+// **************************************************************************************
+// GETCWD()
+// **************************************************************************************
+
+std::string Global::GETCWD()
+{
+	char* cwdbuffer;
+	char szBuffer[200];
+
+	// Get the current working directory:
+	if ((cwdbuffer = _getcwd(NULL, 0)) == NULL)  perror("_getcwd error");
+	else
+	{
+		// stdstrtochar
+		sprintf_s(szBuffer, "workdir: [%s]", cwdbuffer);
+		WriteLog(szBuffer);
+
+		Global::asCWD = chartostdstr(szBuffer);
+		return cwdbuffer;
+		//free(cwdbuffer);
+	}
+	
+}
+
+
+// ********************************************************************************************************************************
+// MIN0R
+// ********************************************************************************************************************************
+
+double __fastcall Min0R(double x1, double x2)
+{
+	double Min0R;
+
+	if (x1 < x2)  Min0R = x1; else Min0R = x2;
+
+	return Min0R;
+}
+
+
+// ********************************************************************************************************************************
+// MAX0R
+// ********************************************************************************************************************************
+
+double __fastcall Max0R(double x1, double x2)
+{
+	double Max0R;
+
+	if (x1 > x2)  Max0R = x1; else Max0R = x2;
+
+	return Max0R;
+}
+
+
+// ********************************************************************************************************************************
+// TestFlag()
+// ********************************************************************************************************************************
+
+bool __fastcall TestFlag(int Flag, int Value)
+{
+	if ((Flag && Value) == Value)
+		return true;
+	else return false;
+}
+
+bool __fastcall SetFlag(int Flag, int Value)
+{
+	bool SF = false;
+	if (Value > 0)
+		if ((Flag && Value) == 0)
+		{
+			Flag = Flag + Value;
+			SF = true;
+		}
+	if (Value < 0)
+		if ((Flag && abs(Value)) == abs(Value))
+		{
+			Flag = Flag + Value;
+			SF = true;
+		}
+	return SF;
+}
+
+int Sign(int v)
+{
+	return v > 0 ? 1 : (v < 0 ? -1 : 0);
 }

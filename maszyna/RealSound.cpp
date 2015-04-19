@@ -92,10 +92,10 @@ void TRealSound::Play(long Volume, int Looping, bool ListenerInside,  vector3 Ne
       dS = dSoundAtt; //*dSoundAtt; //bo odleglosc podawana w kwadracie
       fDistance = ListenerDistance(Global::pCameraPosition);
       if (ListenerInside) // osłabianie dźwięków z odległością
-        Volume = Volume * dS / (dS + fDistance);
+        Volume = Volume * long(dS) / long(dS + fDistance);
       else
-        Volume = Volume * dS /
-                 (dS + 2 * fDistance); // podwójne dla ListenerInside=false
+        Volume = Volume * long(dS) /
+                 long(dS + 2 * fDistance); // podwójne dla ListenerInside=false
     }
     if (iDoppler) //
     { // Ra 2014-07: efekt Dopplera nie zawsze jest wskazany
@@ -114,8 +114,8 @@ void TRealSound::Play(long Volume, int Looping, bool ListenerInside,  vector3 Ne
       // int glos=1;
       // Volume=Volume*glos; //Ra: whatta hella is this
       if (Volume < 0.0)
-        Volume = 0.0;
-      vol = -5000.0 + 5000.0 * Volume;
+        Volume = 0;
+      vol = -5000 + 5000 * Volume;
       if (vol >= 0)
         vol = -1;
       if (Timer::GetSoundTimer() || !Looping) // Ra: po co to jest?
@@ -242,7 +242,7 @@ void TTextSound::Init(char *SoundName, double SoundAttenuation, double X, double
 
 
  // txt.Delete(txt.Length() - 3, 4); // obcięcie rozszerzenia
-  for (int i = txt.length(); i > 0; --i)
+  for (int i = int(txt.length()); i > 0; --i)
     if (txt[i] == '/')
       txt[i] = '\\'; // bo nie rozumi
   txt += "-" + Global::asLang + ".txt"; // już może być w różnych językach

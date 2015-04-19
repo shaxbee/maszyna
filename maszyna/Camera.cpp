@@ -2,6 +2,7 @@
 
 #include "commons.h"
 #include "commons_usr.h"
+#include "camera.h"
 //#include "Timer.h"
 //#include "mover.h"
 //---------------------------------------------------------------------------

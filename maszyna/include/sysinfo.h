@@ -4,6 +4,7 @@
 #define sysinfoH
 
 #include "../commons.h"
+#include "../commons_usr.h"
 #include "globals.h"
 
 
@@ -111,28 +112,34 @@ inline void SetProcessorAffinity()
 	CloseHandle(hCurrentProcess);
 }
 
-inline double CALCULATEFPS()
+
+inline void CREATEDIRECTORIES()
 {
-	float newTime = float(glfwGetTime());
+	DeleteFile("maszyna.pdb");
+	DeleteFile("maszyna.ilk");
+	CreateDirectory("screenshot", NULL);
+	CreateDirectory("textures", NULL);
+	CreateDirectory("sounds", NULL);
+	CreateDirectory("scenery", NULL);
+	CreateDirectory("database", NULL);
+	CreateDirectory("logs", NULL);
+	CreateDirectory("updates", NULL);
+}
 
-	Global::frameTime = newTime - Global::previousFrameTime;
 
-	Global::fdt = Global::frameTime;
-
-	Global::previousFrameTime = newTime;
-
-	Global::timeAccumulator += Global::frameTime;
-
-	Global::frameCount++;
-
-	// If our timeAccumulator passes 1 second, it means we should take a sample of our FPS
-	if (Global::timeAccumulator > Global::fpsMeasureInterval)
+inline void RESTOREBACKUP()
+{
+	if (!FileExists("database\\config.txt"))
 	{
-		Global::FPS = (double)Global::frameCount;
-		Global::frameCount = 0;
-		Global::timeAccumulator = 0;
+		std::string cfgfile = Global::asCWD + "\\database\\config.txt";
+		std::string kbdfile = Global::asCWD + "\\database\\keyboard.txt";
+		std::string inffile = Global::asCWD + "\\database\\[lista klawiszy].txt";
+
+		CopyFile("c:\\backup\\config.txt", cfgfile.c_str(), false);
+		CopyFile("c:\\backup\\keyboard.txt", kbdfile.c_str(), false);
+		CopyFile("c:\\backup\\[lista klawiszy].txt", inffile.c_str(), false);
 	}
- return Global::FPS;
+
 }
 
 #endif

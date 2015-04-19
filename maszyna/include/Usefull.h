@@ -7,13 +7,13 @@
 #include "commons.h"
 #include "commons_usr.h"
 
-//#define	B1(t)     (t*t*t)
-//#define	B2(t)     (3*t*t*(1-t))
-//#define	B3(t)     (3*t*(1-t)*(1-t))
-//#define	B4(t)     ((1-t)*(1-t)*(1-t))
+#define	B1(t)     (t*t*t)
+#define	B2(t)     (3*t*t*(1-t))
+#define	B3(t)     (3*t*(1-t)*(1-t))
+#define	B4(t)     ((1-t)*(1-t)*(1-t))
 //Ra: to jest mocno nieoptymalne: 10+3*4=22 mno¿enia, 6 odejmowañ, 3*3=9 dodawañ
 //Ra: po przeliczeniu wspó³czynników mamy: 3*3=9 mno¿eñ i 3*3=9 dodawañ
-//#define	Interpolate(t,p1,cp1,cp2,p2)     (B4(t)*p1+B3(t)*cp1+B2(t)*cp2+B1(t)*p2)
+#define	Interpolate(t,p1,cp1,cp2,p2)     (B4(t)*p1+B3(t)*cp1+B2(t)*cp2+B1(t)*p2)
 
 //Ra: "delete NULL" nic nie zrobi, wiêc "if (a!=NULL)" jest zbêdne
 //#define SafeFree(a) if (a!=NULL) free(a)
@@ -35,8 +35,10 @@
 #define szTexturePath "textures\\"
 //#define szDefaultTextureExt ".dds"
 
-const double M_PI = 3.141592653589793238463;
+const float M_PI = 3.141592653589793238463;
+const double M_PI_2 = 6.2831853;
 const double M_PI_4 = 12.56636;
+
 
 //#define DevelopTime     //FIXME
 //#define EditorMode

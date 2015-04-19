@@ -1,3 +1,7 @@
+#include "../commons.h"
+#include "../commons_usr.h"
+#include "globals.h"
+
 GLvoid QBuildFontX(GLvoid);
 GLvoid QKillFont(GLvoid);
 GLvoid QglPrint(GLint, GLint, char *, int set, TColor rgba); //x,y,*string,set

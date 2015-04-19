@@ -46,7 +46,7 @@ void TFadeSound::Update() {
     if (fTime >= fFade) {
       fTime = fFade;
       State = ss_Commencing;
-      Sound->SetVolume(-2000 * (fFade - fTime) / fFade);
+      Sound->SetVolume(-2000 * long(fFade - fTime) / fFade);
       Sound->SetFrequency(44100 - 500 + 500 * (fTime) / fFade);
     } else if (Timer::GetSoundTimer()) {
       Sound->SetVolume(-2000 * (fFade - fTime) / fFade);

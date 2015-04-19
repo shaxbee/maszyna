@@ -166,7 +166,7 @@ __fastcall TTexture::TTexture(char* szFileName, TTexture *NNext )
 	std::string qext;
     qext.append(szFileName);
 	int size;
-	size = qext.length();
+	size = int(qext.length());
     qext = qext.substr(size-4,4);
    // WriteLogSS("QEXT=", qext);
 
@@ -845,7 +845,7 @@ GLuint __fastcall TTexturesManager::GetTextureID( char *Name, bool dynamic )  //
     if (strchr(Name,'.')==NULL)  // JESLI BRAK ROZSZERZENIA TO DODAJ DEFAULTOWE
 		strcat_s(buf, Global::szDefaultExt.c_str());  // szDefaultTextureExt, Global::szDefaultExt
 
-	WriteLog(buf);
+	//WriteLog(buf);
 /*
     if (i!=0)
         buff= Name.SubString(1,i-1);
@@ -859,10 +859,10 @@ GLuint __fastcall TTexturesManager::GetTextureID( char *Name, bool dynamic )  //
 
     for (TTexture *tmp= First; tmp!=NULL; tmp= tmp->Next)
     {
-        if (stricmp(tmp->Name,buf)==0)
+        if (_stricmp(tmp->Name,buf)==0)
             return (tmp->ID);
     }
-WriteLog(buf);
+//WriteLog(buf);
     return (LoadFromFile( buf ));
 }
 
@@ -883,7 +883,7 @@ GLuint __fastcall TTexturesManager::GetTextureIDB( char *Name )  // char *Name
 
     for (TTexture *tmp= First; tmp!=NULL; tmp= tmp->Next)
     {
-        if (stricmp(tmp->Name,buf)==0)
+        if (_stricmp(tmp->Name,buf)==0)
             return (tmp->ID);
     }
 

@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "commons.h"
 #include "commons_usr.h"
+#include "Plugin.h"
+#include "igraphics.h"
 
 MASZYNA_DECLARE_TRACE_SWITCH(AppMain, Debug, Debug);
 MASZYNA_DEFINE_TRACE_SWITCH(AppMain);
@@ -27,11 +29,12 @@ const int GLFW_FALSE = static_cast<int>(GL_FALSE);
 std::vector<std::string> ssize;
 std::vector<std::string> skeybind;
 
+
 TWorld World;
 //static int mx = 0, my = 0;
 static POINT xmouse;
 int ckey, ccode, caction, cmod, nbFrames;
-
+int mx, my;
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
 
@@ -45,7 +48,7 @@ void LOADKEYBINDINGS()
 {
 	
 	int cl = 0;
-	std::ifstream file("keyboard.txt");
+	std::ifstream file("database\\keyboard.txt");
 	std::string str;
 	Global::keybindsnum = 0;
 	while (std::getline(file, str))
@@ -124,7 +127,7 @@ void error_callback(int, const char* description)
 }
 
 // ***************************************************************************************************************************************
-// Drop callback
+// Drop file callback
 
 void drop_callback(GLFWwindow* window, int count, const char** paths)
 {
@@ -153,33 +156,10 @@ void resize_callback(GLFWwindow* window, int w, int h) {
 	gluPerspective(45.0f, (float)w / (float)h, 0.1f, 1000.0f);
 	gluLookAt(0.0f, 0.0f, 30, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 	glMatrixMode(GL_MODELVIEW);
+
+	World.Resize(w, h);
 }
 
-
-// ***************************************************************************************************************************************
-// Keyboard callback
-
-//void key_callbackq(GLFWwindow* window, int key, int scancode, int action, int mods)
-//{
-//	MASZYNA_TRACE_WRITELINE(AppMain, Debug, "Window: %p, Key: %d, Scancode: %03x, Action: %08x, Modifiers: %03x", window, key, scancode, action, mods);
-//
-//	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-//		glfwSetWindowShouldClose(window, true);
-//}
-
-// ***************************************************************************************************************************************
-// Mouse scroll callback
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-
-	if (yoffset ==  1) Global::FOV += 1.0; // g_Scale += g_MouseWheelScale;
-	if (yoffset == -1) Global::FOV -= 1.0; // g_Scale -= g_MouseWheelScale  ;
-	if (Global::FOV < 10) Global::FOV = 10;
-	if (Global::FOV > 90) Global::FOV = 90;
-
-	//MASZYNA_TRACE_WRITELINE(AppMain, Debug, "factor: %d.%d.%d", xoffset, yoffset, g_Scale);
-}
 
 // ***************************************************************************************************************************************
 // key callback
@@ -334,48 +314,111 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 //}
 
 // ***************************************************************************************************************************************
+// Mouse scroll callback
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+
+	if (yoffset == 1) Global::FOV += 1.0; // g_Scale += g_MouseWheelScale;
+	if (yoffset == -1) Global::FOV -= 1.0; // g_Scale -= g_MouseWheelScale  ;
+	if (Global::FOV < 10) Global::FOV = 10;
+	if (Global::FOV > 90) Global::FOV = 90;
+
+	World.OnMouseWheel(yoffset);
+	//MASZYNA_TRACE_WRITELINE(AppMain, Debug, "factor: %d.%d.%d", xoffset, yoffset, g_Scale);
+}
+
+// ***************************************************************************************************************************************
 // mouse move callback
 
 bool firstMouse = true;
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	//MASZYNA_TRACE_WRITELINE(AppMain, Debug, "x: %f, y: %f", xpos, ypos);
-
+	mx = xpos;
+	my = ypos;
 	World.OnMouseMove(double(xpos)*0.0001, double(ypos)*0.001);
 }
 
+void mouseB_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	//MASZYNA_TRACE_WRITELINE(AppMain, Debug, "x: %f, y: %f", xpos, ypos);
+	
+	if (button == GLFW_MOUSE_BUTTON_LEFT) World.OnLButtonDown(mx, my);
+	if (button == GLFW_MOUSE_BUTTON_RIGHT) World.OnRButtonDown(mx, my);
+}
 
+DWORD WINAPI MyThreadProc(void* pContext)
+{
+	return 0;
+}
+
+DWORD WINAPI myThread(LPVOID lpParameter) 
+{ 
+	SetProcessorAffinity();
+	unsigned int& myCounter = *((unsigned int*)lpParameter); 
+	while (myCounter < 0xFFFFFFFF)
+	{
+		++myCounter;
+		//WriteLog("..........................................................................");
+		//Beep(1500, 60);
+		//MASZYNA_TRACE_WRITELINE(AppMain, Debug, "..........................................");
+	}
+	return 0; 
+}
+
+std::wstring s2lws(const std::string& s)
+{
+	int len;
+	int slength = (int)s.length() + 1;
+	len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
+	wchar_t* buf = new wchar_t[len];
+	MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
+	std::wstring r(buf);
+	delete[] buf;
+	return r;
+}
 // ***************************************************************************************************************************************
 // int main(int, char const* []) 
 
-int main(int, char const* [])
+int main(int argc, TCHAR **argv)
 {
-	//bool exists;
-	int ssx, ssy;
-	int count,  argc;
-	int major, minor, rev;
-	WORD vmajor, vminor, vbuild, vrev;
+	bool exists;
+	unsigned int myCounter = 0;
+	DWORD myThreadID;
+	int ssx, ssy, count, arg, major, minor, rev;
+	//WORD vmajor, vminor, vbuild, vrev;
 	char appvers[100];
-
 	Global::bWriteLogEnabled = true;
-	// Initialize tracing with 'maszyna.log' file as a target.
-	Maszyna::Diagnostics::Trace::Initialize("debuglog.log");
 
-	Global::asCWD = GETCWD();
+	SetProcessorAffinity();
+
+	Global::logfilenm1 = "logs\\runlog.log";
+	Global::asCWD = Global::GETCWD();
+
+	HANDLE myHandle = CreateThread(0, 0, myThread, &myCounter, 0, &myThreadID); 
+
+	CREATEDIRECTORIES(); // create directories prevently (sysinfo.h)
+
+	RESTOREBACKUP(); // copy files into place after the removal build directory (sysinfo.h)
+
+	Maszyna::Diagnostics::Trace::Initialize("logs\\debuglog.log"); // Initialize tracing with 'maszyna.log' file as a target.
 
 	argc = ParseCommandline();
-	GetAppVersion(Global::argv[0], &vmajor, &vminor, &vbuild, &vrev);
-	sprintf_s(appvers, "appfile: %s", Global::argv[0]);
+	//GetAppVersion(Global::argv[0], &vmajor, &vminor, &vbuild, &vrev);  // USES Version.lib
+	sprintf_s(appvers, "appfile: [%s]", Global::argv[0]);
 	WriteLog(appvers);
-	sprintf_s(appvers, "appvers: %i %i %i", vmajor, vminor, vbuild);
-	WriteLog(appvers);
+	//sprintf_s(appvers, "appvers: %i %i %i", vmajor, vminor, vbuild);
+	//WriteLog(appvers);
+
+
 	MASZYNA_TRACE_WRITELINE(AppMain, Debug, "Reading keyboard file...");
 	LOADKEYBINDINGS();
 
 	MASZYNA_TRACE_WRITELINE(AppMain, Debug, "Reading configuration file...");
 	WriteLog("Reading configuration...");
 	std::cerr << "Reading configuration..." << std::endl;
-	ConfigFile cfg("config.txt");
+	ConfigFile cfg("database\\config.txt");
 
 	//exists = cfg.keyExists("testbool");
 	//std::cerr << "testbool key: " << std::boolalpha << exists << "\n";
@@ -390,18 +433,31 @@ int main(int, char const* [])
 	std::cerr << "value of key vechicle: " << vechicleValue << "\n";
 	std::string screensizeValue = cfg.getValueOfKey<std::string>("screensize", "1024x768");
 	std::cerr << "value of key screensize: " << screensizeValue << "\n";
-
 	std::string testboolValue = cfg.getValueOfKey<std::string>("testbool");
 	std::cerr << "value of key testbool: " << testboolValue << "\n";
 	std::string desktopresValue = cfg.getValueOfKey<std::string>("desktopres");
 	std::cerr << "value of key desktopres: " << desktopresValue << "\n";
+	bool logonexitValue = cfg.getValueOfKey<bool>("logonexit");
+	std::cerr << "value of key logonexit: " << logonexitValue << "\n";
+	bool infonexitValue = cfg.getValueOfKey<bool>("infonexit");
+	std::cerr << "value of key infonexit: " << infonexitValue << "\n";
 	bool fullscreenVal = cfg.getValueOfKey<bool>("fullscreen");
 	std::cerr << "value of key fullscreen: " << fullscreenVal << "\n";
+	bool checkupdVal = cfg.getValueOfKey<bool>("checkupd");
+	std::cerr << "value of key checkupd: " << checkupdVal << "\n";
 	double doubleVal = cfg.getValueOfKey<double>("testdouble");
 	std::cerr << "value of key double: " << doubleVal << "\n";
+	int MONITORSEL_VAL = cfg.getValueOfKey<double>("monitorsel");
+	std::cerr << "value of key monitorsel: " << MONITORSEL_VAL << "\n";
+	MASZYNA_TRACE_WRITELINE(AppMain, Debug, "value of key monitorsel: %i", MONITORSEL_VAL);
+	ssize = split(screensizeValue, ':');                                   // Splits screensize key value into two params
+  //std::cerr << "screensize: " << ssize[0] << "x" << ssize[1] << "\n";
+	MASZYNA_TRACE_WRITELINE(AppMain, Debug, "screen size: %ix%i", ssize[0], ssize[1]);
+	Sleep(2000);
+	WriteLog("");
 
-    ssize = split(screensizeValue, ':');                                   // Splits screensize key value into two params
-	std::cerr << "screensize: " << ssize[0] << "x" << ssize[1] << "\n";
+	CHECKUPDATES(checkupdVal);
+
 
 	MASZYNA_TRACE_WRITELINE(AppMain, Debug, "Initializing OpenGL...");
 	std::cerr << "Initializing OpenGL..." << std::endl;
@@ -415,11 +471,12 @@ int main(int, char const* [])
 	std::cerr << "OpenGL version: " << major << " " << minor << " " << rev << std::endl;
 	GLFWmonitor** monitors = glfwGetMonitors(&count);
 	std::cerr << "monitors count " << count << std::endl;
-	const GLFWvidmode* mode = glfwGetVideoMode(monitors[0]);
+	const GLFWvidmode* mode = glfwGetVideoMode(monitors[MONITORSEL_VAL]);
 	std::cerr << "video mode: " << mode->width << "x"  << mode->height << std::endl; // current desktop resplution
 	std::cerr << "video refr: " << mode->refreshRate << std::endl;
-	const char* monitorname = glfwGetMonitorName(monitors[0]);
+	const char* monitorname = glfwGetMonitorName(monitors[MONITORSEL_VAL]);
 	std::cerr << "Monitor name: " << monitorname << std::endl;
+	Sleep(2000);
 
     //glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
     //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -437,9 +494,8 @@ int main(int, char const* [])
 		ssy = mode->height;
 	}
 
-
 	
-	if (fullscreenVal == 1) Global::window = glfwCreateWindow(ssx, ssy, "MaSzyna 2", monitors[0], nullptr);
+	if (fullscreenVal == 1) Global::window = glfwCreateWindow(ssx, ssy, "MaSzyna 2", monitors[MONITORSEL_VAL], nullptr);
 	if (fullscreenVal == 0) Global::window = glfwCreateWindow(ssx, ssy, "MaSzyna 2", nullptr, nullptr);
 
 	if (!Global::window)
@@ -448,17 +504,38 @@ int main(int, char const* [])
 		exit(EXIT_FAILURE);
 	}
 
-	SetProcessorAffinity();
 
 	Global::iWindowWidth = ssx;
 	Global::iWindowHeight = ssy;
 
 	glfwSetWindowSize(Global::window, ssx, ssy); // Change window size sets in configuration
 	glfwMakeContextCurrent(Global::window);
-	glfwSwapInterval(1);
-	//glewExperimental = GL_TRUE;
-	//glewInit();
+	glfwSwapInterval(0);
+	glewExperimental = GL_TRUE;
 
+	if (glewInit() != GLEW_OK)
+	{
+		WriteLogSS("There was a problem initializing GLEW. Exiting...", "ERROR");
+		std::cerr << "There was a problem initializing GLEW. Exiting..." << std::endl;
+		exit(-1);
+	}
+
+	// Check for 3.3 support.
+	// I've specified that a 3.3 forward-compatible context should be created.
+	// so this parameter check should always pass if our context creation passed.
+	// If we need access to deprecated features of OpenGL, we should check
+	// the state of the GL_ARB_compatibility extension.
+	if (!GLEW_VERSION_3_3)
+	{
+		WriteLogSS("OpenGL 3.3 required version support not present.", "ERROR");
+		std::cerr << "OpenGL 3.3 required version support not present." << std::endl;
+		exit(-1);
+	}
+
+
+	ilInit();
+	iluInit();
+	ilutInit();
 
 	glfwSetWindowSizeCallback(Global::window, resize_callback);
 	glfwSetKeyCallback(Global::window, key_callback);
@@ -467,6 +544,7 @@ int main(int, char const* [])
 	glfwSetScrollCallback(Global::window, scroll_callback);
 	glfwSetDropCallback(Global::window, drop_callback);
 	glfwSetCursorPosCallback(Global::window, mouse_callback);
+	glfwSetMouseButtonCallback(Global::window, mouseB_callback);
 
 	glfwSetInputMode(Global::window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	glfwSetCursorPos(Global::window, ssx / 2, ssy / 2);
@@ -484,7 +562,7 @@ int main(int, char const* [])
 
 	while (!glfwWindowShouldClose(Global::window))
     {
-		CALCULATEFPS();
+		Global::CALCULATEFPS();
 
 		glfwGetFramebufferSize(Global::window, &ssx, &ssy);
 
@@ -508,8 +586,8 @@ int main(int, char const* [])
 
 	fout.close();
 	
-	ShellExecute(0, "open", "notepad.exe", "info.txt", NULL, SW_SHOW);
-	ShellExecute(0, "open", "notepad.exe", "log.txt", NULL, SW_SHOW);
+	if (infonexitValue) ShellExecute(0, "open", "notepad.exe", "info.txt", NULL, SW_SHOW);
+	if (logonexitValue) ShellExecute(0, "open", "notepad.exe", Global::logfilenm1.c_str(), NULL, SW_SHOW);
 	Sleep(140);
 	DeleteFile("info.txt");
 

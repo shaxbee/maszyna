@@ -131,17 +131,17 @@ void TAdvancedSound::UpdateAF(
     vector3 NewPosition) { // update, ale z amplituda i czestotliwoscia
   if ((State == ss_Commencing) && (SoundCommencing.AM > 0)) {
     SoundShut.Stop(); // hunter-311211
-    SoundCommencing.Play(A, DSBPLAY_LOOPING, ListenerInside, NewPosition);
+    SoundCommencing.Play(long(A), DSBPLAY_LOOPING, ListenerInside, NewPosition);
   } else if (State == ss_Starting) {
     fTime += Timer::GetDeltaTime();
     //        SoundStart->SetVolume(-1000*(4-fTime)/4);
     if (fTime >= fStartLength) {
       State = ss_Commencing;
       SoundCommencing.ResetPosition();
-      SoundCommencing.Play(A, DSBPLAY_LOOPING, ListenerInside, NewPosition);
+      SoundCommencing.Play(long(A), DSBPLAY_LOOPING, ListenerInside, NewPosition);
       SoundStart.Stop();
     } else
-      SoundStart.Play(A, 0, ListenerInside, NewPosition);
+      SoundStart.Play(long(A), 0, ListenerInside, NewPosition);
   } else if (State == ss_ShuttingDown) {
     fTime -= Timer::GetDeltaTime();
     //        SoundShut->SetVolume(-1000*(4-fTime)/4);
@@ -149,7 +149,7 @@ void TAdvancedSound::UpdateAF(
       State = ss_Off;
       SoundShut.Stop();
     } else
-      SoundShut.Play(A, 0, ListenerInside, NewPosition);
+      SoundShut.Play(long(A), 0, ListenerInside, NewPosition);
   }
   SoundCommencing.AdjFreq(F, Timer::GetDeltaTime());
 }

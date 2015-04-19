@@ -1,11 +1,10 @@
 #ifndef _Globals_H_
 #define _Globals_H_
 
-#include "../commons.h"
-#include "../commons_usr.h"
 
-
-
+#include "ground.h"
+#include "camerax.h"   
+//#include "shaders.h"  
 #define qPI 3.14159
 
 #define SafeDelete(a) { delete (a); a=NULL; }
@@ -168,11 +167,19 @@ static bool FileExists(const std::string & fileName)
 	return 0 == ret;
 }
 
+double __fastcall Min0R(double x1, double x2);
+double __fastcall Max0R(double x1, double x2);
+bool __fastcall TestFlag(int Flag, int Value);
+bool __fastcall SetFlag(int Flag, int Value);
+int Sign(int v);
+
 class Global
 {
 public:
+	static HWND hWnd; //uchwyt okna 
 	static GLFWwindow* window;
 	static char **argv;
+	static TGround *pGround;
 
 	// Camera
 	static glm::vec3 cameraPos;
@@ -217,6 +224,7 @@ public:
 	static float fdt;
 	static float fms;
 	static float FOV;
+	static float tracksegmentlen;
 
 	static bool detonatoryOK;
 	static bool bFreeFly;
@@ -228,6 +236,12 @@ public:
 	static bool bSCNLOADED;
 	static bool bfirstloadingscn;
 	static bool bSoundEnabled;
+	static bool bManageNodes;
+	static bool bWireFrame;
+	static bool bOpenGL_1_5;
+	static bool bRenderAlpha;
+	static int iReCompile; //zwiêkszany, gdy trzeba odœwie¿yæ siatki
+	static bool bUseVBO; //czy jest VBO w karcie graficznej
 	static int iPARSERBYTESPASSED;
 	static int iNODES;
 	static int postep;
@@ -240,6 +254,10 @@ public:
 	static int keyscancode;
 	static int keymods;
 	static int keybindsnum;
+	static int iRailProFiltering;
+	static int iBallastFiltering;
+	static int iWriteLogEnabled;
+	static int iMultiplayer;
 	static std::string KEYCODE;
 	static std::string KEYCOMMAND;
 	static std::string asCWD;
@@ -249,6 +267,9 @@ public:
 	static std::string asCurrentSceneryPath;
 	static std::string asLang;
 
+	static GLuint boxtex;
+	static GLuint balltex;
+	static GLuint dirttex;
 	static GLuint logotex;
 	static GLuint bfonttex;
 	static GLuint loaderbackg;
@@ -268,6 +289,7 @@ public:
 	static GLvoid glPrintxy(GLint x, GLint y, char *string, int set);
 	static GLvoid BuildFont(GLvoid);
 	static GLvoid KillFont(GLvoid);
+	static double CALCULATEFPS();
 };
 
 //---------------------------------------------------------------------------

@@ -6,10 +6,35 @@
 // 2015.04.13 has included other soundsystem files
 // 2015.04.13 starts changing char pointer type into CString (more flexible)
 // 2015.04.14 removed many compiler warnings
+// 2015.04.16 unsuccessful attempt to connect ground.cpp module
+// 2015.04.17 changing directories for logs and configuration files
+// 2015.04.17 creating a system for check and download updates
+// 2015.04.18 solved GLEW functions problem
+// 2015.04.18 unsuccessful attempt to add a sky with dynamic lighting and color change based on shaders
+// 2015.04.18 second attempt to insert a module ground.cpp
+
+// Additional includes:
+// C:\DEPENDIENCES\devil\include
+// C:\DEPENDIENCES\freeimage
+// Additional linker input:
+/*
+C:\GLEW\glew.lib
+C:\GLEW\glew32.lib
+C:\GLEW\glew32s.lib
+C:\GLEW\glew32mx.lib
+C:\GLEW\glew32mxs.lib
+C:\DEPENDIENCES\devil\devil.lib
+C:\DEPENDIENCES\devil\ilu.lib
+C:\DEPENDIENCES\devil\ilut.lib
+*/
 
 #include "commons.h"
 #include "commons_usr.h"
+
+//#include "shaders.h"
+//#include "glmath.h"
 #pragma hdrstop
+
 
 GLuint	texture;			// Storage For Our Font Texture
 GLYPHMETRICSFLOAT gmf[256];	// Storage For Information About Our Outline Font Characters
@@ -20,9 +45,10 @@ vector3 campos;
 GLuint logo;
 char fps[60];
 char str[60];
-typedef void(APIENTRY *FglutBitmapCharacter)(void *font,int character); // typ funkcji
-FglutBitmapCharacter glutBitmapCharacterDLL = NULL; // deklaracja zmiennej
-HMODULE hinstGLUT32 = NULL; // wskaźnik do GLUT32.DLL
+std::vector<std::string> glexts;
+CString ModuleDirectory, ErrorLog;
+
+
 
 
 // *****************************************************************************************
@@ -57,7 +83,7 @@ GLvoid BuildFont3D(HDC hDC)								// Build Our Bitmap Font
 		255,							// Number Of Display Lists To Build
 		baseF3D,							// Starting Display Lists
 		0.0f,							// Deviation From The True Outlines
-		0.05f,							// Font Thickness In The Z Direction
+		0.02f,							// Font Thickness In The Z Direction
 		WGL_FONT_POLYGONS,				// Use Polygons, Not Lines
 		gmf);							// Address Of Buffer To Recieve Data
 }
@@ -66,59 +92,6 @@ int width = 0;
 int height = 0;
 short BitsPerPixel = 0;
 std::vector<unsigned char> Pixels;
-/*
-GLuint LoadTexture(const char * filename)
-{
-	GLuint texture;
-
-	int width, height;
-
-	unsigned char * data;
-	errno_t err;
-
-	FILE * file;
-	err = fopen_s(&file, filename, "rb");
-
-	//file = fopen(filename, "rb");
-
-	//if (file == NULL) return 0;
-	if (err == 1) return 0;
-
-	width = 256;
-	height = 256;
-	data = (unsigned char *)malloc(width * height * 3);
-	//int size = fseek(file,);
-	fread(data, width * height * 3, 1, file);
-	fclose(file);
-
-	for (int i = 0; i < width * height; ++i)
-	{
-		int index = i * 3;
-		unsigned char B, R;
-		B = data[index];
-		R = data[index + 2];
-
-		data[index] = R;
-		data[index + 2] = B;
-
-	}
-
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-
-
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-	free(data);
-
-	return texture;
-}
-*/
 
 
 GLvoid TWorld::glPrint( CString fmt)					// Custom GL "Print" Routine
@@ -167,8 +140,7 @@ GLvoid glPrint3D(float x, float y, float z, CString fmt, ...)					// Custom GL "
 
  TWorld::TWorld()
 {
-	//fps = new char[30];
-	//str = new char[30];
+
 }
 
  TWorld::~TWorld()
@@ -176,212 +148,44 @@ GLvoid glPrint3D(float x, float y, float z, CString fmt, ...)					// Custom GL "
 
 }
 
- GLuint testtex;
 
-
-
- // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- // RenderLoader() - SCREEN WCZYTYWANIA SCENERII ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
- bool __fastcall RenderLoader(HDC hDC, int node, std::string text)
- {
-
-	 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	 glMatrixMode(GL_PROJECTION);
-	 glLoadIdentity();
-	 glOrtho(0, Global::iWindowWidth, Global::iWindowHeight, 0, -100, 100);
-	 glMatrixMode(GL_MODELVIEW);
-	 glLoadIdentity();
-	 glClearColor(0.8f, 0.8f, 0.8f, 0.9f);     // 09 07 04 07
-
-	 //glDisable(GL_DEPTH_TEST);			// Disables depth testing
-	 glDisable(GL_LIGHTING);
-	 glDisable(GL_FOG);
-
-	 //if (!floaded) BFONT = new Font();
-	 //if (!floaded) BFONT->loadf("none");
-	 //floaded = true;
-
-	 glEnable(GL_TEXTURE_2D);
-
-	 //    if (node != 77) nn = Global::iPARSERBYTESPASSED;
-
-	 //    Global::postep = (Global::iPARSERBYTESPASSED * 100 / Global::iNODES ); // PROCENT
-	 //    currloading = AnsiString(Global::postep) + "%";
-	 //    currloading_bytes = IntToStr(Global::iPARSERBYTESPASSED);
-
-	 // else { currloading = IntToStr(nn) + "N, PIERWSZE WCZYTYWANIE"; }
-	 //currloading_b = text;
-
-	 //glColor4f(1.0,1.0,1.0,1);
-	 glColor4f(0.9f, 0.7f, 0.7f, 1.0f);
-	 int margin = 1;
-
-	 //glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-	 //glEnable(GL_BLEND);
-	 // glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-	 //glColor4f(0.5,0.45,0.4, 0.5);
-
-
-	 Global::aspectratio = 169;
-	 // OBRAZEK LOADERA ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-	 if (Global::aspectratio == 43)
-	 {
-		 glBindTexture(GL_TEXTURE_2D, Global::loaderbackg);
-		 glBegin(GL_QUADS);
-		 glTexCoord2f(0, 1); glVertex3i(margin - 174, margin, 0);   // GORNY LEWY
-		 glTexCoord2f(0, 0); glVertex3i(margin - 174, Global::iWindowHeight - margin, 0); // DOLY LEWY
-		 glTexCoord2f(1, 0); glVertex3i(Global::iWindowWidth - margin + 174, Global::iWindowHeight - margin, 0); // DOLNY PRAWY
-		 glTexCoord2f(1, 1); glVertex3i(Global::iWindowWidth - margin + 174, margin, 0);   // GORNY PRAWY
-		 glEnd();
-	 }
-
-	 if (Global::aspectratio == 169)
-	 {
-		 int pm = 0;
-		 glBindTexture(GL_TEXTURE_2D, Global::loaderbackg);
-		 glBegin(GL_QUADS);
-		 glTexCoord2f(0, 1); glVertex3i(margin - pm, margin, 0);   // GORNY LEWY
-		 glTexCoord2f(0, 0); glVertex3i(margin - pm, Global::iWindowHeight - margin, 0); // DOLY LEWY
-		 glTexCoord2f(1, 0); glVertex3i(Global::iWindowWidth - margin + pm, Global::iWindowHeight - margin, 0); // DOLNY PRAWY
-		 glTexCoord2f(1, 1); glVertex3i(Global::iWindowWidth - margin + pm, margin, 0);   // GORNY PRAWY
-		 glEnd();
-	 }
-
-
-	 // LOGO PROGRAMU ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-	 /*
-	 if (LDR_LOGOVIS !=0)
-	 {
-	 glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-	 glColor4f(0.8,0.8,0.8,LDR_MLOGO_A);
-	 glEnable(GL_BLEND);
-	 glBindTexture(GL_TEXTURE_2D, Global::loaderlogo);
-	 glBegin( GL_QUADS );
-	 glTexCoord2f(0, 1); glVertex3i( LDR_MLOGO_X,   LDR_MLOGO_Y,0);   // GORNY LEWY
-	 glTexCoord2f(0, 0); glVertex3i( LDR_MLOGO_X,   LDR_MLOGO_Y+100,0); // DOLY LEWY
-	 glTexCoord2f(1, 0); glVertex3i( LDR_MLOGO_X+300, LDR_MLOGO_Y+100,0); // DOLNY PRAWY
-	 glTexCoord2f(1, 1); glVertex3i( LDR_MLOGO_X+300, LDR_MLOGO_Y,0);   // GORNY PRAWY
-	 glEnd( );
-	 }
-	 */
-
-	 // BRIEFING - OPIS MISJI ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-	 /*
-	 if (LDR_DESCVIS != 0 && Global::bloaderbriefing)
-	 {
-		 glDisable(GL_BLEND);
-		 //glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-		 //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_COLOR);  // PRAWIE OK
-
-		 glColor4f(1.9, 1.9, 1.9, 1.9);
-		 //glEnable(GL_BLEND);
-		 glBindTexture(GL_TEXTURE_2D, loaderbrief);
-		 glBegin(GL_QUADS);
-		 glTexCoord2f(0, 1); glVertex3i(LDR_BRIEF_X, LDR_BRIEF_Y, 0);   // GORNY LEWY
-		 glTexCoord2f(0, 0); glVertex3i(LDR_BRIEF_X, LDR_BRIEF_Y + 1000, 0); // DOLY LEWY
-		 glTexCoord2f(1, 0); glVertex3i(LDR_BRIEF_X + 500, LDR_BRIEF_Y + 1000, 0); // DOLNY PRAWY
-		 glTexCoord2f(1, 1); glVertex3i(LDR_BRIEF_X + 500, LDR_BRIEF_Y, 0);   // GORNY PRAWY
-		 glEnd();
-	 }
-	 */
-	 glDisable(GL_BLEND);
-
-
-	 //PROGRESSBAR ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-	 float PBARY, PBY;
-	 PBY = Global::iWindowHeight - (200.0f - 8.0f);
-	 PBARY= PBY + 68.0f;
-	 float PBARLEN = Global::iWindowWidth / 100.0f; //LDR_PBARLEN;
-
-	 glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	 glEnable(GL_BLEND);
-	 glBegin(GL_QUADS);
-	 glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(20.0f, PBARY - 2.0f);                                   // gorny lewy
-	 glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(20.0f, PBARY - 1.0f);                                   // dolny lewy
-	 glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(100.0f * PBARLEN, PBARY - 1.0f);                          // dolny prawy
-	 glColor4f(1.0f, 1.0f, 1.0f, 1.0f); glVertex2f(100.0f * PBARLEN, PBARY - 2.0f);                          // gorny prawy
-	 glEnd();
-
-	   if (Global::bfirstloadingscn) Global::postep = 0;
-	   if (Global::bfirstloadingscn) PBARLEN = 3;
-	 
-	 if (!Global::bfirstloadingscn) Global::postep = (Global::iNODES * 100 / Global::iPARSERBYTESPASSED);
-
-	 if (Global::bfirstloadingscn)   // PRZY PIERWSZYM WCZYTYWANIU PASEK POSTEPU JEST USTAWIONY NA 100%
-	 {
-		 glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		 //glEnable(GL_BLEND);
-		 glColor4f(0.9f, 0.7f, 0.1f, 0.5f);
-		 glBegin(GL_QUADS);
-		 glVertex2f(20, PBARY + 2);    // gorny lewy
-		 glVertex2f(20, PBARY + 10);   // dolny lewy
-		 glVertex2f(100 * PBARLEN, PBARY + 10);   // dolny prawy
-		 glVertex2f(100 * PBARLEN, PBARY + 2);   // gorny prawy
-		 glEnd();
-	 }
-
-	 else
-	 {
-		 glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		 //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-		 //glEnable(GL_BLEND);
-		 glDisable(GL_TEXTURE_2D);
-		 glColor4f(0.9f, 0.7f, 0.1f, 0.5f);
-		 glBegin(GL_QUADS);
-		 glVertex2f(20.0, PBARY + 2);    // gorny lewy
-		 glVertex2f(20.0, PBARY + 10);   // dolny lewy
-		 glVertex2f(Global::postep*PBARLEN, PBARY + 10);   // dolny prawy
-		 glVertex2f(Global::postep*PBARLEN, PBARY + 2);   // gorny prawy
-		 glEnd();
-	 }
-
-	 //glEnable(GL_BLEND);
-	 //glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-
-	//-- RenderInformation(99);
-
-	// if (!Global::bSCNLOADED) 
-		// glfwSwapBuffers(Global::window); //SwapBuffers(hDC);
-	 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	 glEnable(GL_TEXTURE_2D);
-	 glEnable(GL_BLEND);
-	 return true;
- }
-
+// ********************************************************************************************************************
+// TWorld::Init() - INICJALIZACJA SZECHSWIATA ;)
+// ******************************************************************************************************************** 
 bool  TWorld::Init()
 {
+//	TGroundNode *tmp, *tmp2;
+//	TTrack *TRACK;
+//	tmp = new TGroundNode();
+//	TRACK = new TTrack(tmp);
+	bool Error = false;
 	std::string subpath = Global::asCurrentSceneryPath.c_str(); //   "scenery/";
-	cParser parser("scenery.scn", cParser::buffer_FILE, subpath, false);
+	//cParser parser("scenery.scn", cParser::buffer_FILE, subpath, false);
 
 	CString ax = stdstrtocstr("opopoa13123");
-	WriteLog("string to CString test: " + ax);
+	//WriteLog("string to CString test: " + ax);
 	
 	WriteLog("Starting MaSzyna rail vehicle simulator.");
 	WriteLog("Online documentation and additional files on http://eu07.pl");
 	WriteLog("Authors: Marcin_EU, McZapkie, ABu, Winger, Tolaris, nbmx_EU, OLO_EU, Bart, Quark-t, ShaXbee, Oli_EU, youBy, KURS90, Ra, hunter and others");
 
 	// Winger030405: sprawdzanie sterownikow
-	CString glrndstr = (char *)glGetString(GL_RENDERER);
-	CString glvenstr = (char *)glGetString(GL_VENDOR);
-	CString glverstr = (char *)glGetString(GL_VERSION);
-	WriteLog("Renderer: " + glrndstr);
-	WriteLog("Vendor: " + glvenstr);
-	WriteLog("OpenGL Version: " + glverstr);	
-	WriteLog("Supported extensions:");
-	WriteLog((char *)glGetString(GL_EXTENSIONS));
-  //WriteLog(glverstr);
+	CString glrndstr =   (char *)glGetString(GL_RENDERER);
+	CString glvenstr =   (char *)glGetString(GL_VENDOR);
+	CString glverstr =   (char *)glGetString(GL_VERSION);
+	        glexts=split((char *)glGetString(GL_EXTENSIONS), ' ');
+
+	std::string extsnum = itoss(glexts.size());
+
+	WriteLogSS("Graphic GPU   :", std::string(glrndstr));
+	WriteLogSS("Graphic Vendor:", std::string(glvenstr));
+	WriteLogSS("OpenGL version:", std::string(glverstr));
+	WriteLogSS("accepted exts :", extsnum);
+  //WriteLog((char *)glGetString(GL_EXTENSIONS));
+  
+	for (int i = 0; i < glexts.size(); i++) WriteLogSS(">", glexts[i]);
+
 	Global::detonatoryOK = true;
-	if ((glverstr == "1.5.1") || (glverstr == "1.5.2")) 
-	{
-		//Error("Niekompatybilna wersja openGL - dwuwymiarowy tekst nie bedzie "
-		//	"wyswietlany!");
-		WriteLog(	"WARNING! This OpenGL version is not fully compatible with simulator!");
-		WriteLog(	"UWAGA! Ta wersja OpenGL nie jest w pelni kompatybilna z symulatorem!");
-		Global::detonatoryOK = false;
-	}
 
 	char glver[100];
 	char tolog[100];
@@ -393,40 +197,41 @@ bool  TWorld::Init()
 	Global::fOpenGL = float(atof(tolog));
 	sprintf_s(glver, "glverdouble: %f", Global::fOpenGL);
 	WriteLog("");
-	WriteLog(glver);
-
+  //WriteLog(glver);
+	WriteLog("");
+	Error = CHECKEXTENSIONS();
+	
 
 	Global::bfonttex = TTexturesManager::GetTextureID("font.bmp", 0);  // FOR LOADER
 	Global::fonttexturex = TTexturesManager::GetTextureID("font.bmp", 0);
-	//testtex = TTexturesManager::GetTextureID("testtex.bmp", 0);
 	Global::loaderbackg = TTexturesManager::GetTextureID("logo.bmp", 0);
+	Global::logotex = TTexturesManager::GetTextureID("logo.bmp", 0);
+	Global::boxtex = TTexturesManager::GetTextureID("boxtex.bmp", 0);
+	Global::dirttex = TTexturesManager::GetTextureID("lensdirt_lowc.bmp", 0);
 
+	Resize(1280, 1024);
+
+	glEnable(GL_LIGHT0);
+	glEnable(GL_COLOR_MATERIAL);
+
+
+	HWND hWIN = GetActiveWindow();
+	
 	/*-----------------------Render Initialization----------------------*/
-//	if (Global::fOpenGL >= 1.2) // poniższe nie działa w 1.1
+	//if (Global::fOpenGL >= 1.2) // poniższe nie działa w 1.1
 	//	glTexEnvf(TEXTURE_FILTER_CONTROL_EXT, TEXTURE_LOD_BIAS_EXT, -1);
-	GLfloat FogColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	
+	GLfloat FogColor[] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
 	glClear(GL_COLOR_BUFFER_BIT |GL_DEPTH_BUFFER_BIT); // Clear screen and depth buffer
 	glLoadIdentity();
-
-	glClearColor(0.2f, 0.4f, 0.33f, 1.0f);                                         // Background Color
-
-	glFogfv(GL_FOG_COLOR, FogColor);					        // Set Fog Color
-
-	glClearDepth(1.0f);                                                         // ZBuffer Value
-
 	glClearColor(0.2f, 0.4f, 0.33f, 1.0f); // Background Color
-
-	WriteLog("glFogfv(GL_FOG_COLOR, FogColor);");
-	glFogfv(GL_FOG_COLOR, FogColor); // Set Fog Color
-
 	WriteLog("glClearDepth(1.0f);  ");
 	glClearDepth(1.0f); // ZBuffer Value
 
     glEnable(GL_NORMALIZE);
 	glEnable(GL_RESCALE_NORMAL);
 
-	  //  glEnable(GL_CULL_FACE);
 	WriteLog("glEnable(GL_TEXTURE_2D);");
 	glEnable(GL_TEXTURE_2D); // Enable Texture Mapping
 	WriteLog("glShadeModel(GL_SMOOTH);");
@@ -435,39 +240,25 @@ bool  TWorld::Init()
 	glEnable(GL_DEPTH_TEST);
 
 
-	//  our_font.init("data\\consolefont.TTF", 16);					//Build the freetype font
-
-
 
 	//McZapkie:261102-uruchomienie polprzezroczystosci (na razie linie) pod kierunkiem Marcina
 
-	//if (Global::bRenderAlpha)
+	if (Global::bRenderAlpha)
 	{
-
 		glEnable(GL_BLEND);
-
 		glEnable(GL_ALPHA_TEST);
-
 		glAlphaFunc(GL_GREATER, 0.04f);
-
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 		glDepthFunc(GL_LEQUAL);
 	}
-
-	//else
-	/*
+	else
 	{
-
 		glEnable(GL_ALPHA_TEST);
-
 		glAlphaFunc(GL_GREATER, 0.5);
-
 		glDepthFunc(GL_LEQUAL);
-
 		glDisable(GL_BLEND);
 	}
-	*/
+	
 
 	WriteLog("glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);");
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST); // Really Nice Perspective Calculations
@@ -490,13 +281,16 @@ bool  TWorld::Init()
 	Global::lightPos[2] = GLfloat(lp.z);
 	Global::lightPos[3] = GLfloat(0.0f);
 
-
-	// Ra: światła by sensowniej było ustawiać po wczytaniu scenerii
+	// glColor() ma zmieniać kolor wybrany w glColorMaterial()
+	WriteLog("glEnable(GL_COLOR_MATERIAL);");
+	glEnable(GL_COLOR_MATERIAL);
+	WriteLog("glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);");
+	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+	WriteLog("glMaterialfv( GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteLight );");
 
 	// Ra: szczątkowe światło rozproszone - żeby było cokolwiek widać w ciemności
 	WriteLog("glLightModelfv(GL_LIGHT_MODEL_AMBIENT,darkLight);");
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, Global::darkLight);
-
 	// Ra: światło 0 - główne światło zewnętrzne (Słońce, Księżyc)
 	WriteLog("glLightfv(GL_LIGHT0,GL_AMBIENT,ambientLight);");
 	glLightfv(GL_LIGHT0, GL_AMBIENT, Global::ambientDayLight);
@@ -506,19 +300,10 @@ bool  TWorld::Init()
 	glLightfv(GL_LIGHT0, GL_SPECULAR, Global::specularDayLight);
 	WriteLog("glLightfv(GL_LIGHT0,GL_POSITION,lightPos);");
 	glLightfv(GL_LIGHT0, GL_POSITION, Global::lightPos);
+	WriteLog("lMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Global::whiteLight);");
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Global::whiteLight);
 	WriteLog("glEnable(GL_LIGHT0);");
 	glEnable(GL_LIGHT0);
-
-	// glColor() ma zmieniać kolor wybrany w glColorMaterial()
-	WriteLog("glEnable(GL_COLOR_MATERIAL);");
-	glEnable(GL_COLOR_MATERIAL);
-
-	WriteLog("glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);");
-	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-	WriteLog("glMaterialfv( GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteLight );");
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Global::whiteLight);
-
 	WriteLog("glEnable(GL_LIGHTING);");
 	glEnable(GL_LIGHTING);
 
@@ -528,145 +313,70 @@ bool  TWorld::Init()
 	glFogfv(GL_FOG_COLOR, FogColor); // Set Fog Color
 	//	glFogf(GL_FOG_DENSITY, 0.594f);						// How Dense Will
 	glHint(GL_FOG_HINT, GL_NICEST);					  
-
 	WriteLog("glFogf(GL_FOG_START, 1.0f);");
 	glFogf(GL_FOG_START, 1.0f); // Fog Start Depth
 	WriteLog("glFogf(GL_FOG_END, 200.0f);");
-	glFogf(GL_FOG_END, 200.0f); // Fog End Depth
+	glFogf(GL_FOG_END, 90.0f); // Fog End Depth
 	WriteLog("glEnable(GL_FOG);");
 	glEnable(GL_FOG); // Enables GL_FOG
 
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-	/*
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Clear The Background Color To Black
-	glClearDepth(1.0);									// Enables Clearing Of The Depth Buffer
-	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Test To Do
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);					// Select The Type Of Blending
-	glShadeModel(GL_SMOOTH);							// Enables Smooth Color Shading
-	glEnable(GL_TEXTURE_2D);							// Enable 2D Texture Mapping
-	*/
+
+	ENALPHATEST(true);
+	ENDITHER(false);
+	ENMULTISAMPLE(false);
+	ENPOLYGONOFFSETLINE(true);
+	ENPOLYGONOFFSETPOINT(true);
+	ENPOLYGONSMOOTH(false);
+	ENSAMPLEALPHATOCOVERAGE(true);
+	ENSAMPLEALPHATOONE(true);
+	ENFRAMEBUFFERSRGB(false);
+
 	/*--------------------Render Initialization End---------------------*/
 
 	WriteLog("Font init"); // początek inicjacji fontów 2D
 	
-	Global::bGlutFont = true;
-	if (Global::bGlutFont) // jeśli wybrano GLUT font, próbujemy zlinkować GLUT32.DLL
-	{
-		SetDllDirectory(Global::asCWD.c_str());
-		SetCurrentDirectory(Global::asCWD.c_str());
+	Global::bGlutFont = false;
 
-
-		//UINT mode = SetErrorMode(
-		//	SEM_NOOPENFILEERRORBOX); // aby nie wrzeszczał, że znaleźć nie może
-		hinstGLUT32 = LoadLibrary("glut32.dll"); // get a handle to the DLL module
-		//SetErrorMode(mode);
-		// If the handle is valid, try to get the function address.
-		if (hinstGLUT32)
-		{
-		 	glutBitmapCharacterDLL = (FglutBitmapCharacter)GetProcAddress(hinstGLUT32, "glutBitmapCharacter");
-			WriteLog("GLUT32.DLL EXIST");
-		}
-		else
-			WriteLog("Missed GLUT32.DLL.");
-
-		if (glutBitmapCharacterDLL)
-			WriteLog("Used font from GLUT32.DLL.");
-		else
-			Global::bGlutFont =	false; // nie udało się, trzeba spróbować na Display List
-	}
 	hDC = GetDC(0);
 
-	
-	if (!Global::bGlutFont) { // jeśli bezGLUTowy font
+	if (!Global::bGlutFont) { 
 		HFONT font; // Windows Font ID
 		Global::fbase = glGenLists(96); // storage for 96 characters
-		font = CreateFont(-15, // height of font
-			0, // width of font
-			0, // angle of escapement
-			0, // orientation angle
-			FW_NORMAL, // font weight
-			FALSE, // italic
-			FALSE, // underline
-			FALSE, // strikeout
-			ANSI_CHARSET, // character set identifier
-			OUT_TT_PRECIS, // output precision
-			CLIP_DEFAULT_PRECIS, // clipping precision
-			ANTIALIASED_QUALITY, // output quality
-			FF_DONTCARE | DEFAULT_PITCH, // family and pitch
-			"Courier New"); // font name
-		SelectObject(hDC, font); // selects the font we want
+		font = CreateFont(-15, 0, 0, 0, 
+		FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_DONTCARE | DEFAULT_PITCH, "Courier New"); 
+		SelectObject(hDC, font);
 		wglUseFontBitmapsA(hDC, 32, 96, Global::fbase); // builds 96 characters starting at character 32
 		WriteLog("Display Lists font used."); //+AnsiString(glGetError())
 	}
-	
-	WriteLog("Font init OK"); //+AnsiString(glGetError())
 
-	glEnable(GL_LIGHTING);
-
-	
-	WriteLog("Sound Init");
-	glLoadIdentity();
-	//glColor4f(0.7f,0.5f,0.0f,0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glTranslatef(0.0f, 0.0f, -0.70f);
-    //glRasterPos2f(0.25f, 1.10f);
-	glEnable(GL_DEPTH_TEST); // Disables depth testing
-	glColor4f(0.9f, 1.0f, 1.0f, 1.0f);
-
-	
-	Global::logotex =	TTexturesManager::GetTextureID("logo.bmp", 0);
-	glBindTexture(GL_TEXTURE_2D, Global::logotex); // Select our texture
-
-	glBegin(GL_QUADS); // Drawing using triangles
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(-0.28f, -0.22f, 0.0f); // bottom left of the texture and quad
-	glTexCoord2f(1.0f, 0.0f);
-	glVertex3f(0.28f, -0.22f, 0.0f); // bottom right of the texture and quad
-	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f(0.28f, 0.22f, 0.0f); // top right of the texture and quad
-	glTexCoord2f(0.0f, 1.0f);
-	glVertex3f(-0.28f, 0.22f, 0.0f); // top left of the texture and quad
-	glEnd();
-
-	glColor3f(1.0f, 0.9f, 1.0f);
-	if (Global::detonatoryOK) {
-		glColor3ub(255, 225, 0);
-		glRasterPos2f(0.25f, 0.09f);
-		glPrint("Uruchamianie / Initializing...");
-		glRasterPos2f(-0.25f, -0.10f);
-		glPrint("Dzwiek / Sound...");	
-	}
-	
-	
-	RenderLoader(hDC, 77, "SOUND INITIALIZATION...");
-	
-	//Global::glPrintxy(110, 10, "MaSZyna 2", 0);
-	glfwSwapBuffers(Global::window);
-	Sleep(2400);
-	
-	HWND hWIN = GetActiveWindow();
-
-
-	TSoundsManager::Init(hWIN);
-	WriteLog("Sound Init OK");
-
-	//Global::fonttexturex = LoadTexture("font.bmp");
-	//texture = LoadTexture("textures/font.bmp");
-	//glGenTextures(1, &Global::fonttexturex);
-	//glBindTexture(GL_TEXTURE_2D, Global::fonttexturex);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 128, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, Pixels.data());
 	//Global::BuildFont();							    // Build The Font
 	QBuildFontX();					                //inicailizácia fontu
 	BuildFont3D(hDC);
+	WriteLog("Font init OK"); 
+
+	WriteLog("Sound Init");
+	TSoundsManager::Init(hWIN);
+	WriteLog("Sound Init OK");
+
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+	Global::CAMERA.Position_Camera(5, 2.5, 13, 0, 2.5, 3, 0, 1, 0);  // Position      View(target)  Up
+
+    RenderLoader(hDC, 77, "SOUND INITIALIZATION...");
+	
+	Global::glPrintxy(110, 10, "MaSZyna 2", 0);
+	glfwSwapBuffers(Global::window);
+	Sleep(2400);
 
 	//Camera.Init(Global::pFreeCameraInit[0], Global::pFreeCameraInitAngle[0]);
 	//Global::bFreeFlyModeFlag = true; //Ra: automatycznie włączone latanie
 	//Camera.Type = tp_Free;
 	//Camera.Reset();
 
-	Global::CAMERA.Position_Camera(0, 2.5, 18, 0, 2.5, 3, 0, 1, 0);  // Position      View(target)  Up
 
+	Global::bActive = true;
  return true;
 };
 
@@ -678,53 +388,72 @@ void  TWorld::InOutKey()
 void __fastcall TWorld::OnMouseMove(double x, double y)
 {//McZapkie:060503-definicja obracania myszy
 
-	//Camera.OnCursorMove(x*Global::fMouseXScale, -y*Global::fMouseYScale);
+	Camera.OnCursorMove(x*Global::fMouseXScale, -y*Global::fMouseYScale);
 	Global::CAMERA.mWindowWidth = Global::iWindowWidth;
 	Global::CAMERA.mWindowHeight = Global::iWindowHeight;
 	Global::CAMERA.Mouse_Move();
+
 }
 
+void  TWorld::OnMouseWheel(float zDelta)
+{
 
-// *****************************************************************************
+}
+
+void  TWorld::OnRButtonDown(int X, int Y)
+{
+	Beep(1500, 100);
+}
+
+void  TWorld::OnLButtonDown(int X, int Y)
+{
+	Beep(1000, 100);
+}
+
+// ********************************************************************************************************************
 // OnKeyDown()
-// *****************************************************************************
+// ********************************************************************************************************************
 void __fastcall TWorld::OnKeyDown(int cKey, int scancode, int action, int mode, std::string command)
-{//(cKey) to kod klawisza, cyfrowe i literowe się zgadzają
-
+{
 	float camspeed = 2.0f * Global::fdt;
 
 	if (GetKeyState(VK_CONTROL) & 0x80) camspeed = 16.0f * (float)Global::fdt;
 	if (GetKeyState(VK_SHIFT) & 0x80) camspeed = 32.0f * (float)Global::fdt;
-	if (GetKeyState(VK_TAB) & 0x80) camspeed = 64.0f * (float)Global::fdt;
+	if (GetKeyState(VK_TAB) & 0x80) camspeed = 128.0f * (float)Global::fdt;
 
 	Global::KEYCOMMAND = ReplaceCharInString(Global::KEYCOMMAND, '"', "");
 
 	//WriteLogSS("KEYCOMMAND=[", Global::KEYCOMMAND + "]");
-	if ((GetKeyState('W') & 0x80)) 
-	 Global::CAMERA.Move_Camera(CAMERASPEED*float(camspeed));
+	if ((GetKeyState('W') & 0x80))  Global::CAMERA.Move_Camera(CAMERASPEED*float(camspeed));
 
-	if ((GetKeyState('S') & 0x80)) 
-		Global::CAMERA.Move_Camera(-CAMERASPEED*float(camspeed));
+	if ((GetKeyState('S') & 0x80)) Global::CAMERA.Move_Camera(-CAMERASPEED*float(camspeed));
 
-	if ((GetKeyState('A') & 0x80)) 
-	 Global::CAMERA.Rotate_View(0, -ROTATESPEED*camspeed, 0);
+	if ((GetKeyState('A') & 0x80)) Global::CAMERA.Rotate_View(0, -ROTATESPEED*camspeed, 0);
 
-	if ((GetKeyState('D') & 0x80)) 
-	 Global::CAMERA.Rotate_View(0, ROTATESPEED*camspeed, 0);
+	if ((GetKeyState('D') & 0x80)) Global::CAMERA.Rotate_View(0, ROTATESPEED*camspeed, 0);
 
-	if ((GetKeyState('Q') & 0x80)) 
-	 Global::CAMERA.Move_CameraU(CAMERASPEED*camspeed);
+	if ((GetKeyState('Q') & 0x80)) Global::CAMERA.Move_CameraU(CAMERASPEED*camspeed);
 
-	if ((GetKeyState('E') & 0x80)) 
-	 Global::CAMERA.Move_CameraD(-CAMERASPEED*camspeed);
+	if ((GetKeyState('E') & 0x80)) Global::CAMERA.Move_CameraD(-CAMERASPEED*camspeed);
 
+	if (Global::KEYCOMMAND == "SCREENSHOT") 
+	{ 
+		takeScreenshot("screenshot.png"); Beep(1000, 50); Sleep(50); Beep(1000, 50); Sleep(50);
+		Global::KEYCOMMAND = ""; 
+	}
+
+
+}
+
+bool  TWorld::Resize(int Width, int Height)
+{
+	return true;
 }
 
 bool  TWorld::Update(double dt)
 {
  //Camera.Pos = Global::Camerapos;
 // Camera.Update(); //uwzględnienie ruchu wywołanego klawiszami
-
 
  Global::pCameraPosition.x = Global::CAMERA.mPos.x;
  Global::pCameraPosition.y = Global::CAMERA.mPos.y;
@@ -734,7 +463,7 @@ bool  TWorld::Update(double dt)
  campos.y = Global::CAMERA.mPos.y;
  campos.z = Global::CAMERA.mPos.z;
 
- if (!Render(dt)) return false;
+ if (!Render(dt, 1)) return false;
 
  return (true);
 };
@@ -754,7 +483,6 @@ bool switch2dRender()
 }
 
 
-
 // *****************************************************************************
 // RenderX()
 // *****************************************************************************
@@ -764,7 +492,7 @@ bool  TWorld::RenderX()
  //glEnable(GL_TEXTURE_2D);
  //glBindTexture(GL_TEXTURE_2D, 0);
  glLineWidth(0.4f);
- glColor4f(0.9f, 0.2f, 0.0f, 0.9f);
+ glColor4f(0.9f, 0.2f, 0.0f, 0.7f);
 
  glPushMatrix(); 
  glTranslatef(-4.6f, 1.75f, 6.0f);
@@ -779,13 +507,13 @@ bool  TWorld::RenderX()
  return true;
 }
 
-
 // *********************************************************************************************************************
 // TWorld::Render()
 // *********************************************************************************************************************
 
-bool  TWorld::Render(double dt)
+bool  TWorld::Render(double dt, int id)
 {
+
 	char  szBuffer[100];
 	glClearColor(0.10f, 0.10f, 0.10f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -800,7 +528,11 @@ bool  TWorld::Render(double dt)
 
 	gluLookAt(campos.x, campos.y, campos.z, Global::CAMERA.mView.x, Global::CAMERA.mView.y, Global::CAMERA.mView.z, Global::CAMERA.mUp.x, Global::CAMERA.mUp.y, Global::CAMERA.mUp.z);
 
-    glDisable(GL_FOG);
+	DRAW_XYGRID();
+
+	Draw_SCENE000(0, 0, 0);
+	
+	glDisable(GL_FOG);
     //Clouds.Render();
     glEnable(GL_FOG);
 
@@ -851,6 +583,7 @@ bool  TWorld::Render(double dt)
 	sprintf_s(szBuffer, "Symulator Pojazdow Trakcyjnych MaSZyna 4");
     rgba = Global::SetColor(0.2f, 0.2f, 0.2f, 0.9f);
 	QglPrint(10, 1015, szBuffer, 0, rgba);
+	
  return true;
 };
 

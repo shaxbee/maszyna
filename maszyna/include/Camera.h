@@ -1,8 +1,8 @@
 //---------------------------------------------------------------------------
 #ifndef CameraH
 #define CameraH
-
-#include "commons_usr.h"
+//#include "../commons.h"
+//#include "../commons_usr.h"
 #include "dumb3d.h"
 using namespace Math3D;
 

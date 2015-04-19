@@ -14,6 +14,8 @@
 #include <assert.h>
 #include <direct.h>
 #include <wtypes.h>
+#include <tchar.h>
+#include <strsafe.h>
 #include <shellapi.h> // !!
 #include <iomanip>
 #include <direct.h>
@@ -21,35 +23,40 @@
 #include <FLOAT.H>
 #include <sys/types.h>
 #include <sys/stat.h>
+//#include <urlmon.h> //"urlmon.h: No such file or directory found"
+#include <winhttp.h>
 
+#define GLEW_STATIC // <- NO ZESZ KURWA JA PIERDOLE ;)
 #define GLFW_INCLUDE_GLU
-#include <GL/glew.h> // include GLEW and new version of GL on Windows
+#include <GL/glew.h> // include GLEW and new version of GL on Windows  http://glew.sourceforge.net/
 #include <GLFW/glfw3.h>
+//#include <GL/wglew.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-//#include "opengl\glew.h"
-//#include "opengl\glext.h"
-//#include "opengl\gl.h"			// Header File For The OpenGL32 Library
-//#include "opengl\glu.h"			// Header File For The GLu32 Library
-//#include "opengl\glut.h"	
-//#include "opengl\glaux.h"		// Header File For The Glaux Library
+#include "il/il.h"
+#include "il/ilu.h"
+#include "il/ilut.h"
+#include "freeimage.h"
 
-//#include <glbinding/gl/gl33core.h>
-//#include <glbinding/gl/gl.h>
-//#include <glbinding/Binding.h>
-#include "include\camerax.h"
-#include "include\dumb3d.h"
-//using namespace gl33core;
-//using namespace glbinding;
 
-#pragma comment(lib,"Version.lib")
-#pragma comment(lib,"winmm.lib")
-#pragma comment(lib,"dsound.lib")
+//#pragma comment(lib, "urlmon.lib")
+//#pragma comment(lib, "WinInet.lib")
+#pragma comment(lib, "winhttp.lib")
+#pragma comment(lib, "winmm.lib")
+#pragma comment(lib, "dsound.lib")
 
-#if !defined(ARRAY_SIZE)
-#define ARRAY_SIZE(x) (sizeof((x)) / sizeof((x)[0]))
-#endif
+//#pragma comment(lib, "opengl32.lib")
+//#pragma comment(lib, "glu32.lib")
+//#pragma comment(lib, "opengl32.lib")
+//#pragma comment(lib, "c:/glew/glut32.lib")
+//#pragma comment(lib, "glew32.lib")
+//#pragma comment(lib, "glew32s.lib")
+//#pragma comment(lib, "glew32mx.lib")
+//#pragma comment(lib, "glew32mxs.lib")
+//#pragma comment(lib, "devil.lib")
+
 
 #endif 
