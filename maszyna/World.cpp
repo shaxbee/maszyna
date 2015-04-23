@@ -7,7 +7,7 @@
 // 2015.04.13 starts changing char pointer type into CString (more flexible)
 // 2015.04.14 removed many compiler warnings
 // 2015.04.16 unsuccessful attempt to connect ground.cpp module
-// 2015.04.17 changing directories for logs and configuration files
+// 2015.04.16 changing directories for logs and configuration files
 // 2015.04.17 creating a system for check and download updates
 // 2015.04.18 solved GLEW functions problem
 // 2015.04.18 unsuccessful attempt to add a sky with dynamic lighting and color change based on shaders
@@ -26,7 +26,11 @@ C:\GLEW\glew32mxs.lib
 C:\DEPENDIENCES\devil\devil.lib
 C:\DEPENDIENCES\devil\ilu.lib
 C:\DEPENDIENCES\devil\ilut.lib
+C:\FreeImage\Dist\x64\freeimage.lib
 */
+
+// ADDITIONAL INCLUDE DIR
+//C:\DEPENDIENCES\freeimage\FreeImageLib\Release
 
 #include "commons.h"
 #include "commons_usr.h"
@@ -35,11 +39,6 @@ C:\DEPENDIENCES\devil\ilut.lib
 //#include "glmath.h"
 #pragma hdrstop
 
-
-GLuint	texture;			// Storage For Our Font Texture
-GLYPHMETRICSFLOAT gmf[256];	// Storage For Information About Our Outline Font Characters
-GLuint baseF3D;
-HDC hDC;
 TCamera Camera;
 vector3 campos;
 GLuint logo;
@@ -47,95 +46,57 @@ char fps[60];
 char str[60];
 std::vector<std::string> glexts;
 CString ModuleDirectory, ErrorLog;
+GLfloat  lightPos[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-
-
-
-// *****************************************************************************************
-// BuildFont3D() - DO NAPISOW 3D ***********************************************************
-// *****************************************************************************************
-
-GLvoid BuildFont3D(HDC hDC)								// Build Our Bitmap Font
-{
-	HFONT	font;										// Windows Font ID
-
-	baseF3D = glGenLists(256);								// Storage For 256 Characters
-
-	font = CreateFont(-12,							// Height Of Font
-		0,								// Width Of Font
-		0,								// Angle Of Escapement
-		0,								// Orientation Angle
-		FW_NORMAL,						// Font Weight
-		FALSE,							// Italic
-		FALSE,							// Underline
-		FALSE,							// Strikeout
-		ANSI_CHARSET,					// Character Set Identifier
-		OUT_TT_PRECIS,					// Output Precision
-		CLIP_DEFAULT_PRECIS,			// Clipping Precision
-		ANTIALIASED_QUALITY,			// Output Quality
-		FF_DONTCARE | DEFAULT_PITCH,		// Family And Pitch
-		"Arial");				// Font Name
-
-	SelectObject(hDC, font);							// Selects The Font We Created
-
-	wglUseFontOutlines(hDC,							// Select The Current DC
-		0,								// Starting Character
-		255,							// Number Of Display Lists To Build
-		baseF3D,							// Starting Display Lists
-		0.0f,							// Deviation From The True Outlines
-		0.02f,							// Font Thickness In The Z Direction
-		WGL_FONT_POLYGONS,				// Use Polygons, Not Lines
-		gmf);							// Address Of Buffer To Recieve Data
-}
-
-int width = 0;
-int height = 0;
-short BitsPerPixel = 0;
-std::vector<unsigned char> Pixels;
-
-
-GLvoid TWorld::glPrint( CString fmt)					// Custom GL "Print" Routine
+TSky::~TSky()
 {
 
-	if (fmt == NULL)									// If There's No Text
-		return;			                                // Do Nothing
-	glColor3ub(255, 205, 0);
-	glPushAttrib(GL_LIST_BIT);							// Pushes The Display List Bits
-	glListBase(Global::fbase - 32);								// Sets The Base Character to 32
-	glCallLists((int)strlen(fmt), GL_UNSIGNED_BYTE, fmt);	// Draws The Display List Text
-	glPopAttrib();										// Pops The Display List Bits
-}
+};
 
-GLvoid glPrint3D(float x, float y, float z, CString fmt, ...)					// Custom GL "Print" Routine
+TSky::TSky()
 {
-	float		length = 0;								// Used To Find The Length Of The Text
-	char		text[256];								// Holds Our String
-	va_list		ap;										// Pointer To List Of Arguments
 
-	if (fmt == NULL)									// If There's No Text
-		return;											// Do Nothing
+};
 
-	va_start(ap, fmt);									// Parses The String For Variables
-	vsprintf_s(text, fmt, ap);					    	// And Converts Symbols To Actual Numbers
-	va_end(ap);											// Results Are Stored In Text
-	GLsizei siz = (int)strlen(fmt);
+void  TSky::Init()
+{
+	WriteLog(Global::asSky.c_str());
+	WriteLog("init");
+	std::string asModel;
+	asModel = Global::asSky = "cgskj_blueclear008.t3d";
 
-	for (unsigned int loop = 0; loop<(strlen(text)); loop++)	// Loop To Find Text Length
-	{
-		length += gmf[text[loop]].gmfCellIncX;			// Increase Length By Each Characters Width
+	//anCloud = new TAnimModel();
+	//anCloud->Load()
+	if ((asModel != "1") && (asModel != "0")) mdCloud = TModelsManager::GetModel("cgskj_blueclear008.t3d", false);
+	
+};
+
+void TSky::Render()
+{
+	if (mdCloud)
+	{//jeśli jest model nieba
+		glPushMatrix();
+		//glDisable(GL_DEPTH_TEST);
+		glTranslatef(Global::pCameraPosition.x, Global::pCameraPosition.y, Global::pCameraPosition.z);
+		glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+		if (Global::bUseVBO)
+		{//renderowanie z VBO
+		//-	mdCloud->RaRender(100, 0);
+		//-	mdCloud->RaRenderAlpha(100, 0);
+		}
+		else
+		{//renderowanie z Display List
+		//-	mdCloud->Render(100, 0);
+		//-	mdCloud->RenderAlpha(100, 0);
+		}
+		//glEnable(GL_DEPTH_TEST);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		//glEnable(GL_LIGHTING);
+		glPopMatrix();
+		glLightfv(GL_LIGHT0, GL_POSITION, Global::lightPos);
 	}
-	glPushMatrix();
-	glTranslatef(x, y, z);
-	glFrontFace(GL_CW);
-	glTranslatef(-length / 2, 0.0f, 0.0f);					// Center Our Text On The Screen
+};
 
-	glPushAttrib(GL_LIST_BIT);							// Pushes The Display List Bits
-	glListBase(baseF3D);									// Sets The Base Character to 0
-	glCallLists(siz, GL_UNSIGNED_BYTE, text);	// Draws The Display List Text
-	glPopAttrib();										// Pops The Display List Bits
-	glFrontFace(GL_CCW);
-	glPopMatrix();
-}
 
 
  TWorld::TWorld()
@@ -158,16 +119,16 @@ bool  TWorld::Init()
 //	TTrack *TRACK;
 //	tmp = new TGroundNode();
 //	TRACK = new TTrack(tmp);
+	hDC = GetDC(0);
 	bool Error = false;
 	std::string subpath = Global::asCurrentSceneryPath.c_str(); //   "scenery/";
-	//cParser parser("scenery.scn", cParser::buffer_FILE, subpath, false);
 
 	CString ax = stdstrtocstr("opopoa13123");
 	//WriteLog("string to CString test: " + ax);
 	
 	WriteLog("Starting MaSzyna rail vehicle simulator.");
 	WriteLog("Online documentation and additional files on http://eu07.pl");
-	WriteLog("Authors: Marcin_EU, McZapkie, ABu, Winger, Tolaris, nbmx_EU, OLO_EU, Bart, Quark-t, ShaXbee, Oli_EU, youBy, KURS90, Ra, hunter and others");
+	WriteLog("Authors: Marcin_EU, McZapkie, ABu, Winger, Tolaris, nbmx_EU, OLO_EU, Bart, Quark-t, ShaXbee, Oli_EU, youBy, KURS90, hunter, Ra i Ja");
 
 	// Winger030405: sprawdzanie sterownikow
 	CString glrndstr =   (char *)glGetString(GL_RENDERER);
@@ -181,7 +142,6 @@ bool  TWorld::Init()
 	WriteLogSS("Graphic Vendor:", std::string(glvenstr));
 	WriteLogSS("OpenGL version:", std::string(glverstr));
 	WriteLogSS("accepted exts :", extsnum);
-  //WriteLog((char *)glGetString(GL_EXTENSIONS));
   
 	for (int i = 0; i < glexts.size(); i++) WriteLogSS(">", glexts[i]);
 
@@ -218,9 +178,7 @@ bool  TWorld::Init()
 	HWND hWIN = GetActiveWindow();
 	
 	/*-----------------------Render Initialization----------------------*/
-	//if (Global::fOpenGL >= 1.2) // poniższe nie działa w 1.1
-	//	glTexEnvf(TEXTURE_FILTER_CONTROL_EXT, TEXTURE_LOD_BIAS_EXT, -1);
-	
+
 	GLfloat FogColor[] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
 	glClear(GL_COLOR_BUFFER_BIT |GL_DEPTH_BUFFER_BIT); // Clear screen and depth buffer
@@ -229,9 +187,6 @@ bool  TWorld::Init()
 	WriteLog("glClearDepth(1.0f);  ");
 	glClearDepth(1.0f); // ZBuffer Value
 
-    glEnable(GL_NORMALIZE);
-	glEnable(GL_RESCALE_NORMAL);
-
 	WriteLog("glEnable(GL_TEXTURE_2D);");
 	glEnable(GL_TEXTURE_2D); // Enable Texture Mapping
 	WriteLog("glShadeModel(GL_SMOOTH);");
@@ -239,27 +194,12 @@ bool  TWorld::Init()
 	WriteLog("glEnable(GL_DEPTH_TEST);");
 	glEnable(GL_DEPTH_TEST);
 
-
-
-	//McZapkie:261102-uruchomienie polprzezroczystosci (na razie linie) pod kierunkiem Marcina
-
-	if (Global::bRenderAlpha)
-	{
-		glEnable(GL_BLEND);
-		glEnable(GL_ALPHA_TEST);
-		glAlphaFunc(GL_GREATER, 0.04f);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDepthFunc(GL_LEQUAL);
-	}
-	else
-	{
-		glEnable(GL_ALPHA_TEST);
-		glAlphaFunc(GL_GREATER, 0.5);
-		glDepthFunc(GL_LEQUAL);
-		glDisable(GL_BLEND);
-	}
+	AlphaBlendMode(Global::bRenderAlpha); //McZapkie:261102-uruchomienie polprzezroczystosci (na razie linie) pod kierunkiem Marcina
 	
-
+	WriteLog("glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);");
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	WriteLog("glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);");
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	WriteLog("glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);");
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST); // Really Nice Perspective Calculations
 	WriteLog("glPolygonMode(GL_FRONT, GL_FILL);");
@@ -281,7 +221,10 @@ bool  TWorld::Init()
 	Global::lightPos[2] = GLfloat(lp.z);
 	Global::lightPos[3] = GLfloat(0.0f);
 
-	// glColor() ma zmieniać kolor wybrany w glColorMaterial()
+	WriteLog("glEnable(GL_NORMALIZE);");
+	glEnable(GL_NORMALIZE);
+	WriteLog("glEnable(GL_RESCALE_NORMAL);");
+	glEnable(GL_RESCALE_NORMAL);
 	WriteLog("glEnable(GL_COLOR_MATERIAL);");
 	glEnable(GL_COLOR_MATERIAL);
 	WriteLog("glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);");
@@ -307,6 +250,7 @@ bool  TWorld::Init()
 	WriteLog("glEnable(GL_LIGHTING);");
 	glEnable(GL_LIGHTING);
 
+// FOG SETUP ----------------------------------------------------------------------------------------------------------
 	WriteLog("glFogi(GL_FOG_MODE, GL_LINEAR);");
 	glFogi(GL_FOG_MODE, GL_LINEAR); // Fog Mode
 	WriteLog("glFogfv(GL_FOG_COLOR, FogColor);");
@@ -320,18 +264,17 @@ bool  TWorld::Init()
 	WriteLog("glEnable(GL_FOG);");
 	glEnable(GL_FOG); // Enables GL_FOG
 
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
-	ENALPHATEST(true);
-	ENDITHER(false);
-	ENMULTISAMPLE(false);
-	ENPOLYGONOFFSETLINE(true);
-	ENPOLYGONOFFSETPOINT(true);
-	ENPOLYGONSMOOTH(false);
-	ENSAMPLEALPHATOCOVERAGE(true);
-	ENSAMPLEALPHATOONE(true);
-	ENFRAMEBUFFERSRGB(false);
+
+	EN_ALPHATEST(true);
+	EN_DITHER(false);
+	EN_MULTISAMPLE(false);
+	EN_POLYGONOFFSETLINE(true);
+	EN_POLYGONOFFSETPOINT(true);
+	EN_POLYGONSMOOTH(false);
+	EN_SAMPLEALPHATOCOVERAGE(true);
+	EN_SAMPLEALPHATOONE(true);
+	EN_FRAMEBUFFERSRGB(false);
 
 	/*--------------------Render Initialization End---------------------*/
 
@@ -339,20 +282,18 @@ bool  TWorld::Init()
 	
 	Global::bGlutFont = false;
 
-	hDC = GetDC(0);
 
-	if (!Global::bGlutFont) { 
-		HFONT font; // Windows Font ID
-		Global::fbase = glGenLists(96); // storage for 96 characters
-		font = CreateFont(-15, 0, 0, 0, 
-		FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_DONTCARE | DEFAULT_PITCH, "Courier New"); 
-		SelectObject(hDC, font);
-		wglUseFontBitmapsA(hDC, 32, 96, Global::fbase); // builds 96 characters starting at character 32
-		WriteLog("Display Lists font used."); //+AnsiString(glGetError())
-	}
+	HFONT font; // Windows Font ID
+	Global::fbase = glGenLists(96); // storage for 96 characters
+	font = CreateFont(-15, 0, 0, 0, 
+	FW_NORMAL, 0, 0, 0, ANSI_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FF_DONTCARE | DEFAULT_PITCH, "Courier New"); 
+	SelectObject(hDC, font);
+	wglUseFontBitmapsA(hDC, 32, 96, Global::fbase); // builds 96 characters starting at character 32
+	WriteLog("Display Lists font used."); //+AnsiString(glGetError())
 
-	//Global::BuildFont();							    // Build The Font
-	QBuildFontX();					                //inicailizácia fontu
+
+  //Global::BuildFont();							
+	QBuildFontX();					              
 	BuildFont3D(hDC);
 	WriteLog("Font init OK"); 
 
@@ -366,14 +307,32 @@ bool  TWorld::Init()
 
     RenderLoader(hDC, 77, "SOUND INITIALIZATION...");
 	
-	Global::glPrintxy(110, 10, "MaSZyna 2", 0);
+	//Global::glPrintxy(110, 10, "MaSZyna 2", 0);
 	glfwSwapBuffers(Global::window);
 	Sleep(2400);
+
+	//cParser parser("scenery.scn", cParser::buffer_FILE, subpath, false);
+
 
 	//Camera.Init(Global::pFreeCameraInit[0], Global::pFreeCameraInitAngle[0]);
 	//Global::bFreeFlyModeFlag = true; //Ra: automatycznie włączone latanie
 	//Camera.Type = tp_Free;
 	//Camera.Reset();
+	WriteLog("CREATE TObject3d instance...");
+	TObject3d *O3D;
+	O3D = new TObject3d();
+	WriteLog("CREATE TObject3d instance OK.");
+
+	WriteLog("CREATE TSubObject instance...");
+	TSubObject *SO3D;
+	SO3D = new TSubObject();
+	WriteLog("CREATE TSubObject instance OK.");
+
+	char *Name;
+	char *newName ="zlksajdkjskdjs";
+	Name = new char[strlen(newName) + 1];
+
+	Clouds.Init();
 
 
 	Global::bActive = true;
@@ -392,7 +351,6 @@ void __fastcall TWorld::OnMouseMove(double x, double y)
 	Global::CAMERA.mWindowWidth = Global::iWindowWidth;
 	Global::CAMERA.mWindowHeight = Global::iWindowHeight;
 	Global::CAMERA.Mouse_Move();
-
 }
 
 void  TWorld::OnMouseWheel(float zDelta)
@@ -536,10 +494,10 @@ bool  TWorld::Render(double dt, int id)
     //Clouds.Render();
     glEnable(GL_FOG);
 
-	ENTEX(0);
+	EN_TEX(0);
 	RenderX();
 
-	ENTEX(0);
+	EN_TEX(0);
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	glColor4f(0.9f, 0.6f, 0.1f, 1.0f);
 	glPushMatrix();
@@ -548,7 +506,7 @@ bool  TWorld::Render(double dt, int id)
 
 
 	//switch2dRender();
-	ENTEX(0);
+	EN_TEX(0);
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	glColor4f(0.8f, 0.8f, 0.8f, 0.9f);
 	glLoadIdentity();
@@ -575,7 +533,7 @@ bool  TWorld::Render(double dt, int id)
 	//glColor4f(0.8f, 0.8f, 0.8f, 0.9f);
 	glPrint("----------------------------");
 
-	ENTEX(1);
+	EN_TEX(1);
 	sprintf_s(szBuffer, "Symulator Pojazdow Trakcyjnych MaSZyna 2");
 	TColor rgba = Global::SetColor(0.9f, 0.7f, 0.0f, 0.9f);
 	QglPrint_(2, 1, szBuffer, 1, rgba);

@@ -1,26 +1,10 @@
-// TRKFOLL.CPP 283
+//---------------------------------------------------------------------------
 
 /*
     MaSzyna EU07 locomotive simulator
     Copyright (C) 2001-2004  Marcin Wozniak and others
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-
-//#include    "system.hpp"
-//#include    "classes.hpp"
 
 
 #pragma hdrstop
@@ -30,248 +14,245 @@
 #include "trackfollower.h"
 #include "Globals.h"
 
-#define M_PI 3.14
-
-  void draw_axle_symbol(double r, int lats, int longs) {
-      int i, j;
-      for(i = 0; i <= lats; i++) {
-          double lat0 = M_PI * (-0.5 + (double) (i - 1) / lats);
-          double z0  = sin(lat0);
-          double zr0 =  cos(lat0);
- 
-          double lat1 = M_PI * (-0.5 + (double) i / lats);
-          double z1 = sin(lat1);
-          double zr1 = cos(lat1);
-
-		  glColor4f(0.9,0.2,0.2,0.8);
-		  glPushMatrix();
-          glScalef(0.3,0.3,0.3);
-          glFrontFace(GL_CW);
-          glBegin(GL_QUAD_STRIP);
-          for(j = 0; j <= longs; j++) {
-              double lng = 2 * M_PI * (double) (j - 1) / longs;
-              double x = cos(lng);
-              double y = sin(lng);
- 
-              glNormal3f(x * zr0, y * zr0, z0);
-              glVertex3f(x * zr0, y * zr0, z0);
-              glNormal3f(x * zr1, y * zr1, z1);
-              glVertex3f(x * zr1, y * zr1, z1);
-          }
-          glEnd();
-		  glPopMatrix();
-		  glFrontFace(GL_CCW);
-      }
-  }
-
-
 TTrackFollower::TTrackFollower()
 {
-    pCurrentTrack= NULL;
-    pCurrentSegment= NULL;
-    fCurrentDistance= 0;
-    pPosition= vector3(0,0,0);
-    fDirection= 1;
+ pCurrentTrack=NULL;
+ pCurrentSegment=NULL;
+ fCurrentDistance=0;
+ pPosition=vAngles=vector3(0,0,0);
+ fDirection=1; //jest przodem do Point2
+ fOffsetH=0.0; //na starcie stoi na œrodku
 }
 
 TTrackFollower::~TTrackFollower()
 {
 }
 
-bool TTrackFollower::Init(TTrack *pTrack, TDynamicObject *NewOwner, double fDir)
+bool TTrackFollower::Init(TTrack *pTrack,TDynamicObject *NewOwner,double fDir)
 {
-    fDirection= fDir;
-    Owner= NewOwner;
-    SetCurrentTrack(pTrack);
-    iEventFlag=0;
-    iEventallFlag=0;    
-    if ((pCurrentSegment))// && (pCurrentSegment->GetLength()<fFirstDistance))
-        return false;
-
-    return true;
-
+ fDirection=fDir;
+ Owner=NewOwner;
+ SetCurrentTrack(pTrack,0);
+ iEventFlag=3; //na torze startowym równie¿ wykonaæ eventy 1/2
+ iEventallFlag=3;
+ if ((pCurrentSegment))// && (pCurrentSegment->GetLength()<fFirstDistance))
+  return false;
+ return true;
 }
 
-bool TTrackFollower::Move(double fDistance, bool bPrimary)
-{
-    fDistance*= fDirection;
-    double s;
-    bool bCanSkip;
-    while (true)
+void TTrackFollower::SetCurrentTrack(TTrack *pTrack,int end)
+{//przejechanie na inny odcinkek toru, z ewentualnym rozpruciem
+ if (pTrack?pTrack->eType==tt_Switch:false) //jeœli zwrotnica, to przek³adamy j¹, aby uzyskaæ dobry segment
+ {int i=(end?pCurrentTrack->iNextDirection:pCurrentTrack->iPrevDirection);
+  if (i>0) //je¿eli wjazd z ostrza
+   pTrack->SwitchForced(i>>1,Owner); //to prze³o¿enie zwrotnicy - rozprucie!
+ }
+ if (!pTrack)
+ {//gdy nie ma toru w kierunku jazdy
+  //if (pCurrentTrack->iCategoryFlag&1) //jeœli tor kolejowy
+   pTrack=pCurrentTrack->NullCreate(end); //tworzenie toru wykolej¹cego na przed³u¿eniu pCurrentTrack
+ }
+ else
+ {//najpierw +1, póŸniej -1, aby odcinek izolowany wspólny dla tych torów nie wykry³ zera
+  pTrack->AxleCounter(+1,Owner); //zajêcie nowego toru
+  if (pCurrentTrack) pCurrentTrack->AxleCounter(-1,Owner); //opuszczenie tamtego toru
+ }
+ pCurrentTrack=pTrack;
+ pCurrentSegment=(pCurrentTrack?pCurrentTrack->CurrentSegment():NULL);
+};
+
+bool TTrackFollower::Move(double fDistance,bool bPrimary)
+{//przesuwanie wózka po torach o odleg³oœæ (fDistance), z wyzwoleniem eventów
+ //bPrimary=true - jest pierwsz¹ osi¹ w pojeŸdzie, czyli generuje eventy i przepisuje pojazd
+ //Ra: zwraca false, jeœli pojazd ma byæ usuniêty
+ fDistance*=fDirection; //dystans mno¿nony przez kierunek
+ double s;
+ bool bCanSkip; //czy przemieœciæ pojazd na inny tor
+ while (true)  //pêtla wychodzi, gdy przesuniêcie wyjdzie zerowe
+ {//pêtla przesuwaj¹ca wózek przez kolejne tory, a¿ do trafienia w jakiœ
+  if (!pCurrentTrack) return false; //nie ma toru, to nie ma przesuwania
+  if (pCurrentTrack->iEvents) //sumaryczna informacja o eventach
+  {//omijamy ca³y ten blok, gdy tor nie ma on ¿adnych eventów (wiêkszoœc nie ma)
+   if (fDistance<0)
+   {
+
+  //-  if (iSetFlag(iEventFlag,-1)) //zawsze zeruje flagê sprawdzenia, jak mechanik dosi¹dzie, to siê nie wykona
+  //-   if (Owner->Mechanik) //tylko dla jednego cz³onu
+  //-    if (bPrimary && pCurrentTrack->Event1 && (!pCurrentTrack->Event1->iQueued))
+  //-     Global::AddToQuery(pCurrentTrack->Event1,Owner); //dodanie do kolejki
+
+  //-  if (iSetFlag(iEventallFlag,-1)) //McZapkie-280503: wyzwalanie eventall dla wszystkich pojazdow
+  //-   if (bPrimary && pCurrentTrack->Eventall1 && (!pCurrentTrack->Eventall1->iQueued))
+  //-    Global::AddToQuery(pCurrentTrack->Eventall1,Owner); //dodanie do kolejki
+
+   }
+   else if (fDistance>0)
+   {
+   //- if (iSetFlag(iEventFlag,-2)) //zawsze ustawia flagê sprawdzenia, jak mechanik dosi¹dzie, to siê nie wykona
+   //-  if (Owner->Mechanik) //tylko dla jednego cz³onu
+   //-
+   //-   if (bPrimary && pCurrentTrack->Event2 && (!pCurrentTrack->Event2->iQueued))
+   //-    Global::AddToQuery(pCurrentTrack->Event2,Owner);
+
+   //- if (iSetFlag(iEventallFlag,-2)) //sprawdza i zeruje na przysz³oœæ, true jeœli zmieni z 2 na 0
+   //-  if (bPrimary && pCurrentTrack->Eventall2 && (!pCurrentTrack->Eventall2->iQueued))
+   //-   Global::AddToQuery(pCurrentTrack->Eventall2,Owner);
+
+   }
+   else //if (fDistance==0) //McZapkie-140602: wyzwalanie zdarzenia gdy pojazd stoi
+   {
+  //-  if (Owner->Mechanik) //tylko dla jednego cz³onu
+   //-  if (pCurrentTrack->Event0)
+   //-   if (!pCurrentTrack->Event0->iQueued)
+   //-    Global::AddToQuery(pCurrentTrack->Event0,Owner);
+
+   //- if (pCurrentTrack->Eventall0)
+  //-   if (!pCurrentTrack->Eventall0->iQueued)
+   //-   Global::AddToQuery(pCurrentTrack->Eventall0,Owner);
+
+   }
+ 
+  }
+
+  if (!pCurrentSegment) //je¿eli nie ma powi¹zanego segmentu toru?
+   return false;
+  //if (fDistance==0.0) return true; //Ra: jak stoi, to chyba dalej nie ma co kombinowaæ?
+  s=fCurrentDistance+fDistance; //doliczenie przesuniêcia
+  //Ra: W Point1 toru mo¿e znajdowaæ siê "dziura", która zamieni energiê kinetyczn¹
+  // ruchu wzd³u¿nego na energiê potencjaln¹, zamieniaj¹c¹ siê potem na energiê
+  // sprê¿ystoœci na amortyzatorach. Nale¿a³oby we wpisie toru umieœciæ wspó³czynnik
+  // podzia³u energii kinetycznej.
+  if (s<0)
+  {//jeœli przekroczenie toru od strony Point1
+   bCanSkip=bPrimary?pCurrentTrack->CheckDynamicObject(Owner):false;
+   if (bCanSkip) //tylko g³ówna oœ przenosi pojazd do innego toru
+    Owner->MyTrack->RemoveDynamicObject(Owner); //zdejmujemy pojazd z dotychczasowego toru
+   if (pCurrentTrack->iPrevDirection)
+   {//gdy kierunek bez zmiany (Point1->Point2)
+    SetCurrentTrack(pCurrentTrack->CurrentPrev(),0);
+    if (pCurrentTrack==NULL)
     {
-		/*
-        if (fDistance<0)
-         {
-          if (Owner->MoverParameters->CabNo!=0) //McZapkie-280503: wyzwalanie event tylko dla pojazdow z obsada
-           if (TestFlag(iEventFlag,1))
-            if (iSetFlag(iEventFlag,-1))
-              if (bPrimary && pCurrentTrack->Event1 && pCurrentTrack->Event1->fStartTime<=0)
-               {
-                //--  Global::pGround->AddToQuery(pCurrentTrack->Event1,Owner);
-               }
-          if (TestFlag(iEventallFlag,1))        //McZapkie-280503: wyzwalanie eventall dla wszystkich pojazdow
-            if (iSetFlag(iEventallFlag,-1))
-              if (bPrimary && pCurrentTrack->Eventall1 && pCurrentTrack->Eventall1->fStartTime<=0)
-               {
-                  Global::pGround->AddToQuery(pCurrentTrack->Eventall1,Owner);
-               }
-         }
-        if (fDistance>0)
-         {
-          if (Owner->MoverParameters->CabNo!=0)
-           if (TestFlag(iEventFlag,2))
-            if (iSetFlag(iEventFlag,-2))
-              if (bPrimary && pCurrentTrack->Event2 && pCurrentTrack->Event2->fStartTime<=0)
-               {
-                  Global::pGround->AddToQuery(pCurrentTrack->Event2,Owner);
-               }
-          if (TestFlag(iEventallFlag,2))
-            if (iSetFlag(iEventallFlag,-2))
-              if (bPrimary && pCurrentTrack->Eventall2 && pCurrentTrack->Eventall2->fStartTime<=0)
-               {
-                  Global::pGround->AddToQuery(pCurrentTrack->Eventall2,Owner);
-               }
-         }
-        if (fDistance==0) //McZapkie-140602: wyzwalanie zdarzenia gdy pojazd stoi
-         {
-          if (Owner->MoverParameters->CabNo!=0)
-           if (pCurrentTrack->Event0)
-            if (pCurrentTrack->Event0->fStartTime<=0 && pCurrentTrack->Event0->fDelay!=0)
-               {
-                  Global::pGround->AddToQuery(pCurrentTrack->Event0,Owner);
-               }
-          if (pCurrentTrack->Eventall0)
-            if (pCurrentTrack->Eventall0->fStartTime<=0 && pCurrentTrack->Eventall0->fDelay!=0)
-               {
-                  Global::pGround->AddToQuery(pCurrentTrack->Eventall0,Owner);
-               }
-         }
-		*/
-        if (!pCurrentSegment)
-            return false;
-        s= fCurrentDistance+fDistance;
-        (pCurrentTrack->eType);
-        if (s<0)
-        {
-            bCanSkip= bPrimary & pCurrentTrack->CheckDynamicObject(Owner);
-            if (bCanSkip)
-                pCurrentTrack->RemoveDynamicObject(Owner);
-            if (pCurrentTrack->bPrevSwitchDirection)
-            {
-                SetCurrentTrack(pCurrentTrack->CurrentPrev());
-                fCurrentDistance= 0;
-                fDistance= -s;
-                fDirection= -fDirection;
-                if (pCurrentTrack==NULL)
-                {
-                    //--Error(Owner->MoverParameters->Name+" at NULL track");
-                    return false;
-                }
-            }
-            else
-            {
-                SetCurrentTrack(pCurrentTrack->CurrentPrev());
-                if (pCurrentTrack==NULL)
-                {
-                    //--Error(Owner->MoverParameters->Name+" at NULL track");
-                    return false;
-                }
-                fCurrentDistance= pCurrentSegment->GetLength();
-                fDistance= s;
-            }
-            if (bCanSkip)
-             {
-                pCurrentTrack->AddDynamicObject(Owner);
-                iEventFlag= 3; //McZapkie-020602: umozliwienie uruchamiania event1,2 po zmianie toru
-                iEventallFlag= 3; //McZapkie-280503: jw, dla eventall1,2
-             }
-//event1 przesuniete na gore
-            continue;
-        }
-        else
-        if (s>pCurrentSegment->GetLength())
-        {
-            bCanSkip= bPrimary & pCurrentTrack->CheckDynamicObject(Owner);
-            if (bCanSkip)
-                pCurrentTrack->RemoveDynamicObject(Owner);
-            if (pCurrentTrack->bNextSwitchDirection)
-            {
-                fDistance= -(s-pCurrentSegment->GetLength());
-                SetCurrentTrack(pCurrentTrack->CurrentNext());
-                if (pCurrentTrack==NULL)
-                {
-                    //--Error(Owner->MoverParameters->Name+" at NULL track");
-                    return false;
-                }
-                fCurrentDistance= pCurrentSegment->GetLength();
-                fDirection= -fDirection;
-            }
-            else
-            {
-                fDistance= s-pCurrentSegment->GetLength();
-                SetCurrentTrack(pCurrentTrack->CurrentNext());
-                fCurrentDistance= 0;
-                if (pCurrentTrack==NULL)
-                {
-                    //--Error(Owner->MoverParameters->Name+" at NULL track");
-                    return false;
-                }
-            }
-            if (bCanSkip)
-             {
-                pCurrentTrack->AddDynamicObject(Owner);
-                iEventFlag= 3; //McZapkie-020602: umozliwienie uruchamiania event1,2 po zmianie toru
-                iEventallFlag= 3;
-             }
-//event2 przesuniete na gore
-            continue;
-        }
-        else
-        {
-            if (bPrimary)
-            {
-                if (Owner->MoverParameters->CabNo!=0)
-                 {
-                  //if (pCurrentTrack->Event1 && pCurrentTrack->Event1->fDelay<=-1.0f)
-                  //  Global::pGround->AddToQuery(pCurrentTrack->Event1,Owner);
-                  //if (pCurrentTrack->Event2 && pCurrentTrack->Event2->fDelay<=-1.0f)
-                  //  Global::pGround->AddToQuery(pCurrentTrack->Event2,Owner);
-                 }
-                //if (pCurrentTrack->Eventall1 && pCurrentTrack->Eventall1->fDelay<=-1.0f)
-                //    Global::pGround->AddToQuery(pCurrentTrack->Eventall1,Owner);
-                //if (pCurrentTrack->Eventall2 && pCurrentTrack->Eventall2->fDelay<=-1.0f)
-                //    Global::pGround->AddToQuery(pCurrentTrack->Eventall2,Owner);
-            }
-            fCurrentDistance= s;
-            fDistance= 0;
-            return ComputatePosition();
-        }
+     WriteLogSS(Owner->MoverParameters->Name+" at NULL track", "ERROR");
+     return false; //wyjœcie z b³êdem
     }
-}
-
+    fCurrentDistance=pCurrentSegment->GetLength();
+    fDistance=s;
+   }
+   else
+   {//gdy zmiana kierunku toru (Point1->Point1)
+    SetCurrentTrack(pCurrentTrack->CurrentPrev(),0); //ustawienie (pCurrentTrack)
+    fCurrentDistance=0;
+    fDistance=-s;
+    fDirection=-fDirection;
+    if (pCurrentTrack==NULL)
+    {
+     WriteLogSS(Owner->MoverParameters->Name+" at NULL track", "ERROR");
+     return false; //wyjœcie z b³êdem
+    }
+   }
+   if (bCanSkip)
+   {//jak g³ówna oœ, to dodanie pojazdu do nowego toru
+    pCurrentTrack->AddDynamicObject(Owner);
+    iEventFlag=3; //McZapkie-020602: umozliwienie uruchamiania event1,2 po zmianie toru
+    iEventallFlag=3; //McZapkie-280503: jw, dla eventall1,2
+    if (!Owner->MyTrack) return false;
+   }
+   continue;
+  }
+  else if (s>pCurrentSegment->GetLength())
+  {//jeœli przekroczenie toru od strony Point2
+   bCanSkip=bPrimary?pCurrentTrack->CheckDynamicObject(Owner):false;
+   if (bCanSkip) //tylko g³ówna oœ przenosi pojazd do innego toru
+    Owner->MyTrack->RemoveDynamicObject(Owner); //zdejmujemy pojazd z dotychczasowego toru
+   if (pCurrentTrack->iNextDirection)
+   {//gdy zmiana kierunku toru (Point2->Point2)
+    fDistance=-(s-pCurrentSegment->GetLength());
+    SetCurrentTrack(pCurrentTrack->CurrentNext(),1);
+    if (pCurrentTrack==NULL)
+    {
+     WriteLogSS(Owner->MoverParameters->Name + " at NULL track", "ERROR");
+     return false; //wyjœcie z b³êdem
+    }
+    fCurrentDistance=pCurrentSegment->GetLength();
+    fDirection=-fDirection;
+   }
+   else
+   {//gdy kierunek bez zmiany (Point2->Point1)
+    fDistance=s-pCurrentSegment->GetLength();
+    SetCurrentTrack(pCurrentTrack->CurrentNext(),1);
+    fCurrentDistance=0;
+    if (pCurrentTrack==NULL)
+    {
+	 WriteLogSS(Owner->MoverParameters->Name + " at NULL track", "ERROR");
+     return false; //wyjœcie z b³êdem
+    }
+   }
+   if (bCanSkip)
+   {//jak g³ówna oœ, to dodanie pojazdu do nowego toru
+    pCurrentTrack->AddDynamicObject(Owner);
+    iEventFlag=3; //McZapkie-020602: umozliwienie uruchamiania event1,2 po zmianie toru
+    iEventallFlag=3;
+    if (!Owner->MyTrack) return false;
+   }
+   continue;
+  }
+  else
+  {//gdy zostaje na tym samym torze (przesuwanie ju¿ nie zmienia toru)
+   if (bPrimary)
+   {//tylko gdy pocz¹tkowe ustawienie, dodajemy eventy stania do kolejki
+    if (Owner->MoverParameters->ActiveCab!=0)
+    //if (Owner->MoverParameters->CabNo!=0)
+    {
+    //- if (pCurrentTrack->Event1 && pCurrentTrack->Event1->fDelay<=-1.0f)
+    //-  Global::AddToQuery(pCurrentTrack->Event1,Owner);
+    //- if (pCurrentTrack->Event2 && pCurrentTrack->Event2->fDelay<=-1.0f)
+    //-  Global::AddToQuery(pCurrentTrack->Event2,Owner);
+    }
+    //-if (pCurrentTrack->Eventall1 && pCurrentTrack->Eventall1->fDelay<=-1.0f)
+    //- Global::AddToQuery(pCurrentTrack->Eventall1,Owner);
+    //-if (pCurrentTrack->Eventall2 && pCurrentTrack->Eventall2->fDelay<=-1.0f)
+   //-  Global::AddToQuery(pCurrentTrack->Eventall2,Owner);
+   }
+   fCurrentDistance=s;
+   //fDistance=0;
+   return ComputatePosition(); //przeliczenie XYZ, true o ile nie wyjecha³ na NULL
+  }
+ }
+};
 
 bool TTrackFollower::ComputatePosition()
-{
-    if (pCurrentSegment)
-    {
-        pPosition= pCurrentSegment->GetPoint(fCurrentDistance);
-        return true;
-    }
-    return false;
+{//ustalenie wspó³rzêdnych XYZ
+ if (pCurrentSegment) //o ile jest tor
+ {
+  //pPosition=pCurrentSegment->GetPoint(fCurrentDistance); //wyliczenie z dystansu od Point1
+  pCurrentSegment->RaPositionGet(fCurrentDistance,pPosition,vAngles);
+  if (fDirection<0) //k¹ty zale¿¹ jeszcze od zwrotu na torze
+  {vAngles.x=-vAngles.x; //przechy³ka jest w przecinw¹ stronê
+   vAngles.y=-vAngles.y; //pochylenie jest w przecinw¹ stronê
+   vAngles.z+=M_PI; //ale kierunek w planie jest obrócony o 180° 
+  }
+  if (fOffsetH!=0.0)
+  {//jeœli przesuniêcie wzglêdem osi toru, to je doliczyæ
+
+  }
+  return true;
+ }
+ return false;
 }
 
-bool TTrackFollower::Render()
-{
-    glPushMatrix();
-        glTranslatef(pPosition.x, pPosition.y, pPosition.z);
-        glRotatef(-90,1,0,0);
-        //glutSolidCone(5,10,4,1);
-		draw_axle_symbol(0.5, 12, 12);
-    glPopMatrix();
-
-	return true;
+void TTrackFollower::Render(float fNr)
+{//funkcja rysuj¹ca sto¿ek w miejscu osi
+ glPushMatrix(); //matryca kamery
+  glTranslatef(pPosition.x,pPosition.y+6,pPosition.z); //6m ponad
+  glRotated(RadToDeg(-vAngles.z),0,1,0); //obrót wzglêdem osi OY
+  //glRotated(RadToDeg(vAngles.z),0,1,0); //obrót wzglêdem osi OY
+  glDisable(GL_LIGHTING);
+  glColor3f(1.0-fNr,fNr,0); //czerwone dla 0, zielone dla 1
+  //glutWireCone(promieñ podstawy,wysokoœæ,k¹tnoœæ podstawy,iloœæ segmentów na wysokoœæ)
+  //-glutWireCone(0.5,2,4,1); //rysowanie sto¿ka (ostros³upa o podstawie wieloboka)
+  glEnable(GL_LIGHTING);
+ glPopMatrix();
 }
 
 //---------------------------------------------------------------------------
 
-#pragma package(smart_init)

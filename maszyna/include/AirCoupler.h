@@ -3,6 +3,8 @@
 #ifndef AirCouplerH
 #define AirCouplerH
 
+#include "../commons.h"
+#include "../commons_usr.h"
 #include "Model3d.h"
 //#include "QueryParserComp.hpp"
 

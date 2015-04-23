@@ -9,6 +9,7 @@
 #include "commons.h"
 #include "commons_usr.h"
 
+TAnimModel *Global::pTerrainCompact = NULL; //do zapisania terenu w pliku
 TGround *Global::pGround = NULL;
 char **Global::argv = NULL;
 HWND Global::hWnd = NULL; // 
@@ -39,7 +40,16 @@ double Global::FPS = 0.0f;
 float Global::fdt = 0.0f;
 float Global::fms = 0.0f;
 float Global::FOV = 45.0f;
+float Global::fFogStart = 10.0f;
+float Global::fFogEnd = 90.0f;
+double Global::fMoveLight = -1; //ruchome œwiat³o
+double Global::fLuminance = 1.0; //jasnoœæ œwiat³a do automatycznego zapalania
+float Global::fDistanceFactor = 0;
+float Global::fLatitudeDeg = 10.0f;
+float Global::fSunSpeed = 2.0f;
+float Global::fTimeAngleDeg = 2.0f;
 
+bool Global::bDoubleAmbient = false; //podwójna jasnoœæ ambient
 bool Global::detonatoryOK = false;
 bool Global::bFreeFly = false;
 bool Global::bFreeFlyModeFlag = false;
@@ -55,6 +65,8 @@ bool Global::bUseVBO = false;
 bool Global::bWireFrame = false;
 bool Global::bOpenGL_1_5 = false;
 bool Global::bRenderAlpha = true;
+bool Global::bLoadTraction = false;
+bool Global::bRollFix = true;
 int Global::iReCompile = 0;
 int Global::iPARSERBYTESPASSED = 0;
 int Global::iNODES = 0;
@@ -71,6 +83,9 @@ int Global::iRailProFiltering = 0;
 int Global::iBallastFiltering = 0;
 int Global::iWriteLogEnabled = 1;
 int Global::iMultiplayer = 0;
+int Global::iCameraLast = 0;
+int Global::iSegmentsRendered = 5;
+int Global::iConvertModels = 6; //tworzenie plików binarnych, 2-optymalizacja transformów
 float Global::fOpenGL = 0.0;
 std::string Global::KEYCODE = "0";
 std::string Global::KEYCOMMAND = "NONE";
@@ -80,6 +95,9 @@ std::string Global::szDefaultExt = ".bmp";
 std::string Global::asCurrentDynamicPath = "dynamic\\eu07\\";
 std::string Global::asCurrentSceneryPath = "scenery\\";
 std::string Global::asLang = "pl";
+std::string Global::asSky = "1";
+std::string Global::asTerrainModel = ""; //nazwa obiektu terenu do zapisania w pliku
+std::string Global::asCurrentTexturePath = std::string(szDefaultTexturePath);
 
 GLuint Global::boxtex = NULL;
 GLuint Global::balltex = NULL;
@@ -246,6 +264,10 @@ std::string Global::GETCWD()
 	
 }
 
+bool __fastcall Global::AddToQuery(TEvent *event, TDynamicObject *who)
+{
+	return pGround->AddToQuery(event, who);
+};
 
 // ********************************************************************************************************************************
 // MIN0R
@@ -308,3 +330,4 @@ int Sign(int v)
 {
 	return v > 0 ? 1 : (v < 0 ? -1 : 0);
 }
+

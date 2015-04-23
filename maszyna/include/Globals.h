@@ -4,6 +4,7 @@
 
 #include "ground.h"
 #include "camerax.h"   
+
 //#include "shaders.h"  
 #define qPI 3.14159
 
@@ -225,7 +226,15 @@ public:
 	static float fms;
 	static float FOV;
 	static float tracksegmentlen;
-
+	static float fFogStart;
+	static float fFogEnd;
+	static float fDistanceFactor;
+	static float fLatitudeDeg;
+	static float fSunSpeed;
+	static float fTimeAngleDeg;
+	static bool bDoubleAmbient; //podwójna jasnoœæ ambient
+	static double fMoveLight; //numer dnia w roku albo -1
+	static double fLuminance; //jasnoœæ œwiat³a do automatycznego zapalania
 	static bool detonatoryOK;
 	static bool bFreeFly;
 	static bool bFreeFlyModeFlag;
@@ -240,6 +249,8 @@ public:
 	static bool bWireFrame;
 	static bool bOpenGL_1_5;
 	static bool bRenderAlpha;
+	static bool bLoadTraction;
+	static bool bRollFix;
 	static int iReCompile; //zwiêkszany, gdy trzeba odœwie¿yæ siatki
 	static bool bUseVBO; //czy jest VBO w karcie graficznej
 	static int iPARSERBYTESPASSED;
@@ -258,6 +269,9 @@ public:
 	static int iBallastFiltering;
 	static int iWriteLogEnabled;
 	static int iMultiplayer;
+	static int iCameraLast;
+	static int iSegmentsRendered;
+	static int iConvertModels;
 	static std::string KEYCODE;
 	static std::string KEYCOMMAND;
 	static std::string asCWD;
@@ -266,6 +280,10 @@ public:
 	static std::string asCurrentDynamicPath;
 	static std::string asCurrentSceneryPath;
 	static std::string asLang;
+	static std::string asSky;
+	static std::string asTerrainModel; //nazwa obiektu terenu do zapisania w pliku
+	static std::string asCurrentTexturePath;
+	static TAnimModel *pTerrainCompact; //obiekt terenu do ewentualnego zapisania w pliku
 
 	static GLuint boxtex;
 	static GLuint balltex;
@@ -290,6 +308,7 @@ public:
 	static GLvoid BuildFont(GLvoid);
 	static GLvoid KillFont(GLvoid);
 	static double CALCULATEFPS();
+	static bool AddToQuery(TEvent *event, TDynamicObject *who);
 };
 
 //---------------------------------------------------------------------------

@@ -2,35 +2,35 @@
 #ifndef MdlMngrH
 #define MdlMngrH
 
-#include "../commons.h"
-#include "../commons_usr.h"
 
+#include "Model3d.h"
+#include "Object3d.h"
+#include "usefull.h"
 
 class TMdlContainer
 {
-    friend class TModelsManager;
-    __fastcall TMdlContainer() { Name= NULL; Model= NULL; };
-    __fastcall ~TMdlContainer() { SafeDeleteArray(Name); SafeDelete(Model); };
-    TModel3d* __fastcall LoadModel(char *newName, bool dynamic);
-    TModel3d *Model;
+public:
+	TObject3d *Model3D;
+    //friend class TModelsManager;
+    TMdlContainer();
+	~TMdlContainer();
+	TObject3d* LoadModel(static char *newName, bool dynamic);
+    
     char *Name;
 };
 
 class TModelsManager
 {
-private:
-//    CD3DFile** Models;
-    static TMdlContainer *Models;
-    static int Count;
-    static TModel3d* __fastcall LoadModel(char *Name, bool dynamic);
+	
 public:
-//    __fastcall TModelsManager();
-//    __fastcall ~TModelsManager();
-   int static __fastcall Init();
-   int static __fastcall Free();
+	static int Count;
+	static TObject3d* LoadModel(static char *Name, bool dynamic);
+	static TMdlContainer* Models;
+    static void Init();
+    static void Free();
 //McZapkie: dodalem sciezke, notabene Path!=Patch :)
-    static int __fastcall LoadModels(char *asModelsPathc);
-    static TModel3d* __fastcall GetModel(char *Name, bool dynamic=false); 
+	static int LoadModels(std::string asModelsPathC);
+	static TObject3d* GetModel(static char *Name, bool dynamic = false);
 };
 //---------------------------------------------------------------------------
 #endif

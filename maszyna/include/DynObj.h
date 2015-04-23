@@ -7,6 +7,7 @@
 
 
 //#include "QueryParserComp.hpp"
+#include "model3d.h"
 #include "AnimModel.h"
 #include "mover.h"
 #include "mtable.h"

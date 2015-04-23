@@ -41,4 +41,7 @@
 #include "Model3d.h"
 #include "Traction.h"
 #include "Flags.h"
+#include "float3d.h"
+#include "MdlMngr.h"
+#include "object3d.h"
 #endif 

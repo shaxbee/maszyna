@@ -1,9 +1,26 @@
 #ifndef _World_H_
 #define _World_H_
 
-#include "commons.h"
-#include "commons_usr.h"
+#include "../commons.h"
+#include "../commons_usr.h"
 #include "cstring.h"
+#include "model3d.h"
+#include "object3d.h"
+#include "classes.h"
+
+
+class TSky
+{
+private:
+	TAnimModel *anCloud;
+	TObject3d *mdCloud;
+public:
+	TSky();
+	~TSky();
+	void Init();
+	void Render();
+};
+
 class TWorld
 {
 public:
@@ -24,7 +41,7 @@ public:
    ~TWorld();
   
 private:
-
+	TSky Clouds;
     bool  RenderX();
 
 public:

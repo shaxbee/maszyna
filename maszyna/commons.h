@@ -23,7 +23,7 @@
 #include <FLOAT.H>
 #include <sys/types.h>
 #include <sys/stat.h>
-//#include <urlmon.h> //"urlmon.h: No such file or directory found"
+#include <urlmon.h> //"urlmon.h: No such file or directory found"
 #include <winhttp.h>
 
 #define GLEW_STATIC // <- NO ZESZ KURWA JA PIERDOLE ;)
@@ -43,7 +43,7 @@
 
 
 //#pragma comment(lib, "urlmon.lib")
-//#pragma comment(lib, "WinInet.lib")
+#pragma comment(lib, "WinInet.lib")
 #pragma comment(lib, "winhttp.lib")
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "dsound.lib")

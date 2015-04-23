@@ -330,6 +330,7 @@ public:
  inline TSubModel* GetSMRoot() {return(Root);};
  //double Radius; //Ra: nie u¿ywane
  TModel3d();
+// TModel3d(char *FileName);
  ~TModel3d();
  TSubModel* GetFromName(const char *sName);
  //TMaterial* GetMaterialFromName(char *sName);

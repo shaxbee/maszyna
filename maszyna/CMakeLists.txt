@@ -33,10 +33,20 @@ set(MASZYNA_SOURCES
 	segment.cpp
 	trackfollower.cpp
 	track.cpp
+	download.cpp
 	pdownloader.cpp
+	float3d.cpp
+	animmodel.cpp
+	model3d.cpp
+	mdlmngr.cpp
+	ground.cpp
+        download.cpp
+	vbo.cpp
 )
 
 set(MASZYNA_HEADERS
+	include/usefull.h/
+	include/trace.h
 	include/dumb3d.h
 	include/sysinfo.h
 	include/Globals.h
@@ -61,12 +71,33 @@ set(MASZYNA_HEADERS
 	include/ResourceManager.h
 	include/data.h
 	include/names.h
+	include/texture.h
 	include/segment.h
 	include/trackfollower.h
+	include/pdownloader.h
         include/track.h
+	include/classes.h
+	include/flags.h
+	include/float3d.h
+	include/animmodel.h
+	include/model3d.h
+	include/mdlmngr.h
 )
+
+set(Q_LIB_DIRS C:\\DEPENDIENCES\\devil)
+message("${Q_LIB_DIRS}")
+LINK_DIRECTORIES(${Q_LIB_DIRS}/)
+
+
 
 add_executable(maszyna ${MASZYNA_SOURCES} ${MASZYNA_HEADERS})
 target_include_directories(maszyna PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(maszyna glfw glm glew)
 target_compile_definitions(maszyna PRIVATE -DGLBINDING_STATIC)
+
+ADD_DEPENDENCIES(maszyna copy_bar.ini)
+FIND_LIBRARY( WIN32_COMCTRL devil.lib 
+		PATHS 
+			"C:/DEPENDIENCES/devil" 	
+		DOC "Path to psdk"
+	) 
