@@ -1,51 +1,48 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(maszyna)
 
+option(GTEST_ROOT:STRING "Location of GTest source package")
+
 find_package(glew 1.12.0 REQUIRED CONFIG)
 find_package(glfw3 REQUIRED CONFIG)
 find_package(glm REQUIRED CONFIG)
 
 set(MASZYNA_SOURCES
-	main.cpp
-	globals.cpp
-	logs.cpp
-	console.cpp
-	camera.cpp
-	camerax.cpp
-	dumb3d.cpp
-	world.cpp
-	trace.cpp
-	texture.cpp
-	texturedds.cpp
-	xbitmap_font.cpp
-	sound.cpp
-	wavread.cpp
-	parser.cpp
-	timer.cpp
-	realsound.cpp
-	fadesound.cpp
-	advsound.cpp
-	cstring.cpp
-	gui.cpp
-	classes.cpp
-	ResourceManager.cpp
-	names.cpp
-	segment.cpp
-	trackfollower.cpp
-	track.cpp
-	download.cpp
-	pdownloader.cpp
-	float3d.cpp
-	animmodel.cpp
-	model3d.cpp
-	mdlmngr.cpp
-	ground.cpp
-        download.cpp
-	vbo.cpp
+	src/main.cpp
+	src/globals.cpp
+	src/logs.cpp
+	src/console.cpp
+	src/camera.cpp
+	src/camerax.cpp
+	src/dumb3d.cpp
+	src/world.cpp
+	src/trace.cpp
+	src/texture.cpp
+	src/texturedds.cpp
+	src/xbitmap_font.cpp
+	src/sound.cpp
+	src/wavread.cpp
+	src/parser.cpp
+	src/timer.cpp
+	src/realsound.cpp
+	src/fadesound.cpp
+	src/advsound.cpp
+	src/cstring.cpp
+	src/gui.cpp
+	src/classes.cpp
+	src/ResourceManager.cpp
+	src/names.cpp
+	src/segment.cpp
+	src/trackfollower.cpp
+	src/track.cpp
+    src/model3d.cpp
+    src/mdlmngr.cpp
+    src/ground.cpp
+    src/vbo.cpp
 )
 
 set(MASZYNA_HEADERS
-	include/usefull.h/
+	include/usefull.h
 	include/trace.h
 	include/dumb3d.h
 	include/sysinfo.h
@@ -74,8 +71,7 @@ set(MASZYNA_HEADERS
 	include/texture.h
 	include/segment.h
 	include/trackfollower.h
-	include/pdownloader.h
-        include/track.h
+    include/track.h
 	include/classes.h
 	include/flags.h
 	include/float3d.h
@@ -84,20 +80,25 @@ set(MASZYNA_HEADERS
 	include/mdlmngr.h
 )
 
-set(Q_LIB_DIRS C:\\DEPENDIENCES\\devil)
-message("${Q_LIB_DIRS}")
-LINK_DIRECTORIES(${Q_LIB_DIRS}/)
-
-
-
 add_executable(maszyna ${MASZYNA_SOURCES} ${MASZYNA_HEADERS})
 target_include_directories(maszyna PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(maszyna glfw glm glew)
-target_compile_definitions(maszyna PRIVATE -DGLBINDING_STATIC)
+target_compile_definitions(maszyna PRIVATE -DGLEW_STATIC)
 
-ADD_DEPENDENCIES(maszyna copy_bar.ini)
-FIND_LIBRARY( WIN32_COMCTRL devil.lib 
-		PATHS 
-			"C:/DEPENDIENCES/devil" 	
-		DOC "Path to psdk"
-	) 
+set(MASZYNA_TESTS
+    test/format_test.cpp
+)
+
+add_executable(maszyna_test 
+    ${MASZYNA_TESTS} 
+    "${GMOCK_ROOT}/fused-src/gmock-gtest-all.cc"
+    "${GMOCK_ROOT}/fused-src/gmock_main.cc"
+)
+target_include_directories(maszyna_test PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${GMOCK_ROOT}/gtest/include"
+    "${GMOCK_ROOT}/include"
+)
+set_target_properties(maszyna_test PROPERTIES 
+    CXX_STANDARD 11 
+    CXX_STANDARD_REQUIRED ON)

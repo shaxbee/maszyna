@@ -37,12 +37,13 @@ ExternalProject_Add(
 
 ExternalProject_Add(
     maszyna
-    DEPENDS glfw glew glm
+    DEPENDS glfw glew glm googlemock
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/maszyna
-	CMAKE_ARGS
+    CMAKE_CACHE_ARGS
 		-Dglfw3_DIR:STRING=${CMAKE_BINARY_DIR}/Build/glfw
 		-Dglew_DIR:STRING=${CMAKE_BINARY_DIR}/Build/glew
 		-Dglm_DIR:STRING=${CMAKE_BINARY_DIR}/Build/glm
+        -DGMOCK_ROOT:STRING=${CMAKE_BINARY_DIR}/Source/googlemock
     INSTALL_COMMAND ""
 )
 
