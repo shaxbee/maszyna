@@ -1,55 +1,64 @@
-
-#if !defined(rainKERNELTEXTPARSER_H_INCLUDED)
-#define rainKERNELTEXTPARSER_H_INCLUDED
-
-#pragma warning ( disable : 4786 )    // 'containers too long for debug' warning
+#ifndef PARSER_H
+#define PARSER_H
 
 #include <string>
-#include <sstream>
-#include <map>
-#include <vector>
-#include <fstream>
-#include <ctype.h>
+#include <istream>
+#include <tuple>
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-// cParser -- generic class for parsing text data, either from file or provided string
-
-class cParser : public std::stringstream
-{
-public:
- //parameters:
- enum buffertype {buffer_FILE,buffer_TEXT};
- //constructors:
- cParser(std::string Stream,buffertype Type=buffer_TEXT,std::string Path="",bool tr=true);
- //destructor:
- virtual ~cParser();
- //methods:
- template <typename OutputT>
-  inline void getToken(OutputT& output) {getTokens(); *this >> output;};
- inline void ignoreToken() {readToken();};
- inline void ignoreTokens(int count) {for (int i=0;i<count;i++) readToken();};
- inline bool expectToken(std::string value) {return readToken()==value;};
- bool eof() {return mStream->eof();};
- bool ok() {return !mStream->fail();};
- bool getTokens(int Count=1,bool ToLower=true,const char* Break="\n\t ;");
- int getProgress() const;	// percentage of file processed.
- //load traction?
- bool LoadTraction;
-protected:
- // methods:
- std::string readToken(bool ToLower=true,const char* Break="\n\t ;");
- std::string readComment(const std::string Break="\n\t ;");
- std::string trtest;
- bool trimComments(std::string& String);
- // members:
- std::istream *mStream;	 // relevant kind of buffer is attached on creation.
- std::string mPath;	 // path to open stream, for relative path lookups.
- int mSize;		 // size of open stream, for progress report.
- typedef std::map<std::string,std::string> commentmap;
- commentmap mComments;
- cParser *mIncludeParser; // child class to handle include directives.
- std::vector<std::string> parameters;	// parameter list for included file.
+struct Location {
+    std::size_t line;
+    std::size_t column;
 };
 
-#endif // ..!defined(rainKERNELTEXTPARSER_H_INCLUDED)
+class ParseError: public std::runtime_error {
+public:
+    explicit ParseError(const std::string& what, const Location location):
+        std::runtime_error(what), _location(location) { }
+    virtual ~ParseError() { }
 
+    const Location& location();
+
+private:
+    const Location _location;
+};
+
+class Parser
+{
+public:
+    explicit Parser(std::istream& input, const std::string delim = " \t");
+
+    const Location& location() const {
+        return _location;
+    }
+
+    void ignoreToken();
+
+    std::string readString();
+    std::int32_t readInt32();
+    std::uint32_t readUInt32();
+    std::int64_t readInt64();
+    std::uint64_t readUInt64();
+    float readFloat();
+    double readDouble();
+
+    bool expectToken(const std::string expected);
+    bool expectToken(const char* expected);
+
+private:
+    struct Token {
+        std::size_t pos;
+        std::size_t len;
+    };
+
+    Token readToken();
+    
+    template <typename T>
+    T checkAndAdvance(T val, const Token& token, char* end);
+
+    std::istream& _input;
+    const std::string _delim;
+    std::string _line;
+    Location _location;
+};
+
+#endif

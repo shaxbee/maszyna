@@ -85,12 +85,20 @@ target_include_directories(maszyna PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include"
 target_link_libraries(maszyna glfw glm glew)
 target_compile_definitions(maszyna PRIVATE -DGLEW_STATIC)
 
-set(MASZYNA_TESTS
+enable_testing()
+
+set(MASZYNA_TEST_SOURCES
     test/format_test.cpp
+    test/parser_test.cpp
+)
+
+set(MASZYNA_TEST_SUBJECTS
+    src/parser.cpp
 )
 
 add_executable(maszyna_test 
-    ${MASZYNA_TESTS} 
+    ${MASZYNA_TEST_SOURCES}
+    ${MASZYNA_TEST_SUBJECTS}
     "${GMOCK_ROOT}/fused-src/gmock-gtest-all.cc"
     "${GMOCK_ROOT}/fused-src/gmock_main.cc"
 )
@@ -102,3 +110,5 @@ target_include_directories(maszyna_test PRIVATE
 set_target_properties(maszyna_test PROPERTIES 
     CXX_STANDARD 11 
     CXX_STANDARD_REQUIRED ON)
+
+add_test(NAME maszyna_test COMMAND maszyna_test)
